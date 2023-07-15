@@ -25,6 +25,10 @@ lua << EOF
 
   require("lazy").setup("plugins", {
     defaults = { lazy = true },
+    dev = {
+        path = "~/s/nvim/",
+        patterns = {},
+      }
     })
 
   -- automatically compile and load Fennel code as if it were natively
