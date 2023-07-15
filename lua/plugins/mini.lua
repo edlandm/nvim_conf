@@ -1,0 +1,148 @@
+-- vim: set foldmethod=marker
+return {
+  'echasnovski/mini.nvim',
+  version = false,
+  lazy = false,
+  priority = 998, -- load this after tmux-navigate
+  config = function()
+    -- extend/create a/i (around/in) text-objects
+    require("mini.ai").setup({
+        search_method = 'cover_or_prev',
+    })
+    -- Align - align text using motions+objects (`gl`)
+    require("mini.align").setup({
+        mappings = {
+            start = 'gl',
+            start_with_preview = 'gL',
+        },
+    })
+
+    -- {{{ Animate - animations when scrolling, moving cursor, resizing windows
+    local animate = require("mini.animate")
+    animate.setup({
+      cursor = { timing = animate.gen_timing.exponential({ duration = 3 }) },
+      scroll = { timing = animate.gen_timing.quartic({ duration = 3 }) },
+      resize = { timing = animate.gen_timing.exponential({ duration = 3 }) },
+      open   = { timing = animate.gen_timing.quadratic({ duration = 10 }) },
+      close  = { timing = animate.gen_timing.quadratic({ duration = 10 }) },
+    }) -- }}}
+
+    -- {{{ Basics - common configuration presets
+    require("mini.basics").setup({
+      mappings = {
+        option_toggle_prefix = [[<leader>o]],
+        basics        = true,
+        windows       = true,
+        move_with_alt = false,
+      }
+    })
+    -- delete the keymaps I don't like
+    vim.keymap.del({'n', 'i', 'v'}, '<c-s>')
+    vim.keymap.del({'n', 'i'}, '<c-z>')
+    -- }}}
+
+    require("mini.bracketed").setup() -- go forward/backward with [brackets]
+    vim.keymap.del('n', ']d')
+    vim.keymap.del('n', ']D')
+    vim.keymap.del('n', '[d')
+    vim.keymap.del('n', '[D')
+
+    -- {{{ Comments - toggle comments on objects+motions
+    require("mini.comment").setup({
+      mappings = {
+        comment      = '<leader>c',
+        comment_line = '<leader>cc',
+        textobject   = '<leader>c',
+      }
+    })
+    vim.keymap.set('n', '<leader>cy', 'yy<leader>cc',
+      { remap = true, silent = true, desc = "yank line and comment it" })
+    vim.keymap.set('i', ';c', '<cmd>lua MiniComment.toggle_lines(vim.fn.line("."), vim.fn.line("."))<cr>',
+    { desc = "comment current line" })
+    -- }}}
+
+    require("mini.cursorword").setup() -- underline word under cursor
+
+    -- {{{ HiPatterns - highlight patterns in text
+    -- also highlight hex color strings using that color
+    local hipatterns = require('mini.hipatterns')
+    hipatterns.setup({
+      highlighters = {
+        -- Highlight standalone 'FIXME', 'WARNING', 'TODO', 'NOTE'
+        fixme = { pattern = '%f[%w]()FIXME()%f[%W]', group = 'MiniHipatternsFixme' },
+        hack  = { pattern = '%f[%w]()WARNING()%f[%W]',  group = 'MiniHipatternsWarning'  },
+        todo  = { pattern = '%f[%w]()TODO()%f[%W]',  group = 'MiniHipatternsTodo'  },
+        note  = { pattern = '%f[%w]()NOTE()%f[%W]',  group = 'MiniHipatternsNote'  },
+        -- Highlight hex color strings (`#rrggbb`) using that color
+        hex_color = hipatterns.gen_highlighter.hex_color(),
+      },
+    }) -- }}}
+
+    -- {{{ IndentScope: add indent text objects and draw line at current indent
+    local indentscope = require("mini.indentscope")
+    indentscope.setup({
+      draw = {
+        delay = 0,
+        -- animation = indentscope.gen_animation.none()
+        animation = indentscope.gen_animation.cubic({ duration = 8 })
+      },
+      options = {
+        border = "none"
+      }
+    }) -- }}}
+
+    -- {{{ Move - move selections of text
+    require("mini.move").setup({
+      mappings = {
+        left  = "<",
+        right = ">",
+        up    = "{",
+        down  = "}",
+        -- I don't care about these mappings for moving the current line
+        line_left  = "",
+        line_right = "",
+        line_up    = "",
+        line_down  = "",
+      }}) -- }}}
+
+    require("mini.pairs").setup()     -- autopairs: () [] {} <> '' ""
+    require("mini.splitjoin").setup() -- split/join args/items with `gS`
+
+    require("mini.statusline").setup() -- statusline
+
+    -- {{{ Surround - surround text-objects/motions with pairs of characters
+    require("mini.surround").setup({
+      mappings = {
+        add            = 'ys', -- Add surrounding in Normal and Visual modes
+        delete         = 'ds', -- Delete surrounding
+        replace        = 'cs', -- Replace surrounding
+        find           = '',   -- Find surrounding (to the right)
+        find_left      = '',   -- Find surrounding (to the left)
+        highlight      = '',   -- Highlight surrounding
+        update_n_lines = '',   -- Update `n_lines`
+        suffix_last    = '',   -- Suffix to search with "prev" method
+        suffix_next    = '',   -- Suffix to search with "next" method
+      },
+      search_method = 'cover_or_next',
+    })
+    -- Remap adding surrounding to Visual mode selection
+    vim.keymap.del('x', 'ys')
+    vim.keymap.set('x', 'S', [[:<C-u>lua MiniSurround.add('visual')<CR>]], { silent = true })
+        -- Make special mapping for "add surrounding for line"
+        vim.keymap.set('n', 'yss', '^ys$', { remap = true, desc = "surround current line" })
+    -- }}}
+
+    require("mini.tabline").setup() -- simple tabline
+
+    -- {{{ Trailspace - trim trailing spaces/empty-lines from the current buffer
+    local trailspace = require("mini.trailspace")
+    trailspace.setup()
+    vim.keymap.set('n', '<leader>ts', '<cmd>lua MiniTrailspace.trim(); MiniTrailspace.trim_last_lines()<cr>',
+      { silent = true, desc = "removing trailing spaces and trailing empty lines"})
+    -- }}}
+  end,
+  dependencies = {
+    'nvim-tree/nvim-web-devicons',
+    'lewis6991/gitsigns.nvim',
+  }
+}
