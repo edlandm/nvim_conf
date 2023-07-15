@@ -15,7 +15,8 @@
 (defn- unmap [mode ...]
   "unmap keybindings for the given mode(s)"
   (each [_ mapping (ipairs [...])]
-    (vim.keymap.del (assert mode "mode required") mapping)))
+    (when (not= "" (vim.fn.maparg mapping mode))
+        (vim.keymap.del (assert mode "mode required") mapping))))
 ;;;; }}}
 
 ;;;; {{{ Normal Mode Mappings
