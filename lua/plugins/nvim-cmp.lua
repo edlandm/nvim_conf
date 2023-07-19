@@ -74,7 +74,7 @@ return {
             label = '[tmux]',
           },
         },
-        -- { name = 'codeium' },
+        { name = 'codeium' },
       })
     })
 
