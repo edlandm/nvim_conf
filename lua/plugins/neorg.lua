@@ -15,7 +15,13 @@ return {
       ['core.keybinds'] = {
         config = {
           hook = function(keybinds)
+            -- continue list object
             keybinds.remap_key("norg", "i", "<M-CR>", ";n")
+
+            -- edit a code-block in its own buffer
+            keybinds.map("norg", "n", "<localleader>ec",
+              "<cmd>Neorg keybind all core.looking-glass.magnify-code-block<cr>",
+              { desc = "edit code-block"})
           end,
         }
       }
