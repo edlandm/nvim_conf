@@ -106,10 +106,6 @@
   [[:InsertEnter] {:pattern :* :command "set nolist"}]
   [[:InsertLeave] {:pattern :* :command "set list"}]) ; }}}
 ;;; }}}
-;; TODO: commands
-;; TODO: plugins -- https://github.com/folke/lazy.nvim
-;; TODO: mappings
-;; TODO: commands
 
 ;; source machine-local config file
 (vim.cmd "silent! source ~/.nvim.local.lua")
