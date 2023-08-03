@@ -97,8 +97,6 @@
   ["'" "`" {:desc "jump to line+column of a mark"}]
   [:<c-c> #(vim.cmd "echo ''") {:desc "clear status-line"}]
   [:<c-e> :3<c-e> {:desc "scroll up"}]
-  [:<c-d> :<c-d>zz {:desc "scroll half-page down"}]
-  [:<c-u> :<c-u>zz {:desc "scroll half-page up"}]
   [:<c-w><c-d> toggle-window-diff {:expr true :desc "toggle diff-mode in current tab"}]
   [:<c-w><c-v> "<cmd>vertical wincmd f<cr>" {:desc "open file under cursor in vertical split"}]
   [:<c-w>z "<cmd>wincmd _ | wincmd |<cr>" {:desc "open file under cursor in vertical split"}]
