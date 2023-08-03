@@ -5,6 +5,7 @@ return {
   build = ':TSUpdate',
   cmd = { "TSUpdateSync" },
   dependencies = {
+    { 'nvim-treesitter/playground' },
     { 'romgrk/nvim-treesitter-context',
       opts = {
         enable = true, -- Enable this plugin (Can be enabled/disabled later via commands)
