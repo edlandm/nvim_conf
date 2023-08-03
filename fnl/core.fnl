@@ -113,5 +113,5 @@
 
 ;; set default color-scheme (if it was not set in local config)
 (let [colorscheme vim.g.colors_name]
-  (when (or (= nil colorscheme) (= "default" colorscheme))
+  (when (or (not colorscheme) (= "default" colorscheme))
     (vim.cmd.colorscheme "habamax")))
