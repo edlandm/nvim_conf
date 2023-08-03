@@ -1,3 +1,7 @@
 return {
-  'edkolev/tmuxline.vim'
+  'edkolev/tmuxline.vim',
+  cmd = {
+    'Tmuxline',
+    'TmuxlineSnapshot',
+  }
 }
