@@ -22,7 +22,7 @@
   :cursorline
   :expandtab
   :ignorecase
-  :lazyredraw
+  ; :lazyredraw - disabled for noice.nvim
   :list
   :number
   :relativenumber
