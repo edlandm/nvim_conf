@@ -32,6 +32,7 @@
   :splitright
   :termguicolors
   :wildignorecase
+  :wrap
   [:cdpath "~/,.,./*"]
   [:completeopt "longest,menuone,preview"]
   [:diffopt "filler,vertical,iwhite,hiddenoff"]
