@@ -1,6 +1,6 @@
 return {
   'neovim/nvim-lspconfig',
-  lazy = false,
+  event = "VeryLazy",
   config = function()
     require('lspconfig').rust_analyzer.setup({
       settings = {
