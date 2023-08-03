@@ -139,7 +139,7 @@
   [:S "j@:" {:desc "repeat the last command on the next line"}]
   [:s :j. {:desc "repeat the last edit on the next line"}]
   [:Y :y$ {:desc "yank to end of line"}]
-  [:z< #(set vim.wo.foldlevel (+ -1 vim.wo.foldlevel)) {:desc "decrement foldlevel"}]
+  [:z< #(set vim.wo.foldlevel (if (> vim.wo.foldlevel 0) (+ -1 vim.wo.foldlevel) 0)) {:desc "decrement foldlevel"}]
   [:z> #(set vim.wo.foldlevel (+ 1 vim.wo.foldlevel))  {:desc "increment foldlevel"}]
   ["z," #(set vim.wo.foldlevel (+ -1 (vim.fn.foldlevel (vim.fn.line ".")))) {:desc "set foldlevel to one less than current line"}]
   ["z." #(set vim.wo.foldlevel (vim.fn.foldlevel (vim.fn.line "."))) {:desc "set foldlevel to current line"}]
