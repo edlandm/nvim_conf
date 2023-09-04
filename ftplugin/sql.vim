@@ -4,7 +4,7 @@ if exists("b:sql_loaded") " {{{ quit if already loaded
 endif
 let b:sql_loaded = 1 " }}}
 " {{{ settings
-setlocal noexpandtab
+setlocal expandtab
 setlocal noshiftround
 setlocal tabstop=4
 setlocal shiftwidth=4
