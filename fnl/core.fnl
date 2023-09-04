@@ -85,6 +85,20 @@
   [:netrw_browsex_viewer "xdg-open"]) ; }}}
 ;;;; }}}
 ;;; {{{ autocommands
+;; {{{ cd to the directory of the first file in the argument list
+(defn- cd-to-argdir []
+  (let [dir (-?> (or (. (vim.fn.argv) 1) (vim.api.nvim_buf_get_name 1))
+                 (#(.. (string.gsub $ "[^/]*$" "")))
+                 (#(if (= "/" (string.sub $ 1 1))
+                     $
+                     (.. "./" $))))]
+    (when dir
+      (vim.cmd.cd [dir]))))
+(set vim.g.cd_to_argdir cd-to-argdir)
+(ac.augroup :cd-to-argdir
+  [[:VimEnter]
+   {:pattern :*
+    :command "call g:cd_to_argdir()"}]) ; }}}
 ;; {{{ return to last edit position when opening files
 (ac.augroup :jump-to-last-edit-pos
   [[:BufReadPost]
