@@ -194,11 +194,14 @@
 (define-mappings "i"
   [:hh "<esc>" {:desc "exit insert mode"}]
   [:hn "<esc>" {:desc "exit insert mode"}]
-  [";]" #(do (set vim.o.paste true) (vim.cmd "call system(\"tmux paste-buffer\")") (set vim.o.paste false)) {:desc "lowercase current word"}]
+  [";]" #(do (set vim.o.paste true) (vim.cmd "call system(\"tmux paste-buffer\")") (set vim.o.paste false)) {:desc "paste from tmux clipboard"}]
   [";l" "<c-o>b<c-o>guiw<c-o>e<c-o>a" {:desc "lowercase current word"}]
   [";s" "<c-o>z=" {:desc "correct mispelled word"}]
   [";u" "<c-o>b<c-o>gUiw<c-o>e<c-o>a" {:desc "uppercase current word"}]
   [";=" "<c-o>==" {:desc "indent current line with `=`"}]
+  ;; training myself to use the builtin mappings
+  ["<<" "<cmd>echo \"use <c-d> to dedent\"<cr>" {:desc "decrease indent"}]
+  [">>" "<cmd>echo \"use <c-t> to indent\"<cr>" {:desc "increase indent"}]
   [:<c-a> :<c-o>^ {:desc "move cursor to beginning of line"}]
   [:<c-e> :<c-o>$ {:desc "move cursor to end of line"}]
   ["<c-r><c-r>" :<c-r>+ {:desc "paste from system clipboard"}]
