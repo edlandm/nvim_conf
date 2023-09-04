@@ -6,6 +6,11 @@ return {
       ['core.concealer'] = {},
       ['core.export'] = {},
       ['core.itero'] = {},
+      ['core.completion'] = {
+        config = {
+          engine = "nvim-cmp",
+        }
+      },
       ['core.presenter'] = {
         config = {
           zen_mode = "zen-mode",
