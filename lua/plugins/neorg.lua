@@ -40,6 +40,11 @@ return {
         }
       },
       ['core.export'] = {},
+      ['core.journal'] = {
+        config = {
+          strategy = "flat",
+        }
+      },
     },
   },
   dependencies = {
