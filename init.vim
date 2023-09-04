@@ -27,7 +27,9 @@ lua << EOF
     defaults = { lazy = true },
     dev = {
         path = "~/s/nvim/",
-        patterns = {},
+        patterns = {
+          "_local_",
+        },
       }
     })
 
