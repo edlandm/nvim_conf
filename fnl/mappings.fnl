@@ -199,8 +199,6 @@
   [";s" "<c-o>z=" {:desc "correct mispelled word"}]
   [";u" "<c-o>b<c-o>gUiw<c-o>e<c-o>a" {:desc "uppercase current word"}]
   [";=" "<c-o>==" {:desc "indent current line with `=`"}]
-  ["<<" :<c-d> {:desc "decrease indent"}]
-  [">>" :<c-t> {:desc "increase indent"}]
   [:<c-a> :<c-o>^ {:desc "move cursor to beginning of line"}]
   [:<c-e> :<c-o>$ {:desc "move cursor to end of line"}]
   ["<c-r><c-r>" :<c-r>+ {:desc "paste from system clipboard"}]
