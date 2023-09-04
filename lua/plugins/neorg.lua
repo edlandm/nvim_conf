@@ -58,7 +58,4 @@ return {
     'nvim-treesitter/nvim-treesitter',
   },
   ft = 'norg',
-  keys = {
-    { "<c-r><c-l>", "{<c-r><c-+>}[]<left>", { desc = "paste link from system clipboard" }},
-  }
 }
