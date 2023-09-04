@@ -20,12 +20,12 @@ return {
       ['core.keybinds'] = {
         config = {
           hook = function(keybinds)
-            -- continue list object
-            keybinds.remap_key("norg", "i", "<M-CR>", ";n")
             keybinds.unmap("all", "n", "gO") -- originally mapped to open table-of-contents
             keybinds.unmap("all", "n", "go") -- originally mapped to open table-of-contents
 
-            -- edit a code-block in its own buffer
+            keybinds.remap_key("norg", "i", "<M-CR>", ";n",
+              { desc = "start new list entry" })
+
             keybinds.map("norg", "n", "<localleader>ec",
               "<cmd>Neorg keybind all core.looking-glass.magnify-code-block<cr>",
               { desc = "edit code-block"})
