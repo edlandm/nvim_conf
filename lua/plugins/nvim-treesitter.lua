@@ -84,7 +84,8 @@ return {
       enable = true
     },
     indent = {
-      enable = true
+      enable = true,
+      disable = { "sql" },
     },
     ensure_installed = {
       "bash",
