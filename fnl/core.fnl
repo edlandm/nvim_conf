@@ -40,6 +40,7 @@
   [:equalalways false]
   [:fileencodings "utf-8,default,latin1"]
   [:foldopen "insert,percent,quickfix,tag,undo,mark"]
+  [:foldlevelstart 1]
   [:fillchars "fold: "]
   ;; TODO: find a way to write this in lua
   ; [:foldtext "util#get_foldtext()"]
