@@ -121,12 +121,6 @@ return {
 
           return MiniStatusline.combine_groups({
             { hl = mode_hl,                  strings = { mode } },
-            { hl = 'MiniStatuslineModeCommand',  strings = {
-              -- display if we're recording a macro
-              require("noice").api.statusline.mode.has()
-                and vim.fn.split(require("noice").api.statusline.mode.get(), " ")[2]
-                or ""
-            } },
             { hl = 'MiniStatuslineDevinfo',  strings = { git, diagnostics } },
             '%<', -- Mark general truncate point
             { hl = 'MiniStatuslineFilename', strings = { filename } },
