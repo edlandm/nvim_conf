@@ -101,6 +101,18 @@
        (when (not= input :<CANCELLED>)
          (vim.cmd (.. "keeppatterns " s "," e "s/" cword "/" input "/g")))))
 
+(defn- global-do [start end cursor]
+  "prompt for a command to run on all lines containing <cword>"
+  (let [[_ curline curcol] cursor]
+        (vim.fn.cursor curline curcol))
+  (let [s (if (< start end) start end)
+        e (if (< start end) end start)
+        cword (.. "\\<" (vim.fn.expand "<cword>") "\\>")
+        input (vim.fn.input {:prompt (.. "Replace /" cword "/ with: ")
+                             :cancelreturn :<CANCELLED>})]
+       (when (not= input :<CANCELLED>)
+         (vim.cmd (.. "keeppatterns " s "," e "g/" cword "/" input "/g")))))
+
 (defn- operator [f]
   "set the given function as the operator function then start the motion"
   (let [cursor (vim.fn.getcurpos)]
@@ -151,6 +163,8 @@
   [:<leader>m #(operator yeet-move) {:desc "move current line to end of motion"}]
   [:<leader>ns #(operator substitute) {:desc "substitute <cword> within motion with a given word"}]
   [:<leader>nss #(substitute 1 (vim.fn.line "$") (vim.fn.getcurpos)) {:desc "substitute <cword> within motion with a given word"}]
+  [:<leader>ng #(operator global-do) {:desc "global-do <cword> within motion with a given word"}]
+  [:<leader>ngg #(global-do 1 (vim.fn.line "$") (vim.fn.getcurpos)) {:desc "global-do <cword> within the current buffer"}]
   [:<leader>Q :<cmd>q!<cr> {:desc "quit without saving"}]
   [:<leader>q :<cmd>q<cr> {:desc "quit"}]
   [:<leader>s #(operator yeet-swap) {:desc "swap lines with motion"}]
