@@ -7,7 +7,7 @@ return {
   opts = { "max-perf" },
   keys = {
     { "<c-p>", "<cmd>lua require('fzf-lua').files()<cr>", },
-    { "<tab>", "<cmd>lua require('fzf-lua').buffers()<cr>", },
+    { "<leader><tab>", "<cmd>lua require('fzf-lua').buffers({ sort_lastused = false })<cr>", },
     { "<leader>/,", "<cmd>lua require('fzf-lua').lines()<cr>",
       desc = "FZF: lines in open buffers"},
     { "<leader>/.", "<cmd>lua require('fzf-lua').blines()<cr>",
