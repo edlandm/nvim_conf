@@ -113,6 +113,8 @@
                      (set _G.op_fn nil)))
      (set vim.go.operatorfunc "v:lua.op_fn")
      (nvim.feedkeys "g@" "i" false)))
+
+(set _G.operator operator)
 ;;; }}}
 
 (define-mappings "n"
