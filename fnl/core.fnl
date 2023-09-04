@@ -54,7 +54,7 @@
   [:path "~/,."]
   [:pumheight 15]
   [:scrolloff 3]
-  [:sessionoptions "blank,buffers,curdir,folds,options,localoptions,tabpages,winsize,"]
+  [:sessionoptions "blank,buffers,curdir,options,localoptions,tabpages,winsize,"]
   [:shelltemp false]
   [:shiftwidth 4]
   [:suffixes ".bak,~,.o,.h,.info,.swp,.obj,.pyc"]
