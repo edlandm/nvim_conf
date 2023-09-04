@@ -6,6 +6,13 @@ return {
       ['core.concealer'] = {},
       ['core.export'] = {},
       ['core.itero'] = {},
+      ['core.dirman'] = {
+        config = {
+          workspaces = {
+            nvim = "~/.config/nvim",
+          },
+        },
+      },
       ['core.completion'] = {
         config = {
           engine = "nvim-cmp",
