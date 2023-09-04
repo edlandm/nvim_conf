@@ -36,7 +36,7 @@ return {
         ['<c-d>'] = cmp.mapping.scroll_docs(4),
         ['<c-n>'] = cmp.mapping.select_next_item(),
         ['<c-p>'] = cmp.mapping.select_prev_item(),
-        ['<c-e>'] = cmp.mapping.abort(),
+        ['<c-space>'] = cmp.mapping.abort(),
         -- ['<tab>']  = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
         -- attempt to emulate super-tab behavior
         ["<tab>"] = cmp.mapping(function(fallback)
