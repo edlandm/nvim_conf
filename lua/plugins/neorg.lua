@@ -22,6 +22,8 @@ return {
           hook = function(keybinds)
             -- continue list object
             keybinds.remap_key("norg", "i", "<M-CR>", ";n")
+            keybinds.unmap("all", "n", "gO") -- originally mapped to open table-of-contents
+            keybinds.unmap("all", "n", "go") -- originally mapped to open table-of-contents
 
             -- edit a code-block in its own buffer
             keybinds.map("norg", "n", "<localleader>ec",
