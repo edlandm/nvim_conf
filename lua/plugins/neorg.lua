@@ -38,7 +38,8 @@ return {
               { desc = "Jump to Link (Vertical Split)" })
           end,
         }
-      }
+      },
+      ['core.export'] = {},
     },
   },
   dependencies = {
