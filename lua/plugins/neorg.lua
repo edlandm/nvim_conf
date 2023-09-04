@@ -32,6 +32,10 @@ return {
 
             keybinds.map("norg", "n", "<localleader><leader>", "<cmd>Neorg toc qflist<cr>",
               { desc = "open table-of-contents in quickfix list"})
+
+            keybinds.remap("norg", "n", "<localleader><cr>",
+              "<cmd>Neorg keybind all core.esupports.hop.hop-link vsplit<cr>",
+              { desc = "Jump to Link (Vertical Split)" })
           end,
         }
       }
