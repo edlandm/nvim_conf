@@ -157,11 +157,15 @@ return {
     -- Remap adding surrounding to Visual mode selection
     vim.keymap.del('x', 'ys')
     vim.keymap.set('x', 'S', [[:<C-u>lua MiniSurround.add('visual')<CR>]], { silent = true })
-        -- Make special mapping for "add surrounding for line"
-        vim.keymap.set('n', 'yss', '^ys$', { remap = true, desc = "surround current line" })
+    -- Make special mapping for "add surrounding for line"
+    -- TODO: fix mini.surround so that it will automatically grab the line (minus
+    -- leading whitespace) to surround the text in lines.
+    -- having it depend on a motion does not make surrounding linewise
+    -- a repeatable action without recordings
+    vim.keymap.set('n', 'yss', '^ys$', { remap = true, desc = "surround current line" })
     -- }}}
 
-    require("mini.tabline").setup() -- simple tabline
+    -- require("mini.tabline").setup({}) -- simple tabline
 
     -- {{{ Trailspace - trim trailing spaces/empty-lines from the current buffer
     local trailspace = require("mini.trailspace")
