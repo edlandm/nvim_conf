@@ -67,6 +67,28 @@
     (vim.fn.cursor curline curcol)))
 ;; }}}
 
+(defn- append [start end cursor]
+  "prompt for a string to append to the end of the given range"
+  (let [[_ curline curcol] cursor]
+        (vim.fn.cursor curline curcol))
+  (let [s (if (< start end) start end)
+        e (if (< start end) end start)
+        input (vim.fn.input {:prompt (.. "Append: ")
+                             :cancelreturn :<CANCELLED>})]
+       (when (not= input :<CANCELLED>)
+         (vim.cmd (.. "keeppatterns " s "," e "s/$/" input "/g")))))
+
+(defn- prepend [start end cursor]
+  "prompt for a string to append to the end of the given range"
+  (let [[_ curline curcol] cursor]
+        (vim.fn.cursor curline curcol))
+  (let [s (if (< start end) start end)
+        e (if (< start end) end start)
+        input (vim.fn.input {:prompt (.. "Prepend: ")
+                             :cancelreturn :<CANCELLED>})]
+       (when (not= input :<CANCELLED>)
+         (vim.cmd (.. "keeppatterns " s "," e "s/^/" input "/g")))))
+
 (defn- substitute [start end cursor]
   "replace <cword> with a prompted string"
   (let [[_ curline curcol] cursor]
@@ -114,6 +136,7 @@
   [:<leader>bD :<cmd>:bwipeout!<cr> {:desc "delete buffer ignoring unsaved changes"}]
   [:<leader>bo "<cmd>silent! execute \"bd|e#|bd#\"<cr>" {:desc "delete all buffers except the current one"}]
   [:<leader>cs "0C<C-R>=repeat(\"=\",<Space>78)<CR><Esc>0R<C-R>\"<Space><Esc>" {:desc "add section marker to end of line"}]
+  [:<leader>a #(operator append) {:desc "append a string to lines in <motion>"}]
   [:<leader>C #(operator yeet-copy) {:desc "copy current line to end of motion"}]
   [:<leader>D "<cmd>%delete _<cr>" {:desc "delete all lines in buffer"}]
   [:<leader>d #(operator yeet-delete) {:desc "delete line at the end of motion"}]
@@ -122,6 +145,7 @@
   [:<leader>fi "<cmd>set fdm=indent<cr>" {:desc "set fold-method to indent"}]
   [:<leader>fm "<cmd>set fdm=marker<cr>" {:desc "set fold-method to marker"}]
   [:<leader>fs "<cmd>set fdm=syntax<cr>" {:desc "set fold-method to syntax"}]
+  [:<leader>i #(operator prepend) {:desc "prepend a string to lines in <motion>"}]
   [:<leader>m #(operator yeet-move) {:desc "move current line to end of motion"}]
   [:<leader>ns #(operator substitute) {:desc "substitute <cword> within motion with a given word"}]
   [:<leader>nss #(substitute 1 (vim.fn.line "$") (vim.fn.getcurpos)) {:desc "substitute <cword> within motion with a given word"}]
