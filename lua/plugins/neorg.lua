@@ -58,4 +58,5 @@ return {
     'nvim-treesitter/nvim-treesitter',
   },
   ft = 'norg',
+  cmd = 'Neorg',
 }
