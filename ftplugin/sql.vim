@@ -19,6 +19,9 @@ let delimitMate_matchpairs = "(:),[:],{:}"
 " }}}
 " {{{ commands
 command! -range AliasColumns keeppatterns <line1>,<line2> s/\s*,\?\zs\(\w\+\.\)\?\(@\?\w\+\)/[\2] = \1\2/
+command! -range FixCommas keeppatterns <line1>s/^\(\t\| {4}\)*\zs[^,[:space:]]/ &/e
+      \| keeppatterns <line1>+1,<line2>s/^\s*\zs[^,[:space:]]/,&/e
+      \| keeppatterns <line1>,<line2>s/,\s*$//e
 " }}}
 " {{{ mappings
 " {{{ text object for SELECT clause (all fields) of SQL statement
@@ -142,5 +145,9 @@ vnoremap <buffer> <silent> <leader>i :!sql project table_insert<cr>
 "    @pick_id                ->    [@pick_id]          = @pick_id
 "   ,@pick_qty_in_tote       ->   ,[@pick_qty_in_tote] = @pick_qty_in_tote
 vmap <buffer> <leader>,] :AliasColumns<cr>gvgl=
+
+" prepend each line at the current indent level with a comma (except prepend
+" the first such line with a space)
+vnoremap <localleader>f, :FixCommas<cr>
 " }}}
 " }}}
