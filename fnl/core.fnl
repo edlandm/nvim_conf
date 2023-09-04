@@ -70,6 +70,7 @@
   ;; next two options disable "Thanks for Flying Vim" message
   [:title false]
   [:titleold ""]
+  [:viewoptions "cursor"]
   [:wildignore ".hg,.git,.svn,*.aux,*.out,*.toc,*.jpg,*.bmp,*.gif,*.png,*.jpeg,*.o,*.obj,*.exe,*.dll,*.manifest,#.spl,#.sw?,#.DS_Store,#.pyc"]
   [:wildmode "list:longest"]
   ) ; }}}
