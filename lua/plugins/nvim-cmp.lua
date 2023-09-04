@@ -87,6 +87,23 @@ return {
         })
     })
 
+    -- Set configuration for specific filetype.
+    cmp.setup.filetype('norg', {
+      sources = cmp.config.sources({
+        { name = 'neorg' },
+        { name = 'luasnip' },
+        { name = 'buffer' },
+        { name = 'tmux',
+          option = {
+            -- Source from all panes in session instead of adjacent panes
+            all_panes = true,
+            -- Completion popup label
+            label = '[tmux]',
+          },
+        },
+      })
+    })
+
     -- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore).
     cmp.setup.cmdline({ '/', '?' }, {
       mapping = cmp.mapping.preset.cmdline(),
