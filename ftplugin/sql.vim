@@ -78,6 +78,14 @@ nnoremap <buffer> <silent> <localleader>yp <cmd>keeppatterns 0/CREATE PROCEDURE/
 " yank sprocname (based off of filename)
 nnoremap <buffer> <silent> <localleader>yn <cmd>keeppatterns let @"=expand("%:t:r")<cr>
 
+" expand temp-table/table-variable from shorthand
+" table definitions can take the form of
+" @table_var_name(field1, field2)
+" #temp_table_name(field1, field2)
+" or
+" @table_var_name:field1, field2
+" #temp_table_name:field1, field2
+nnoremap <buffer><localleader>et <cmd>.!prodb expand table<cr>
 " }}}
 " {{{ VISUAL
 " uppercase all sql keywords
