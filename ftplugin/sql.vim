@@ -100,6 +100,6 @@ vmap <buffer> <leader>,] :AliasColumns<cr>gvgl=
 
 " prepend each line at the current indent level with a comma (except prepend
 " the first such line with a space)
-vnoremap <localleader>f, :FixCommas<cr>
+vnoremap <buffer><localleader>f, :FixCommas<cr>
 " }}}
 " }}}
