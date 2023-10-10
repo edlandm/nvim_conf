@@ -170,6 +170,8 @@
   [:<leader>G ":%g/" {:desc "do command globally"}]
   [:<leader>i #(operator prepend) {:desc "prepend a string to lines in <motion>"}]
   [:<leader>m #(operator yeet-move) {:desc "move current line to end of motion"}]
+  [:<leader>nc #(vim.cmd (.. "vimgrep /" (cword true) "/ %")) {:desc "quickfix <cword> in current file"}]
+  [:<leader>nC #(vim.cmd (.. "vimgrep /" (cword true) "/ " (vim.fn.getcwd) "/**/*")) {:desc "quickfix <cword> in working directory"}]
   [:<leader>ns #(operator substitute) {:desc "substitute <cword> within motion with a given word"}]
   [:<leader>nss #(substitute 1 (vim.fn.line "$") (vim.fn.getcurpos)) {:desc "substitute <cword> within the current buffer"}]
   [:<leader>ng #(operator global-do) {:desc "global-do <cword> within motion with a given word"}]
