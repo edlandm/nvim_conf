@@ -12,6 +12,7 @@ setlocal foldmethod=indent
 setlocal suffixesadd=.sql
 setlocal foldignore=
 setlocal commentstring=--\ %s
+let g:sql_type_default = 'sqlserver'
 
 " {{{ plugin-specific settings
 " delimitMate autocompleting angle brackets <> was messing with my shorthand
