@@ -103,7 +103,7 @@
         (vim.fn.cursor curline curcol))
   (let [s (if (< start end) start end)
         e (if (< start end) end start)
-        cword (.. "\\<" (vim.fn.expand "<cword>") "\\>")
+        cword (cword true)
         input (vim.fn.input {:prompt (.. "Replace /" cword "/ with: ")
                              :cancelreturn :<CANCELLED>})]
        (when (not= input :<CANCELLED>)
@@ -115,7 +115,7 @@
         (vim.fn.cursor curline curcol))
   (let [s (if (< start end) start end)
         e (if (< start end) end start)
-        cword (.. "\\<" (vim.fn.expand "<cword>") "\\>")
+        cword (cword true)
         input (vim.fn.input {:prompt (.. "Replace /" cword "/ with: ")
                              :cancelreturn :<CANCELLED>})]
        (when (not= input :<CANCELLED>)
