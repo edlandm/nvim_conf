@@ -11,6 +11,7 @@ setlocal shiftwidth=4
 setlocal foldmethod=indent
 setlocal suffixesadd=.sql
 setlocal foldignore=
+setlocal commentstring=--\ %s
 
 " {{{ plugin-specific settings
 " delimitMate autocompleting angle brackets <> was messing with my shorthand
