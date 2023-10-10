@@ -42,6 +42,14 @@ return {
 
     -- {{{ Comments - toggle comments on objects+motions
     require("mini.comment").setup({
+      options = {
+        ignore_blank_line = true,
+        custom_commentstring = function(pos)
+          if vim.bo.commentstring then
+            return vim.bo.commentstring
+          end
+        end
+      },
       mappings = {
         comment      = '<leader>c',
         comment_line = '<leader>cc',
