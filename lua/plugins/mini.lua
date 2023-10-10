@@ -9,13 +9,6 @@ return {
     require("mini.ai").setup({
         search_method = 'cover_or_prev',
     })
-    -- Align - align text using motions+objects (`gl`)
-    require("mini.align").setup({
-        mappings = {
-            start = 'gl',
-            start_with_preview = 'gL',
-        },
-    })
 
     -- {{{ Animate - animations when scrolling, moving cursor, resizing windows
     local animate = require("mini.animate")
