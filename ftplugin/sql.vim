@@ -86,6 +86,18 @@ nnoremap <buffer> <silent> <localleader>yn <cmd>keeppatterns let @"=expand("%:t:
 " @table_var_name:field1, field2
 " #temp_table_name:field1, field2
 nnoremap <buffer><localleader>et <cmd>.!prodb expand table<cr>
+
+function! SqlExpandInsert()
+  let l:pieces = split(split(getline("."), ' ')[0], ':')
+  if len(l:pieces) == 2
+    exe ".!prodb -p " .. l:pieces[0] .. " generate insert " .. l:pieces[1]
+  elseif len(l:pieces) == 1
+    exe ".!prodb generate insert " .. l:pieces[0]
+  else
+    echo "no table found"
+  endif
+endfunction
+nnoremap <buffer><localleader>ei <cmd>call SqlExpandInsert()<cr>
 " }}}
 " {{{ VISUAL
 " uppercase all sql keywords
