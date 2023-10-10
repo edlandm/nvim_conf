@@ -212,9 +212,6 @@
   [";s" "<c-o>z=" {:desc "correct mispelled word"}]
   [";u" "<c-o>b<c-o>gUiw<c-o>e<c-o>a" {:desc "uppercase current word"}]
   [";=" "<c-o>==" {:desc "indent current line with `=`"}]
-  ;; training myself to use the builtin mappings
-  ["<<" "<cmd>echo \"use <c-d> to dedent\"<cr>" {:desc "decrease indent"}]
-  [">>" "<cmd>echo \"use <c-t> to indent\"<cr>" {:desc "increase indent"}]
   [:<c-a> :<c-o>^ {:desc "move cursor to beginning of line"}]
   [:<c-e> :<c-o>$ {:desc "move cursor to end of line"}]
   ["<c-r><c-r>" :<c-r>+ {:desc "paste from system clipboard"}]
