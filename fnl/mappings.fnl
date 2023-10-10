@@ -185,6 +185,8 @@
   [:<localleader>. "<cmd>let @+=@\" | echo \"transfered to clipboard\"<cr>" {:desc "transfer contents of unnamed register to system clipboard"}]
   [:<localleader>yf #(vim.fn.setreg "\"" (vim.fn.expand "%:t")) {:desc "yank current filename"}]
   [:<localleader>yF #(vim.fn.setreg "\"" (vim.fn.expand "%:p")) {:desc "yank fullpath of current file"}]
+  [:<localleader>ym "<cmd>1,'myank<cr>" {:desc "yank until 'm mark"}]
+  [:<localleader>yM "<cmd>'m,$yank<cr>" {:desc "yank from 'm mark to end of file"}]
   [:gn :<cmd>bn<cr> {:desc "next buffer"}]
   [:gN :<cmd>bp<cr> {:desc "previous buffer"}]
   [:H :^ {:desc "move cursor to beginning of line"}]
