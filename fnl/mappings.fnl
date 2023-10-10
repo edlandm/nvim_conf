@@ -79,7 +79,8 @@
          (vim.cmd (.. "keeppatterns " s "," e "s/$/" input "/g")))))
 
 (defn- prepend [start end cursor]
-  "prompt for a string to append to the end of the given range"
+  "prompt for a string to prepend to the beginning of the given range
+  (ignores leading whitespace)"
   (let [[_ curline curcol] cursor]
         (vim.fn.cursor curline curcol))
   (let [s (if (< start end) start end)
@@ -87,7 +88,7 @@
         input (vim.fn.input {:prompt (.. "Prepend: ")
                              :cancelreturn :<CANCELLED>})]
        (when (not= input :<CANCELLED>)
-         (vim.cmd (.. "keeppatterns " s "," e "s/^/" input "/g")))))
+         (vim.cmd (.. "keeppatterns " s "," e "s/^\\s*\\zs/" input "/g")))))
 
 (defn- substitute [start end cursor]
   "replace <cword> with a prompted string"
