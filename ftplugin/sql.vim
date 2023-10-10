@@ -64,7 +64,7 @@ inoremap <buffer> X>  ISNULL(,<space>'')<c-o>F,
 " }}}
 " {{{ NORMAL
 " swap operands of the expression on the current line
-nnoremap <buffer> <silent> <leader>O !!sql mappredicate sio<cr>
+nnoremap <buffer> <silent> <localleader>so !!sql mappredicate sio<cr>
 
 " copy my most commonly-used SchemaHistory query (for current file) to clipboard
 nnoremap <buffer> <localleader>sh :!printf "SELECT * FROM SchemaHistory..SchemaHistory WHERE ObjectName = '%:t:r' ORDER BY EventDate DESC"<bar>clip<cr><cr>
