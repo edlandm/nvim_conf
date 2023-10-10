@@ -35,7 +35,7 @@ return {
 
             keybinds.map("norg", "n", "<localleader>ec",
               "<cmd>Neorg keybind all core.looking-glass.magnify-code-block<cr>",
-              { desc = "edit code-block"})
+              { desc = "edit code-block in new buffer"})
 
             keybinds.map("norg", "n", "<localleader><leader>", "<cmd>Neorg toc qflist<cr>",
               { desc = "open table-of-contents in quickfix list"})
