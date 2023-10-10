@@ -70,6 +70,13 @@ nnoremap <buffer> <silent> <leader>O !!sql mappredicate sio<cr>
 nnoremap <buffer> <localleader>sh :!printf "SELECT * FROM SchemaHistory..SchemaHistory WHERE ObjectName = '%:t:r' ORDER BY EventDate DESC"<bar>clip<cr><cr>
 nnoremap <buffer> <localleader>l :!printf "SELECT TOP 20 logged_on_local, log_sequence, details, * FROM ADV..t_log_message ORDER BY logged_on_utc DESC"<bar>clip<cr><cr>
 
+" TODO: turn these all into functions so they can be reused and combined
+" yank contents of first TRY block
+nnoremap <buffer> <silent> <localleader>yt <cmd>keeppatterns 0/BEGIN TRY/+1,0/END TRY/-1y"<cr>
+" yank sproc parameters"
+nnoremap <buffer> <silent> <localleader>yp <cmd>keeppatterns 0/CREATE PROCEDURE/+1,/^\s*AS\s*$/-1y"<cr>
+" yank sprocname (based off of filename)
+nnoremap <buffer> <silent> <localleader>yn <cmd>keeppatterns let @"=expand("%:t:r")<cr>
 
 " }}}
 " {{{ VISUAL
