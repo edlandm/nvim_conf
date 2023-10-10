@@ -182,6 +182,7 @@
   [:<leader>s #(operator yeet-swap) {:desc "swap lines with motion"}]
   [:<leader>S ":%s/" {:desc "search-replace globally"}]
   [:<leader>w :<cmd>w<cr> {:desc "save"}]
+  [:<localleader>. "<cmd>let @+=@\" | echo \"transfered to clipboard\"<cr>" {:desc "transfer contents of unnamed register to system clipboard"}]
   [:<localleader>yf #(vim.fn.setreg "\"" (vim.fn.expand "%:t")) {:desc "yank current filename"}]
   [:<localleader>yF #(vim.fn.setreg "\"" (vim.fn.expand "%:p")) {:desc "yank fullpath of current file"}]
   [:gn :<cmd>bn<cr> {:desc "next buffer"}]
