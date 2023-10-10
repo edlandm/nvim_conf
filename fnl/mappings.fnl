@@ -90,6 +90,13 @@
        (when (not= input :<CANCELLED>)
          (vim.cmd (.. "keeppatterns " s "," e "s/^\\s*\\zs/" input "/g")))))
 
+(defn- cword [boundaries?]
+  "return the word under the cursor
+  set `boundaries?` to add word-boundary markers around it for regexes"
+  (if boundaries?
+    (.. "\\<" (vim.fn.expand "<cword>") "\\>")
+    (vim.fn.expand "<cword>")))
+
 (defn- substitute [start end cursor]
   "replace <cword> with a prompted string"
   (let [[_ curline curcol] cursor]
