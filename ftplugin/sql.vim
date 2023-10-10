@@ -25,18 +25,6 @@ command! -range FixCommas keeppatterns <line1>s/\(^\|^\(\t\| \{4\}\)\+\)\zs[^,[:
       \| keeppatterns <line1>,<line2>s/,\s*$//e
 " }}}
 " {{{ mappings
-" {{{ text object for SELECT clause (all fields) of SQL statement
-onoremap <silent>is :<c-u>call select_textobj#select_textobj(v:true)<cr>
-onoremap <silent>as :<c-u>call select_textobj#select_textobj(v:false)<cr>
-xnoremap <silent>is :<c-u>call select_textobj#select_textobj(v:true)<cr>
-xnoremap <silent>as :<c-u>call select_textobj#select_textobj(v:false)<cr>
-" }}}
-" {{{ text object for FROM clause (and joins) of SQL statement
-onoremap <silent>if :<c-u>call from_textobj#from_textobj(v:true)<cr>
-onoremap <silent>af :<c-u>call from_textobj#from_textobj(v:false)<cr>
-xnoremap <silent>if :<c-u>call from_textobj#from_textobj(v:true)<cr>
-xnoremap <silent>af :<c-u>call from_textobj#from_textobj(v:false)<cr>
-" }}}
 " {{{ INSERT MODE
 inoremap <buffer> A>  AND<space>
 inoremap <buffer> B>  BEGIN<cr>END<esc>O
@@ -82,51 +70,7 @@ nnoremap <buffer> <silent> <leader>O !!sql mappredicate sio<cr>
 nnoremap <buffer> <localleader>sh :!printf "SELECT * FROM SchemaHistory..SchemaHistory WHERE ObjectName = '%:t:r' ORDER BY EventDate DESC"<bar>clip<cr><cr>
 nnoremap <buffer> <localleader>l :!printf "SELECT TOP 20 logged_on_local, log_sequence, details, * FROM ADV..t_log_message ORDER BY logged_on_utc DESC"<bar>clip<cr><cr>
 
-" TODO: rewrite this in lua
-" create a sidebar that displays all of the tables present in the current sproc
-" function! PrintTabledef(table)
-"   let l:td_file="\"$(proot)/indexes/tabledef.index.txt\""
-"   let l:cmd="awk -F'\t' -v table=".a:table." 'match($1, \"^\" table \"$\") == 1 { print $3 }'"
-"   exec ":read !" .l:cmd." < ".l:td_file " | tr -d $'\\r'"
-" endfunction
-" function! TableSidebar() " {{{
-"     let l:filename = expand("%")
-"     let l:proot=shell#proot(expand("%:p"))
-"     if bufexists("tables")
-"         exec "b" . bufnr("tables")
-"         %d
-"         exec "1!sql find_tables " . l:filename
-"     else
-"         vert split
-"         enew
-"         file tables
-"         setlocal
-"             \ buftype=nofile
-"             \ bufhidden=wipe
-"             \ shiftwidth=2
-"             \ tabstop=2
-"             \ suffixesadd=.sql
-"             \ foldmethod=indent
-"             \ noexpandtab
-"         if l:proot != ""
-"             exec "setlocal path=" . l:proot . "/tabledefs/"
-"             " nnoremap <buffer> <cr> m`:read !cat $(proot)/tabledefs/<c-r><c-w>.sql<cr>v''j>gv>
-"             nnoremap <buffer> <cr> m`:call PrintTabledef("<c-r><c-w>")<cr>v''j>gv>
-"             nnoremap <buffer> ] :call search('^\t\zst_\w\+', 'sw')<cr>
-"             nnoremap <buffer> [ :call search('^\t\zst_\w\+', 'swb')<cr>
-"             nmap     <buffer> yI yai:let @"=system("sql p gn", getreg('"'))<cr>
-"             nnoremap <buffer> gq :q<cr>
-"             " create table <c-r><c-w>\_.\{-})\?);\?$
-"         endif
-"
-"         exec "1!sql find_tables " . l:filename
-"     endif
-" endfunction " }}}
-" nnoremap <buffer> <tab> :call TableSidebar()<cr>
 
-" prepend each line at the current indent level with a comma (except prepend
-" the first such line with a space)
-nmap <silent> <leader>is, ^vii<c-v>I,<esc>r<space>
 " }}}
 " {{{ VISUAL
 " uppercase all sql keywords
