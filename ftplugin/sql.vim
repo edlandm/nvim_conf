@@ -125,7 +125,7 @@ nnoremap <buffer><localleader>rv <cmd>call SqlRenameVariable()<cr>
 " }}}
 " {{{ VISUAL
 " uppercase all sql keywords
-vnoremap <buffer> <silent> <leader>U :!sql uppercase<cr>
+vnoremap <buffer> <silent> <leader>U !sql uppercase<cr>
 
 " convert a single-line simple CASE expression to an IIF call
 " e.g. CASE WHEN pkd.container_type = 'CS' THEN pkd.container_type ELSE NULL END
@@ -134,7 +134,7 @@ vnoremap <buffer> <silent> <leader>I :<c-u>keeppatterns '<,'>g/CASE.\+ELSE.\+END
 
 " generate insert statement for the highlighted table plus data-rows
 " (tab-separated, most often pasted directly from SSMS)
-vnoremap <buffer> <silent> <leader>i :!sql project table_insert<cr>
+vnoremap <buffer> <silent> <leader>i !sql project table_insert<cr>
 
 " automatically give [aliases] to all highlighted columns
 " SELECT                     -> SELECT
