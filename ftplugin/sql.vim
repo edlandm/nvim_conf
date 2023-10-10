@@ -148,5 +148,16 @@ vnoremap <buffer><localleader>f, :FixCommas<cr>
 
 " format/expand the selected statement/shorthand
 vnoremap <buffer><localleader>= !prodb expand statement<cr>
+
+" modify a visually selected range of columns (e.g. to add a prefix or suffix
+" to columns in a SELECT statement)
+function! SqlReplaceColumns() range
+  let l:regex = input("Replace columns: ")
+  if l:regex == ""
+    return
+  endif
+  exe "keeppatterns " .. a:firstline .. "," .. a:lastline .. "s/\\( \\|,\\)\\zs\\w\\+/" .. l:regex . "/e"
+endfunction
+vnoremap <buffer><localleader>rc :call SqlReplaceColumns()<cr>
 " }}}
 " }}}
