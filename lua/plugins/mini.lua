@@ -98,7 +98,6 @@ return {
         line_down  = "",
       }}) -- }}}
 
-    require("mini.pairs").setup()     -- autopairs: () [] {} <> '' ""
     require("mini.splitjoin").setup() -- split/join args/items with `gS`
 
     -- statusline
