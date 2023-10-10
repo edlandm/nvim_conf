@@ -98,6 +98,12 @@ function! SqlExpandInsert()
   endif
 endfunction
 nnoremap <buffer><localleader>ei <cmd>call SqlExpandInsert()<cr>
+
+" tSQLt ======================================================================
+" run current test (will error if current file is not a test file)
+nnoremap <buffer> <silent> <localleader>tt <cmd>exe "DB EXEC tSQLt.Run '" .. expand("%:p:h:t") .. ".[" .. expand("%:p:t:r") .. "]'"<cr>
+" tSQLt run test suite tSQLt run current file (will error if not a test file)
+nnoremap <buffer> <silent> <localleader>tT <cmd>exe "DB EXEC tSQLt.Run '" .. expand("%:p:h:t") .. "'"<cr>
 " }}}
 " {{{ VISUAL
 " uppercase all sql keywords
