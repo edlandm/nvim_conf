@@ -104,6 +104,24 @@ nnoremap <buffer><localleader>ei <cmd>call SqlExpandInsert()<cr>
 nnoremap <buffer> <silent> <localleader>tt <cmd>exe "DB EXEC tSQLt.Run '" .. expand("%:p:h:t") .. ".[" .. expand("%:p:t:r") .. "]'"<cr>
 " tSQLt run test suite tSQLt run current file (will error if not a test file)
 nnoremap <buffer> <silent> <localleader>tT <cmd>exe "DB EXEC tSQLt.Run '" .. expand("%:p:h:t") .. "'"<cr>
+
+" rename variable
+function! SqlRenameVariable()
+  let l:old_name = expand("<cword>")
+  if l:old_name == ""
+    return
+  endif
+
+  let l:new_name = input("Rename @" .. l:old_name .. " -> ")
+  if l:new_name == ""
+    return
+  endif
+
+  let l:cursor = getpos(".")
+  exe "%s/@\\zs" .. l:old_name .. "\\ze\\>/" .. l:new_name .. "/g"
+  call setpos(".", l:cursor)
+endfunction
+nnoremap <buffer><localleader>rv <cmd>call SqlRenameVariable()<cr>
 " }}}
 " {{{ VISUAL
 " uppercase all sql keywords
