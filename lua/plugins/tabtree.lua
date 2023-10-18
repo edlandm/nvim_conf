@@ -42,6 +42,12 @@ return {
           ]],
           offsets = {},
         },
+        lua = {
+          target_query = [[
+          (function_definition) @function_capture
+          ]],
+          offsets = {},
+        },
       },
     })
   end,
