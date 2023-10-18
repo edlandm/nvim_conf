@@ -4,7 +4,7 @@ return {
     { "-", "<Plug>(leap-forward)",
       mode = { "n", "x", "o" },
       desc = "Leap forward" },
-    { "g-", "<Plug>(leap-forward)",
+    { "g-", "<Plug>(leap-from-window)",
       mode = { "n", "x", "o" },
       desc = "Leap forward (cross-window)" },
     { "_", "<Plug>(leap-backward)",
