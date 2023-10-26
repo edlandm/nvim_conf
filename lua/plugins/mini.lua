@@ -79,19 +79,6 @@ return {
       },
     }) -- }}}
 
-    -- {{{ IndentScope: add indent text objects and draw line at current indent
-    local indentscope = require("mini.indentscope")
-    indentscope.setup({
-      draw = {
-        delay = 0,
-        -- animation = indentscope.gen_animation.none()
-        animation = indentscope.gen_animation.cubic({ duration = 8 })
-      },
-      options = {
-        border = "none"
-      }
-    }) -- }}}
-
     -- {{{ Move - move selections of text
     require("mini.move").setup({
       mappings = {
