@@ -4,7 +4,7 @@ return {
   -- optional for icon support
   register_ui_select = true,
   dependencies = { "nvim-tree/nvim-web-devicons" },
-  opts = { "max-perf" },
+  opts = { "max-perf", winopts = { fullscreen = true, preview = { horizontal = 'down:75%', layout = 'horizontal' }} },
   keys = {
     { "<c-p>", "<cmd>lua require('fzf-lua').files()<cr>", },
     { "<leader><tab>", "<cmd>lua require('fzf-lua').buffers({ sort_lastused = false })<cr>", },
