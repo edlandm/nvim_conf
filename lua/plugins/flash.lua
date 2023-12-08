@@ -35,7 +35,6 @@ end
 
 return {
   "folke/flash.nvim",
-  event = "VimEnter",
   opts = {
     labels = "cieahtsnbyouldwvgxjkrmf",
     label = {
@@ -51,13 +50,13 @@ return {
       }
     }
   },
+  event = "VimEnter",
   config = true,
   keys = {
     { "_j",  "<cmd>lua require('flash').jump({ search = { forward = true, multi_window = true, wrap = false } })<cr>",
       mode = {"n", "x", "o" }, desc = "flash: jump forward (down)" },
     { "_k",  "<cmd>lua require('flash').jump({ search = { forward = false, multi_window = true, wrap = false } })<cr>",
       mode = {"n", "x", "o" }, desc = "flash: jump backward (up)" },
-    { "_w", select_any_word, mode = {"n", "x", "o" }, desc = "flash: jump start of word" },
     { "_n", flash_cword, mode = {"n", "x", "o" },
         desc = "flash: initialize with cword" },
     { "_t", "<cmd>lua require('flash').treesitter()<cr>", mode = {"n", "x", "o"},
