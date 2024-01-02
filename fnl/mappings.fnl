@@ -121,6 +121,10 @@
        (when (not= input :<CANCELLED>)
          (vim.cmd (.. "keeppatterns " s "," e "g/" cword "/" input "/g")))))
 
+(defn- yank [msg f]
+  (vim.fn.setreg "\"" (f))
+  (print (.. "Yanked: " msg)))
+
 (defn- operator [f]
   "set the given function as the operator function then start the motion"
   (let [cursor (vim.fn.getcurpos)]
@@ -148,7 +152,6 @@
   [:<cr> :i<cr><Esc> {:desc "insert line-break at cursor position"}]
   ["<leader>:" "@:" {:desc "re-run the previous :command"}]
   [:<leader>* "<cmd>let @/ = expand(\"<cword>\") .. \"\\\\>\" | set hlsearch<cr>" {:desc "search for word under cursor without moving cursor"}]
-  [:<leader>. "<cmd>%yank +<cr>" {:desc "yank entire buffer to system clipboard"}]
   [:<leader><leader> "<cmd>buffer #<cr>" {:desc "switch to previous buffer"}]
   [:<leader>< "V`]<" {:desc "outdent what was just pasted"}]
   [:<leader>> "V`]>" {:desc "indent what was just pasted"}]
@@ -182,11 +185,13 @@
   [:<leader>s #(operator yeet-swap) {:desc "swap lines with motion"}]
   [:<leader>S ":%s/" {:desc "search-replace globally"}]
   [:<leader>w :<cmd>w<cr> {:desc "save"}]
-  [:<localleader>. "<cmd>let @+=@\" | echo \"transfered to clipboard\"<cr>" {:desc "transfer contents of unnamed register to system clipboard"}]
-  [:<localleader>yf #(vim.fn.setreg "\"" (vim.fn.expand "%:t")) {:desc "yank current filename"}]
-  [:<localleader>yF #(vim.fn.setreg "\"" (vim.fn.expand "%:p")) {:desc "yank fullpath of current file"}]
-  [:<localleader>ym "<cmd>1,'myank<cr>" {:desc "yank until 'm mark"}]
-  [:<localleader>yM "<cmd>'m,$yank<cr>" {:desc "yank from 'm mark to end of file"}]
+  [:<leader>yy #(yank "file contents" #(vim.api.nvim_buf_get_lines 0 1 -1 true)) {:desc "yank entire buffer to system clipboard"}]
+  [:<leader>yf #(yank "file name" #(vim.fn.expand "%:t:r")) {:desc "yank current filename (without extention)"}]
+  [:<leader>yF #(yank "file NAME" #(vim.fn.expand "%:t")) {:desc "yank current filename (with extention)"}]
+  [:<leader>yp #(yank "file path (absolute)" #(vim.fn.expand "%:p")) {:desc "yank fullpath of current file"}]
+  [:<leader>ym #(yank "1,'m" #(vim.api.nvim_buf_get_lines 0 1 (+ 1 (vim.fn.line "'m")) true)) {:desc "yank until 'm mark"}]
+  [:<leader>yM #(yank "'m,$" #(vim.api.nvim_buf_get_lines 0 (vim.fn.line "'m") -1 true)) {:desc "yank from 'm mark to end of file"}]
+  [:<leader>y<cr> "<cmd>let @+=@\" | echo \"transfered to clipboard\"<cr>" {:desc "transfer contents of unnamed register to system clipboard"}]
   [:gn :<cmd>bn<cr> {:desc "next buffer"}]
   [:gN :<cmd>bp<cr> {:desc "previous buffer"}]
   [:H :^ {:desc "move cursor to beginning of line"}]
