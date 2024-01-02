@@ -50,7 +50,6 @@
   [:maxmapdepth 20]
   [:nrformats "hex"]
   [:omnifunc "syntaxcomplete#Complete"]
-  [:pastetoggle "<F8>"]
   [:path "~/,."]
   [:pumheight 15]
   [:scrolloff 3]
