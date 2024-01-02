@@ -251,7 +251,7 @@
         "<c-w>")
 
 (define-mappings "t"
-  ["<leader>,n" "<c-\\><c-n>" {:desc "exit to normal mode"}]
+  ["<leader><localleader>n" "<c-\\><c-n>" {:desc "exit to normal mode"}]
   )
 ;;;; }}}
 
