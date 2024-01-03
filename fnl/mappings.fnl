@@ -182,6 +182,7 @@
   [:<leader>op #(if vim.o.paste ":set nopaste<cr>" ":set paste<cr>") {:expr true :desc "toggle paste mode"}]
   [:<leader>Q :<cmd>q!<cr> {:desc "quit without saving"}]
   [:<leader>q :<cmd>q<cr> {:desc "quit"}]
+  [:<leader>tc #(tset vim.wo :concealcursor (if (= vim.wo.concealcursor "") "nc" "")) {:desc "toggle conceal cursor"}]
   [:<leader>s #(operator yeet-swap) {:desc "swap lines with motion"}]
   [:<leader>S ":%s/" {:desc "search-replace globally"}]
   [:<leader>w :<cmd>w<cr> {:desc "save"}]
@@ -211,7 +212,7 @@
 ;;;; {{{ Insert Mode Mappings
 (define-mappings "i"
   [:hh "<esc>" {:desc "exit insert mode"}]
-  [:hn "<esc>" {:desc "exit insert mode"}]
+  [:hs "<esc>" {:desc "exit insert mode"}]
   [";]" #(do (set vim.o.paste true) (vim.cmd "call system(\"tmux paste-buffer\")") (set vim.o.paste false)) {:desc "paste from tmux clipboard"}]
   [";l" "<c-o>b<c-o>guiw<c-o>e<c-o>a" {:desc "lowercase current word"}]
   [";s" "<c-o>z=" {:desc "correct mispelled word"}]
