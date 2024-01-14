@@ -1,5 +1,6 @@
 return {
   'Bekaboo/deadcolumn.nvim',
   event = { "BufReadPost", "BufNewFile" },
-  -- lazy = false
+  -- lazy = false,
+  commit = "b9b5e23",
 }
