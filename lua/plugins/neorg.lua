@@ -43,6 +43,16 @@ return {
             keybinds.remap("norg", "n", "<localleader><cr>",
               "<cmd>Neorg keybind all core.esupports.hop.hop-link vsplit<cr>",
               { desc = "Jump to Link (Vertical Split)" })
+
+            keybinds.map("norg", "n", "<localleader>tc", function()
+              local cc = vim.wo.concealcursor
+              if cc == "" then
+                vim.wo.concealcursor = "nc"
+              else
+                vim.wo.concealcursor = ""
+              end
+              end,
+              { desc = "toggle" })
           end,
         }
       },
