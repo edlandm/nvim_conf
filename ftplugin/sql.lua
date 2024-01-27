@@ -105,11 +105,23 @@ vim.api.nvim_create_user_command("SqlRenameVariable",
     nargs = "*",
   })
 
+_G.sql_snake_case_cword = function()
+  local old = vim.fn.expand("<cword>")
+  assert(#old > 0, "cursor not on a word")
+  vim.cmd.normal('crs') -- coerce to snake_case
+  local snek = vim.fn.expand("<cword>")
+  assert(#snek > 0, "failed to convert to snake_case")
+  vim.cmd.undo()
+  rename_var(old, snek)
+  -- setting the operatorfunc allows this function to be dot-repeatable
+  -- NOTE: this needs to be last because the coerce command also sets the operatorfunc
+  vim.go.operatorfunc = "v:lua.sql_snake_case_cword"
+end
+
 -- vim.api.nvim_create_user_command("",
 --   function(opts)
 --   end,
 --   {desc = ""})
-
 
 vim.api.nvim_create_user_command("DBPick",
   function(opts)
