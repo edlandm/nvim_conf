@@ -245,17 +245,7 @@ vim.keymap.set("n", "<localleader>tT", function()
   vim.cmd("DB EXEC tSQLt.Run '" .. testsuite)
 end, mapopts("tSQLt run test suite tSQLt run current file", {silent = true}))
 -- }}}
-vim.keymap.set("n", "<localleader>rv", function() -- {{{ rename variable
-  local old = vim.fn.expand("<cword>")
-  assert(#old > 0, "no variable found")
-
-  local new = vim.fn.input("Rename @" .. old .. " to: ")
-  assert(#new > 0, "no new name provided")
-
-  local cursor = vim.fn.getpos(".")
-  vim.cmd("%s/@\\zs" .. old .. "\\ze\\>/" .. new .. "/g")
-  vim.fn.setpos(".", cursor)
-end, mapopts("rename variable: @old to @new")) -- }}}
+vim.keymap.set("n", "<localleader>rv", "<cmd>SqlRenameVariable<cr>", mapopts("rename variable: @old to @new")) -- }}}
 -- }}}
 -- {{{ VISUAL
 -- vim.keymap.set("v", "", "", mapopts(""))
