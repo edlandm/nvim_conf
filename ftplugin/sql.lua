@@ -206,6 +206,21 @@ vim.keymap.set("n", "<localleader>ys", function()
     print("Yanked: Sproc Signature")
   end,
   mapopts("yank sproc signature", {silent = true}))
+vim.keymap.set("n", "<localleader>ya", function()
+    vim.cmd("let @\"=system(\"sql ss -a '\"..expand('%:p')..\"'\")")
+    print("Yanked: Sproc Architect DBAction")
+  end,
+  mapopts("yank Architect DBAction sproc signature", {silent = true}))
+vim.keymap.set("n", "<localleader>yw", function()
+    vim.cmd("let @\"=system(\"sql ss -w '\"..expand('%:p')..\"'\")")
+    print("Yanked: Sproc Webwise Execute")
+  end,
+  mapopts("yank sproc Webwise execute signature", {silent = true}))
+vim.keymap.set("n", "<localleader>yW", function()
+    vim.cmd("let @\"=system(\"sql ss -W '\"..expand('%:p')..\"'\")")
+    print("Yanked: Sproc Workflow Parameter Mapping")
+  end,
+  mapopts("yank sproc Workflow Parameter Mapping", {silent = true}))
 -- }}}
 vim.keymap.set("n", "<localleader>et", "<cmd>.!prodb expand table<cr>", -- {{{ expand temp-table/table-variable from shorthand
 -- table definitions can take the form of
