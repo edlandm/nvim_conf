@@ -74,6 +74,37 @@ vim.api.nvim_create_user_command("SqlFixCommas",
     range = true,
   })
 
+local rename_var = function(old, new)
+  -- rename a sql variable without moving the cursor
+  local cursor = vim.fn.getpos(".")
+  vim.cmd("%s/@\\zs" .. old .. "\\ze\\>/" .. new .. "/g")
+  vim.fn.setpos(".", cursor)
+end
+
+vim.api.nvim_create_user_command("SqlRenameVariable",
+  function(opts)
+    local old = nil
+    local new = nil
+    if #opts.fargs == 2 then
+      old = opts.fargs[1]
+      new = opts.fargs[2]
+    elseif #opts.fargs == 1 then
+      old = opts.fargs[1]
+      new = vim.fn.input("Rename @" .. old .. " to: ")
+    elseif #opts.fargs == 0 then
+      old = vim.fn.expand("<cword>")
+      new = vim.fn.input("Rename @" .. old .. " to: ")
+    else
+      assert(false, "invalid number of arguments")
+    end
+    assert(#old > 0, "invalid target variable")
+    assert(#new > 0, "invalid new name provided")
+    rename_var(old, new)
+  end,
+  { desc = "Rename a sql variable in the current buffer",
+    nargs = "*",
+  })
+
 -- vim.api.nvim_create_user_command("",
 --   function(opts)
 --   end,
