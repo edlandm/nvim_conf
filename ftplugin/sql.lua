@@ -246,6 +246,7 @@ vim.keymap.set("n", "<localleader>tT", function()
 end, mapopts("tSQLt run test suite tSQLt run current file", {silent = true}))
 -- }}}
 vim.keymap.set("n", "<localleader>rv", "<cmd>SqlRenameVariable<cr>", mapopts("rename variable: @old to @new")) -- }}}
+vim.keymap.set("n", "<localleader>cs", _G.sql_snake_case_cword, mapopts("convert variable to snake_case"))
 -- }}}
 -- {{{ VISUAL
 -- vim.keymap.set("v", "", "", mapopts(""))
