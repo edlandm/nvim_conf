@@ -22,10 +22,15 @@ return {
       on_attach = on_attach,
       capabilities = capabilities
     })
+    lspconfig.gopls.setup({})
   end,
   ft = {
       'rust',
       'cs',
+      'go',
+      'gomod',
+      'gowork',
+      'gotmpl',
   },
   dependencies = {
     'simrat39/rust-tools.nvim',
