@@ -1,5 +1,8 @@
-vim.bo.makeprg = "go"
-vim.bo.expandtab = false
+vim.bo.makeprg    = "go"
+vim.bo.expandtab  = false
+vim.bo.shiftwidth = 4
+vim.bo.tabstop    = 4
+vim.wo.foldmethod = "syntax"
 -- {{{ mappings
 local mapopts = function(desc, opts) -- {{{ shorthand for adding the description
   _t = {buffer = true, noremap = true, desc = desc}
