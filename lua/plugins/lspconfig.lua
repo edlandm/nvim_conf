@@ -35,5 +35,6 @@ return {
   dependencies = {
     'simrat39/rust-tools.nvim',
     'hrsh7th/cmp-nvim-lsp',
+    'rmagatti/goto-preview',
   }
 }
