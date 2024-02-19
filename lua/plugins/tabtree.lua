@@ -48,6 +48,14 @@ return {
           ]],
           offsets = {},
         },
+        go = {
+          target_query = [[
+          (type_declaration)     @type_capture
+          (function_declaration) @function_capture
+          (method_declaration)   @method_capture
+          ]],
+          offsets = {},
+        }
       },
     })
   end,
