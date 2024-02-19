@@ -65,6 +65,10 @@ return {
           fennel = {
             'fn',
             'macro',
+          },
+          go = {
+            'function_declaration',
+            'method_declaration',
           }
         },
         exact_patterns = {
