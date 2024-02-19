@@ -14,5 +14,4 @@ local mapopts = function(desc, opts) -- {{{ shorthand for adding the description
   return _t
 end -- }}}
 -- {{{ NORMAL
-vim.keymap.set("n", "<localleader>t", "<cmd>make! test %:p:h<cr>", mapopts("run tests for the current file's directory")) -- }}}
 -- }}}
