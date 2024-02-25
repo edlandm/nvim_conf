@@ -142,7 +142,6 @@
   [:<cr> :i<cr><Esc> {:desc "insert line-break at cursor position"}]
   ["<leader>:" "@:" {:desc "re-run the previous :command"}]
   [:<leader>* "<cmd>let @/ = expand(\"<cword>\") .. \"\\\\>\" | set hlsearch<cr>" {:desc "search for word under cursor without moving cursor"}]
-  [:<leader><leader> "<cmd>buffer #<cr>" {:desc "switch to previous buffer"}]
   [:<leader>< "V`]<" {:desc "outdent what was just pasted"}]
   [:<leader>> "V`]>" {:desc "indent what was just pasted"}]
   [:<leader>bb :<c-^> {:desc "jump to []counth buffer in the buffer list"}]
