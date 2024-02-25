@@ -32,16 +32,6 @@
       (nvim.buf_set_lines 0 end end true [(vim.fn.getline start)])
       (vim.fn.cursor (if (< end curline) (+ 1 curline) curline) curcol)))
 
-(defn- yeet-replace [start end]
-  "copy line at `end` and use it to replace the line at `start`"
-  (nvim.buf_set_lines 0 (+ -1 end) end true [(vim.fn.getline start)]))
-
-(defn- yeet-delete [start end cursor]
-  "delete line at `end`"
-  (let [[_ curline curcol] cursor]
-      (nvim.buf_set_lines 0 (+ -1 end) end true [])
-      (vim.fn.cursor (if (< end curline) (+ -1 curline) curline) curcol)))
-
 (defn- yeet-move [start end cursor]
   "move line at `start` to the line after `end`"
   (let [[_ curline curcol] cursor
@@ -164,7 +154,6 @@
   [:<leader>a #(operator append) {:desc "append a string to lines in <motion>"}]
   [:<leader>C #(operator yeet-copy) {:desc "copy current line to end of motion"}]
   [:<leader>D "<cmd>%delete _<cr>" {:desc "delete all lines in buffer"}]
-  [:<leader>d #(operator yeet-delete) {:desc "delete line at the end of motion"}]
   [:<leader>fd "<cmd>set fdm=diff<cr>" {:desc "set fold-method to diff"}]
   [:<leader>ff "<cmd>set fdm=manual<cr>" {:desc "set fold-method to manual"}]
   [:<leader>fi "<cmd>set fdm=indent<cr>" {:desc "set fold-method to indent"}]
