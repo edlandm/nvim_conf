@@ -123,9 +123,6 @@
   [[:InsertLeave] {:pattern :* :command "set list"}]) ; }}}
 ;;; }}}
 
-;; source machine-local config file
-(vim.cmd "silent! source ~/.nvim.local.lua")
-
 ;; set default color-scheme (if it was not set in local config)
 (let [colorscheme vim.g.colors_name]
   (when (or (not colorscheme) (= "default" colorscheme))
