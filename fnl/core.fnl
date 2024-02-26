@@ -96,7 +96,7 @@
 (set vim.g.cd_to_argdir cd-to-argdir)
 (ac.augroup :cd-to-argdir
   [[:VimEnter]
-   {:pattern :*
+   {:pattern :*.norg
     :command "call g:cd_to_argdir()"}]) ; }}}
 ;; {{{ return to last edit position when opening files
 (ac.augroup :jump-to-last-edit-pos
