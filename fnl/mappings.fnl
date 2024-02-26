@@ -148,7 +148,7 @@
   [:<leader>bB :<cmd>blast<cr> {:desc "jump to last buffer in buffer-list"}]
   [:<leader>bd "<cmd>bp|silent!<cr> bwipeout #<cr>" {:desc "delete buffer (keep splits)"}]
   [:<leader>bD :<cmd>:bwipeout!<cr> {:desc "delete buffer ignoring unsaved changes"}]
-  [:<leader>bo "<cmd>silent! execute \"bd|e#|bd#\"<cr>" {:desc "delete all buffers except the current one"}]
+  [:<leader>bo "<cmd>silent! execute \"%bd|e#|bd#\"<cr>" {:desc "delete all buffers except the current one"}]
   [:<leader>cs "0C<C-R>=repeat(\"=\",<Space>78)<CR><Esc>0R<C-R>\"<Space><Esc>" {:desc "add section marker to end of line"}]
   [:<leader>a #(operator append) {:desc "append a string to lines in <motion>"}]
   [:<leader>C #(operator yeet-copy) {:desc "copy current line to end of motion"}]
