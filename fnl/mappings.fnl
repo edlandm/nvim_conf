@@ -141,6 +141,8 @@
   [:<c-y> :3<c-y> {:desc "scroll up"}]
   [:<cr> :i<cr><Esc> {:desc "insert line-break at cursor position"}]
   ["<leader>:" "@:" {:desc "re-run the previous :command"}]
+  ["<leader>." "<cmd>cd %:p:h | echo 'cd -> '.getcwd()<cr>" {:desc "cd to dir of current file"}]
+  ["<leader>," "<cmd>cd .. | echo 'cd -> '.getcwd()<cr>" {:desc "cd to parent dir"}]
   [:<leader>* "<cmd>let @/ = expand(\"<cword>\") .. \"\\\\>\" | set hlsearch<cr>" {:desc "search for word under cursor without moving cursor"}]
   [:<leader>< "V`]<" {:desc "outdent what was just pasted"}]
   [:<leader>> "V`]>" {:desc "indent what was just pasted"}]
