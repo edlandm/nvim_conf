@@ -257,7 +257,7 @@ end, mapopts("run current test", {silent = true}))
 -- run testsuite
 vim.keymap.set("n", "<localleader>tT", function()
   local testsuite = vim.fn.expand("%:p:h:t")
-  vim.cmd("DB EXEC tSQLt.Run '" .. testsuite)
+  vim.cmd("DB EXEC tSQLt.Run '" .. testsuite .. "'")
 end, mapopts("tSQLt run test suite tSQLt run current file", {silent = true}))
 -- }}}
 vim.keymap.set("n", "<localleader>rv", "<cmd>SqlRenameVariable<cr>", mapopts("rename variable: @old to @new")) -- }}}
