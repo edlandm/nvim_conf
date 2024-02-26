@@ -46,7 +46,15 @@ return {
           print_only_one_drawer()
           return
         end
-        vim.ui.select(drawers, {
+
+        local select = vim.ui.select
+        if MiniPick then
+          -- TODO: add preview to list buffers in drawer
+          -- (not sure if currently possible via cabinet's api)
+          select = MiniPick.ui_select
+        end
+
+        select(drawers, {
           prompt = prompt..": ",
         }, function(choice)
             if not choice then return end
