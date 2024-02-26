@@ -153,6 +153,66 @@ return {
     vim.keymap.set('n', '<leader>ts', '<cmd>lua MiniTrailspace.trim(); MiniTrailspace.trim_last_lines()<cr>',
       { silent = true, desc = "removing trailing spaces and trailing empty lines"})
     -- }}}
+
+    -- {{{ MiniPick
+    local pick = require('mini.pick')
+    pick.setup({
+      options = {
+        content_from_bottom = true,
+      },
+    })
+    require('mini.extra').setup()
+
+    vim.keymap.set('n', '<c-p>', "<cmd>Pick files<cr>")
+    vim.keymap.set('n', '<leader><tab>', "<cmd>Pick resume<cr>")
+
+    vim.keymap.set('n', '<tab>.', function()
+      MiniExtra.pickers.explorer(
+        { filter = function(e) return e.fs_type == "directory" end },
+        {
+          mappings = {
+            cd_selected_dir = {
+              char = '<C-e>',
+              func = function()
+                local dir = MiniPick.get_picker_matches().current
+                vim.cmd.cd(dir.path)
+                vim.cmd.echo('"Changed directory: '..dir.path..'"')
+              end
+            },
+            cd_open_dir = {
+              char = '<C-o>',
+              func = function()
+                local cwd = MiniPick.get_picker_opts().source.cwd
+                vim.cmd.cd(cwd)
+                vim.cmd.echo('"Changed directory: '..cwd..'"')
+              end
+            }
+          }
+        })
+    end)
+
+    vim.keymap.set('n', '<tab>/', "<cmd>Pick history scope='search'<cr>")
+    vim.keymap.set('n', '<tab>:', "<cmd>Pick history scope='cmd'<cr>")
+    vim.keymap.set('n', '<tab>b', "<cmd>Pick buffers<cr>")
+    vim.keymap.set('n', '<tab>c', "<cmd>Pick commands<cr>")
+    vim.keymap.set('n', '<tab>d', "<cmd>Pick diagnostic<cr>")
+    vim.keymap.set('n', '<tab>gb', "<cmd>Pick git_branches<cr>")
+    vim.keymap.set('n', '<tab>gc', "<cmd>Pick git_commits<cr>")
+    vim.keymap.set('n', '<tab>gh', "<cmd>Pick git_hunks<cr>")
+    vim.keymap.set('n', '<tab>gm', "<cmd>Pick git_files scope='modified'<cr>")
+    vim.keymap.set('n', '<tab>gu', "<cmd>Pick git_files scope='untracked'<cr>")
+    vim.keymap.set('n', '<tab>h', "<cmd>Pick help<cr>")
+    vim.keymap.set('n', '<tab>k', "<cmd>Pick keymaps<cr>")
+    vim.keymap.set('n', '<tab>l', "<cmd>Pick buf_lines<cr>")
+    vim.keymap.set('n', '<tab>m', "<cmd>Pick marks<cr>")
+    vim.keymap.set('n', '<tab>p', "<cmd>Pick hipatterns<cr>")
+    vim.keymap.set('n', '<tab>r', "<cmd>Pick registers<cr>")
+    vim.keymap.set('n', '<tab>q', "<cmd>Pick list scope='quickfix'<cr>")
+    vim.keymap.set('n', '<tab>s', "<cmd>Pick spellsuggest<cr>")
+    vim.keymap.set('n', '<tab>t', "<cmd>Pick treesitter<cr>")
+
+    vim.keymap.set('i', '<c-r><tab>', "<cmd>Pick registers<cr>")
+    -- }}}
   end,
   dependencies = {
     'nvim-tree/nvim-web-devicons',
