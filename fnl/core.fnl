@@ -144,3 +144,12 @@
            [:neovide_cursor_vfx_mode "pixiedust"]
            [:neovide_cursor_vfx_particle_density 10.0]
            ))
+
+(let [shell-path (vim.fn.split (vim.fn.getenv "SHELL") "/")
+      shell-name (. shell-path (length shell-path))]
+  (when (= shell-name :nu)
+    ;; this can be changed to a case statement to accomidate other shells
+    ;; the defaults work fine for bash though, so it's unnecessary for my
+    ;; setups
+    (setopts :o
+             [:shellcmdflag "--env-config ~/.config/nushell/env.nu -c"])))
