@@ -163,10 +163,7 @@ return {
     })
     require('mini.extra').setup()
 
-    vim.keymap.set('n', '<c-p>', "<cmd>Pick files<cr>")
-    vim.keymap.set('n', '<leader><tab>', "<cmd>Pick resume<cr>")
-
-    vim.keymap.set('n', '<tab>.', function()
+    local dir_explorer = function()
       MiniExtra.pickers.explorer(
         { filter = function(e) return e.fs_type == "directory" end },
         {
@@ -189,27 +186,30 @@ return {
             }
           }
         })
-    end)
+    end
 
-    vim.keymap.set('n', '<tab>/', "<cmd>Pick history scope='search'<cr>")
-    vim.keymap.set('n', '<tab>:', "<cmd>Pick history scope='cmd'<cr>")
-    vim.keymap.set('n', '<tab>b', "<cmd>Pick buffers<cr>")
-    vim.keymap.set('n', '<tab>c', "<cmd>Pick commands<cr>")
-    vim.keymap.set('n', '<tab>d', "<cmd>Pick diagnostic<cr>")
-    vim.keymap.set('n', '<tab>gb', "<cmd>Pick git_branches<cr>")
-    vim.keymap.set('n', '<tab>gc', "<cmd>Pick git_commits<cr>")
-    vim.keymap.set('n', '<tab>gh', "<cmd>Pick git_hunks<cr>")
-    vim.keymap.set('n', '<tab>gm', "<cmd>Pick git_files scope='modified'<cr>")
-    vim.keymap.set('n', '<tab>gu', "<cmd>Pick git_files scope='untracked'<cr>")
-    vim.keymap.set('n', '<tab>h', "<cmd>Pick help<cr>")
-    vim.keymap.set('n', '<tab>k', "<cmd>Pick keymaps<cr>")
-    vim.keymap.set('n', '<tab>l', "<cmd>Pick buf_lines<cr>")
-    vim.keymap.set('n', '<tab>m', "<cmd>Pick marks<cr>")
-    vim.keymap.set('n', '<tab>p', "<cmd>Pick hipatterns<cr>")
-    vim.keymap.set('n', '<tab>r', "<cmd>Pick registers<cr>")
-    vim.keymap.set('n', '<tab>q', "<cmd>Pick list scope='quickfix'<cr>")
-    vim.keymap.set('n', '<tab>s', "<cmd>Pick spellsuggest<cr>")
-    vim.keymap.set('n', '<tab>t', "<cmd>Pick treesitter<cr>")
+    vim.keymap.set('n', '<c-p>', "<cmd>Pick files<cr>", { desc = "Pick: files" })
+    vim.keymap.set('n', '<leader><tab>', "<cmd>Pick resume<cr>", { desc = "Resume previous picker" })
+    vim.keymap.set('n', '<tab>.', dir_explorer, { desc = "Pick: explorer" })
+    vim.keymap.set('n', '<tab>/', "<cmd>Pick history scope='search'<cr>", { desc = "Pick: search history" })
+    vim.keymap.set('n', '<tab>:', "<cmd>Pick history scope='cmd'<cr>", { desc = "Pick: command history" })
+    vim.keymap.set('n', '<tab>b', "<cmd>Pick buffers include_current=false<cr>", { desc = "Pick: buffers" })
+    vim.keymap.set('n', '<tab>c', "<cmd>Pick commands<cr>", { desc = "Pick: commands" })
+    vim.keymap.set('n', '<tab>d', "<cmd>Pick diagnostic<cr>", { desc = "Pick: lsp diagnostics" })
+    vim.keymap.set('n', '<tab>gb', "<cmd>Pick git_branches<cr>", { desc = "Pick: git branches" })
+    vim.keymap.set('n', '<tab>gc', "<cmd>Pick git_commits<cr>", { desc = "Pick: git commits" })
+    vim.keymap.set('n', '<tab>gh', "<cmd>Pick git_hunks<cr>", { desc = "Pick: git diff hunks" })
+    vim.keymap.set('n', '<tab>gm', "<cmd>Pick git_files scope='modified'<cr>", { desc = "Pick: git modified files" })
+    vim.keymap.set('n', '<tab>gu', "<cmd>Pick git_files scope='untracked'<cr>", { desc = "Pick: git untracked files" })
+    vim.keymap.set('n', '<tab>h', "<cmd>Pick help<cr>", { desc = "Pick: help" })
+    vim.keymap.set('n', '<tab>k', "<cmd>Pick keymaps<cr>", { desc = "Pick: keymaps" })
+    vim.keymap.set('n', '<tab>l', "<cmd>Pick buf_lines<cr>", { desc = "Pick: open buffer lines" })
+    vim.keymap.set('n', '<tab>m', "<cmd>Pick marks<cr>", { desc = "Pick: marks" })
+    vim.keymap.set('n', '<tab>p', "<cmd>Pick hipatterns<cr>", { desc = "Pick: hipatterns" })
+    vim.keymap.set('n', '<tab>r', "<cmd>Pick registers<cr>", { desc = "Pick: registers" })
+    vim.keymap.set('n', '<tab>q', "<cmd>Pick list scope='quickfix'<cr>", { desc = "Pick: quickfix list" })
+    vim.keymap.set('n', '<tab>s', "<cmd>Pick spellsuggest<cr>", { desc = "Pick: spelling suggestions" })
+    vim.keymap.set('n', '<tab>t', "<cmd>Pick treesitter<cr>", { desc = "Pick: treesitter nodes" })
 
     vim.keymap.set('i', '<c-r><tab>', "<cmd>Pick registers<cr>")
     -- }}}
