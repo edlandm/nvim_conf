@@ -211,6 +211,11 @@ return {
     vim.keymap.set('n', '<tab>s', "<cmd>Pick spellsuggest<cr>", { desc = "Pick: spelling suggestions" })
     vim.keymap.set('n', '<tab>t', "<cmd>Pick treesitter<cr>", { desc = "Pick: treesitter nodes" })
 
+    vim.keymap.set('n', 'gi', "<cmd>Pick lsp scope='implementation'<cr>", { desc = "get references to symbol under cursor" })
+    vim.keymap.set('n', 'gr', "<cmd>Pick lsp scope='references'<cr>", { desc = "get references to symbol under cursor" })
+    vim.keymap.set('n', 'gs', "<cmd>Pick lsp scope='document_symbol'<cr>", { desc = "list symbols current buffer" })
+    vim.keymap.set('n', 'gS', "<cmd>Pick lsp scope='workspace_symbol'<cr>", { desc = "list symbols workspace" })
+
     vim.keymap.set('i', '<c-r><tab>', "<cmd>Pick registers<cr>")
     -- }}}
   end,
