@@ -200,6 +200,7 @@ return {
     vim.keymap.set('n', '<tab>gm', "<cmd>Pick git_files scope='modified'<cr>", { desc = "Pick: git modified files" })
     vim.keymap.set('n', '<tab>gu', "<cmd>Pick git_files scope='untracked'<cr>", { desc = "Pick: git untracked files" })
     vim.keymap.set('n', '<tab>h', "<cmd>Pick help<cr>", { desc = "Pick: help" })
+    vim.keymap.set('n', '<tab>j', "<cmd>Pick list scope='jump'<cr>", { desc = "Pick: jumplist" })
     vim.keymap.set('n', '<tab>k', "<cmd>Pick keymaps<cr>", { desc = "Pick: keymaps" })
     vim.keymap.set('n', '<tab>l', "<cmd>Pick buf_lines scope='current'<cr>", { desc = "Pick: buffer lines (cur)" })
     vim.keymap.set('n', '<tab>L', "<cmd>Pick buf_linesscope='all'<cr>", { desc = "Pick: buffer lines (all)" })
