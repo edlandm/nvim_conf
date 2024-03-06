@@ -92,8 +92,6 @@ return {
         line_down  = "",
       }}) -- }}}
 
-    require("mini.splitjoin").setup() -- split/join args/items with `gS`
-
     -- statusline
     require("mini.statusline").setup({
       content = {
