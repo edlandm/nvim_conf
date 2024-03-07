@@ -1,81 +1,65 @@
 return {
   'hrsh7th/nvim-cmp',
-  event = "VeryLazy",
+  event = "InsertEnter",
   dependencies = {
     'L3MON4D3/LuaSnip',
+    'saadparwaiz1/cmp_luasnip',
     'neovim/nvim-lspconfig',
     'hrsh7th/cmp-buffer',
     'hrsh7th/cmp-path',
     'hrsh7th/cmp-cmdline',
     'dmitmel/cmp-cmdline-history',
     'andersevenrud/cmp-tmux',
+    -- 'hrsh7th/cmp-copilot',
     'jcdickinson/codeium.nvim',
   },
   config = function()
-    local has_words_before = function()
-      unpack = unpack or table.unpack
-      local line, col = unpack(vim.api.nvim_win_get_cursor(0))
-      return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
-    end
-
-    local luasnip = require("luasnip")
     local cmp = require('cmp')
+    local luasnip = require('luasnip')
+
     cmp.setup({
       snippet = {
-        -- snippet engine
+       -- snippet engine
         expand = function(args)
-          require('luasnip').lsp_expand(args.body)
+          luasnip.lsp_expand(args.body)
         end,
+      },
+      completion = {
+        completeopt = 'menu,menuone,noselect'
       },
       window = {
         -- completion = cmp.config.window.bordered(),
         -- documentation = cmp.config.window.bordered(),
       },
       mapping = cmp.mapping.preset.insert({
-        ['<c-u>'] = cmp.mapping.scroll_docs(-4),
-        ['<c-d>'] = cmp.mapping.scroll_docs(4),
         ['<c-n>'] = cmp.mapping.select_next_item(),
         ['<c-p>'] = cmp.mapping.select_prev_item(),
-        ['<c-space>'] = cmp.mapping.abort(),
-        -- ['<tab>']  = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
-        -- attempt to emulate super-tab behavior
-        ["<tab>"] = cmp.mapping(function(fallback)
-          if luasnip.expand_or_jumpable() then
+        ['<c-y>']  = cmp.mapping.confirm({ select = true }),
+        ['<c-e>'] = cmp.mapping.abort(),
+        ['<c-u>'] = cmp.mapping.scroll_docs(-4),
+        ['<c-d>'] = cmp.mapping.scroll_docs(4),
+        --
+        -- <c-l> will move you to the right of each of the expansion locations.
+        -- <c-h> is similar, except moving you backwards.
+        ['<C-l>'] = cmp.mapping(function()
+          if luasnip.expand_or_locally_jumpable() then
             luasnip.expand_or_jump()
-          elseif cmp.visible() then
-            cmp.confirm({ select = true})
-            -- You could replace the expand_or_jumpable() calls with expand_or_locally_jumpable()
-            -- they way you will only jump inside the snippet region
-          elseif has_words_before() then
-            cmp.complete()
-          else
-            fallback()
           end
-        end, { "i", "s" }),
-        ["<s-tab>"] = cmp.mapping(function(fallback)
-          if cmp.visible() then
-            cmp.select_prev_item()
-          elseif luasnip.jumpable(-1) then
+        end, { 'i', 's' }),
+        ['<C-h>'] = cmp.mapping(function()
+          if luasnip.locally_jumpable(-1) then
             luasnip.jump(-1)
-          else
-            fallback()
           end
-        end, { "i", "s" }),
+        end, { 'i', 's' }),
       }),
-      sources = cmp.config.sources({
+      sources = {
         { name = 'nvim_lsp' },
         { name = 'luasnip' },
-        { name = 'buffer' },
-        { name = 'tmux',
-          option = {
-            -- Source from all panes in session instead of adjacent panes
-            all_panes = true,
-            -- Completion popup label
-            label = '[tmux]',
-          },
-        },
+        -- { name = 'copilot' },
         { name = 'codeium' },
-      })
+        { name = 'path' },
+        { name = 'buffer' },
+      },
     })
 
     -- Set configuration for specific filetype.
@@ -84,6 +68,7 @@ return {
         { name = 'git' }, -- You can specify the `git` source if [you were installed it](https://github.com/petertriho/cmp-git).
       }, {
           { name = 'buffer' },
+          { name = 'tmux' },
         })
     })
 
