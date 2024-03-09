@@ -174,7 +174,6 @@
   [:<leader>q :<cmd>q<cr> {:desc "quit"}]
   [:<leader>tc #(tset vim.wo :concealcursor (if (= vim.wo.concealcursor "") "nc" "")) {:desc "toggle conceal cursor"}]
   [:<leader>s #(operator yeet-swap) {:desc "swap lines with motion"}]
-  [:<leader>S ":%s/" {:desc "search-replace globally"}]
   [:<leader>w :<cmd>w<cr> {:desc "save"}]
   [:<leader>yy #(yank "file contents" #(vim.api.nvim_buf_get_lines 0 0 -1 true)) {:desc "yank entire buffer to system clipboard"}]
   [:<leader>yf #(yank "file name" #(vim.fn.expand "%:t:r")) {:desc "yank current filename (without extention)"}]
