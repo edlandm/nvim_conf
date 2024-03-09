@@ -128,22 +128,20 @@
   (when (or (not colorscheme) (= "default" colorscheme))
     (vim.cmd.colorscheme "habamax")))
 
-(when vim.g.neovide
-  (setopts :o
-           [:guifont "Hasklug Nerd Font Mono:h12"])
-  (setopts :g
-           [:neovide_transparency 1]
-           [:neovide_floating_blur_amount_x 2.0]
-           [:neovide_floating_blur_amount_y 2.0]
-           [:neovide_floating_shadow true]
-           [:neovide_floating_z_height 10]
-           [:neovide_light_angle_degrees 45]
-           [:neovide_light_radius 5]
-           [:neovide_hide_mouse_when_typing true]
-           [:neovide_cursor_animate_in_insert_mode true]
-           [:neovide_cursor_vfx_mode "pixiedust"]
-           [:neovide_cursor_vfx_particle_density 10.0]
-           ))
+(setopts :g
+         [:neovide_transparency 1]
+         [:neovide_floating_blur_amount_x 2.0]
+         [:neovide_floating_blur_amount_y 2.0]
+         [:neovide_floating_shadow true]
+         [:neovide_floating_z_height 10]
+         [:neovide_light_angle_degrees 45]
+         [:neovide_light_radius 5]
+         [:neovide_hide_mouse_when_typing true]
+         [:neovide_cursor_animate_in_insert_mode true]
+         [:neovide_cursor_vfx_mode "pixiedust"]
+         [:neovide_cursor_vfx_particle_density 10.0]
+         [:neovide_fullscreen true]
+         )
 
 (let [shell-path (vim.fn.split (vim.fn.getenv "SHELL") "/")
       shell-name (. shell-path (length shell-path))]
