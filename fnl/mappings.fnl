@@ -173,6 +173,7 @@
   [:<leader>Q :<cmd>q!<cr> {:desc "quit without saving"}]
   [:<leader>q :<cmd>q<cr> {:desc "quit"}]
   [:<leader>tc #(tset vim.wo :concealcursor (if (= vim.wo.concealcursor "") "nc" "")) {:desc "toggle conceal cursor"}]
+  [:<leader>rn "<cmd>lua vim.lsp.buf.rename()<cr>" {:desc "LSP Rename" :silent true}]
   [:<leader>s #(operator yeet-swap) {:desc "swap lines with motion"}]
   [:<leader>w :<cmd>w<cr> {:desc "save"}]
   [:<leader>yy #(yank "file contents" #(vim.api.nvim_buf_get_lines 0 0 -1 true)) {:desc "yank entire buffer to system clipboard"}]
