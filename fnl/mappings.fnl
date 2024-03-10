@@ -139,7 +139,6 @@
   [:<c-w><c-v> "<cmd>vertical wincmd f<cr>" {:desc "open file under cursor in vertical split"}]
   [:<c-w>z "<cmd>wincmd _ | wincmd |<cr>" {:desc "open file under cursor in vertical split"}]
   [:<c-y> :3<c-y> {:desc "scroll up"}]
-  [:<cr> :i<cr><Esc> {:desc "insert line-break at cursor position"}]
   ["<leader>:" "@:" {:desc "re-run the previous :command"}]
   ["<leader>." "<cmd>cd %:p:h | echo 'cd -> '.getcwd()<cr>" {:desc "cd to dir of current file"}]
   ["<leader>," "<cmd>cd .. | echo 'cd -> '.getcwd()<cr>" {:desc "cd to parent dir"}]
