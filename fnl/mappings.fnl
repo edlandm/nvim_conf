@@ -150,6 +150,7 @@
   [:<leader>bd "<cmd>bp|silent!<cr> bwipeout #<cr>" {:desc "delete buffer (keep splits)"}]
   [:<leader>bD :<cmd>:bwipeout!<cr> {:desc "delete buffer ignoring unsaved changes"}]
   [:<leader>bo "<cmd>silent! execute \"%bd|e#|bd#\" | echo 'Deleted all buffers except current'<cr>" {:desc "delete all buffers except the current one"}]
+  [:<leader>ca "<cmd>lua vim.lsp.buf.code_action()<cr>" {:desc "LSP Code Actions" :silent true}]
   [:<leader>cs "0C<C-R>=repeat(\"=\",<Space>78)<CR><Esc>0R<C-R>\"<Space><Esc>" {:desc "add section marker to end of line"}]
   [:<leader>a #(operator append) {:desc "append a string to lines in <motion>"}]
   [:<leader>C #(operator yeet-copy) {:desc "copy current line to end of motion"}]
