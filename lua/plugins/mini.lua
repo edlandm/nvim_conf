@@ -187,7 +187,7 @@ return {
     end
 
     vim.keymap.set('n', '<c-p>', "<cmd>Pick files<cr>", { desc = "Pick: files" })
-    vim.keymap.set('n', '<leader><tab>', "<cmd>Pick resume<cr>", { desc = "Resume previous picker" })
+    vim.keymap.set('n', '<tab><tab>', "<cmd>Pick resume<cr>", { desc = "Resume previous picker" })
     vim.keymap.set('n', '<tab>.', dir_explorer, { desc = "Pick: explorer" })
     vim.keymap.set('n', '<tab>/', "<cmd>Pick history scope='search'<cr>", { desc = "Pick: search history" })
     vim.keymap.set('n', '<tab>:', "<cmd>Pick history scope='cmd'<cr>", { desc = "Pick: command history" })
