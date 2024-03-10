@@ -48,10 +48,11 @@ return {
         end
 
         local select = vim.ui.select
-        if MiniPick then
+        local minipick = package.loaded._G.MiniPick
+        if minipick then
           -- TODO: add preview to list buffers in drawer
           -- (not sure if currently possible via cabinet's api)
-          select = MiniPick.ui_select
+          select = minipick.ui_select
         end
 
         select(drawers, {
