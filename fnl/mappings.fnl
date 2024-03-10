@@ -187,6 +187,7 @@
   [:gN :<cmd>bp<cr> {:desc "previous buffer"}]
   [:H :^ {:desc "move cursor to beginning of line"}]
   [:L :$ {:desc "move cursor to end of line"}]
+  [:K "<cmd>lua vim.lsp.buf.hover()<CR>" {:desc "LSP Hover" :silent true}]
   [:N #(. ["n" "N"] (+ 1 vim.v.searchforward)) {:expr true :desc "search backward"}]
   [:n #(. ["N" "n"] (+ 1 vim.v.searchforward)) {:expr true :desc "search forward"}]
   [:Q "@q" {:desc "execute the q macro"}]
