@@ -79,8 +79,10 @@ return {
       vim.cmd.echo('"Buffer moved to: '..drawer_name..'"')
     end
 
+    local prefix = function(lhs) return "<leader><tab>" .. lhs end
+
     -- navigate vertically between drawers (starting from the "top") with j/k
-    vim.keymap.set("n", "<leader>dk", function()
+    vim.keymap.set("n", prefix("k"), function()
       local drawers = cabinet.drawer_list()
       if #drawers == 0 then
         vim.cmd.echo('"Cabinet: no drawers"')
@@ -93,7 +95,7 @@ return {
       cabinet.drawer_previous()
       print_cur_drawer()
     end, { desc = "Switch to Previous Drawer" })
-    vim.keymap.set("n", "<leader>dj", function()
+    vim.keymap.set("n", prefix("j"), function()
       local drawers = cabinet.drawer_list()
       if #drawers == 0 then
         vim.cmd.echo('"Cabinet: no drawers"')
@@ -107,26 +109,26 @@ return {
       print_cur_drawer()
     end, { desc = "Switch to Next Drawer" })
 
-    vim.keymap.set("n", "<leader>dc", ":DrawerNew ",
+    vim.keymap.set("n", prefix("c"), ":DrawerNew ",
       { desc = "Create New Drawer" })
-    vim.keymap.set("n", "<leader>dr", ":DrawerRename ",
+    vim.keymap.set("n", prefix("r"), ":DrawerRename ",
       { desc = "Rename Current Drawer" })
 
-    vim.keymap.set("n", "<leader>dd", print_cur_drawer,
+    vim.keymap.set("n", prefix("d"), print_cur_drawer,
       { desc = "Echo Current Drawer" })
-    vim.keymap.set("n", "<leader>dl", "<cmd>DrawerList<cr>",
+    vim.keymap.set("n", prefix("l"), "<cmd>DrawerList<cr>",
       { desc = "List Drawers" })
-    vim.keymap.set("n", "<leader>db", "<cmd>DrawerListBuffers<cr>",
+    vim.keymap.set("n", prefix("b"), "<cmd>DrawerListBuffers<cr>",
       { desc = "List Buffers in Current Drawer" })
 
     -- select a drawer and perform an action
-    vim.keymap.set("n", "<leader>dx",
+    vim.keymap.set("n", prefix("x"),
       drawer_selector("Select a drawer to delete", delete_drawer),
       { desc = "Delete Drawer" })
-    vim.keymap.set("n", "<leader>dm",
+    vim.keymap.set("n", prefix("m"),
       drawer_selector("Move current buffer to: ", move_cur_buf_to_drawer),
       { desc = "Move Current Buffer to a Drawer" })
-    vim.keymap.set("n", "<leader>do",
+    vim.keymap.set("n", prefix("o"),
       drawer_selector("Select a drawer to open", open_drawer),
       { desc = "Open Drawer" })
   end,
