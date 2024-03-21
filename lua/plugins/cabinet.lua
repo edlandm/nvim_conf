@@ -1,11 +1,53 @@
 return {
   "smilhey/cabinet.nvim",
+  dependencies = {
+    'nvim-neorg/neorg',
+  },
   lazy = false,
   config = function()
     local cabinet = require("cabinet")
+    local workspaces = { "home" }
+
+    local neorg = require("neorg")
+    if neorg then -- set up neorg workspace hook
+      local dirman = neorg.modules.get_module("core.dirman")
+      for _, workspace in ipairs(dirman.get_workspace_names()) do
+        if workspace ~= "default" then
+          workspaces[#workspaces+1] = workspace
+        end
+      end
+
+      -- Open Neorg workspace when entering one of the initial drawers for the first time
+      vim.api.nvim_create_autocmd("User", {
+        nested = true,
+        pattern = "DrawNewEnter",
+        callback = function(event)
+          local drawer = event.data[2]
+          print('Drawer: ' .. drawer)
+
+          local drawer_index
+          for i,name in ipairs(cabinet.drawer_list()) do
+            if name == drawer then
+              drawer_index = i
+              break
+            end
+          end
+
+          assert(drawer_index, "Drawer not found in list")
+          if #cabinet.drawer_list_buffers(drawer_index) > 1 then return end
+          if not dirman.get_workspace(drawer) then return end
+          dirman.open_workspace(drawer)
+        end,
+      })
+    end
+
     cabinet:setup({
-      initial_drawers = { "neovim_config" },
+      initial_drawers = workspaces,
     })
+
+		local save = require("cabinet.save")
+		save.save_cmd()
+		save.load_cmd()
 
     -- Switch to drawer on creation
     vim.api.nvim_create_autocmd("User", {
