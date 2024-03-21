@@ -120,7 +120,7 @@ end
 -- }}}
 -- {{{ mappings
 local mapopts = function(desc, opts) -- {{{ shorthand for adding the description
-  _t = {buffer = true, noremap = true, desc = desc}
+  local _t = {buffer = true, noremap = true, desc = desc}
   if opts then
     for k,v in pairs(opts) do
       _t[k] = v
@@ -215,8 +215,9 @@ vim.keymap.set("n", "<localleader>tT", function()
   vim.cmd("DB EXEC tSQLt.Run '" .. testsuite .. "'")
 end, mapopts("tSQLt run test suite tSQLt run current file", {silent = true}))
 -- }}}
-vim.keymap.set("n", "<localleader>rv", "<cmd>SqlRenameVariable<cr>", mapopts("rename variable: @old to @new")) -- }}}
+vim.keymap.set("n", "<localleader>rv", "<cmd>SqlRenameVariable<cr>", mapopts("rename variable: @old to @new"))
 vim.keymap.set("n", "<localleader>cs", _G.sql_snake_case_cword, mapopts("convert variable to snake_case"))
+-- }}}
 -- }}}
 -- {{{ VISUAL
 -- vim.keymap.set("v", "", "", mapopts(""))
