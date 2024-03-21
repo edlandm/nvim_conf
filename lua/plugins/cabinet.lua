@@ -69,10 +69,6 @@ return {
     -- 	end,
     -- })
 
-    local print_cur_drawer = function()
-      vim.cmd.echo('"Drawer: '..cabinet.drawer_current()..'"')
-    end
-
     local print_only_one_drawer = function()
       vim.cmd.echo('"Cabinet: only one drawer"')
     end
@@ -109,7 +105,6 @@ return {
 
     local open_drawer = function(drawer_name)
       cabinet.drawer_select(drawer_name)
-      print_cur_drawer()
     end
 
     local delete_drawer = function(drawer_name)
@@ -136,7 +131,6 @@ return {
         return
       end
       cabinet.drawer_previous()
-      print_cur_drawer()
     end, { desc = "Switch to Previous Drawer" })
     vim.keymap.set("n", prefix("j"), function()
       local drawers = cabinet.drawer_list()
@@ -149,7 +143,6 @@ return {
         return
       end
       cabinet.drawer_next()
-      print_cur_drawer()
     end, { desc = "Switch to Next Drawer" })
 
     vim.keymap.set("n", prefix("c"), ":DrawerNew ",
@@ -157,7 +150,7 @@ return {
     vim.keymap.set("n", prefix("r"), ":DrawerRename ",
       { desc = "Rename Current Drawer" })
 
-    vim.keymap.set("n", prefix("d"), print_cur_drawer,
+    vim.keymap.set("n", prefix("."), function() print("Drawer: "..cabinet.drawer_current()) end,
       { desc = "Echo Current Drawer" })
     vim.keymap.set("n", prefix("l"), "<cmd>DrawerList<cr>",
       { desc = "List Drawers" })
