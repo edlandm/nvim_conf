@@ -117,34 +117,6 @@ _G.sql_snake_case_cword = function()
   -- NOTE: this needs to be last because the coerce command also sets the operatorfunc
   vim.go.operatorfunc = "v:lua.sql_snake_case_cword"
 end
-
--- vim.api.nvim_create_user_command("",
---   function(opts)
---   end,
---   {desc = ""})
-
-vim.api.nvim_create_user_command("DBPick",
-  function(opts)
-    local ls_fields = function(project, _table)
-      local t = _table or "_"
-      return vim.split(
-        vim.system(
-          { 'prodb', '-p', project, 'ls', 'table', t},
-          { text = true }):wait().stdout,
-        '\n')
-    end
-    local ls_tables = function(project)
-      -- TODO: make default project configurable
-      return vim.split(
-        vim.system(
-          { 'prodb', '-p', project, 'ls', 'table' },
-          { text = true }):wait().stdout,
-        '\n')
-    end
-    require('mini.pick').start({ source = { items = ls_tables('la') } })
-  end,
-  {desc = "Interactive DB Table/Field picker/viewer"})
-
 -- }}}
 -- {{{ mappings
 local mapopts = function(desc, opts) -- {{{ shorthand for adding the description
@@ -230,23 +202,6 @@ vim.keymap.set("n", "<localleader>et", "<cmd>.!prodb expand table<cr>", -- {{{ e
 -- @table_var_name:field1, field2
 -- #temp_table_name:field1, field2
   mapopts("expand: @table_var_name:field1, field2")) -- }}}
-vim.keymap.set("n", "<localleader>ei", function() -- {{{ expand insert: [project:]table
-  local line = vim.fn.trim(vim.fn.getline("."))
-  assert(#line > 0, "no table found")
-  local words = vim.fn.split(line, " ")
-  local pieces = vim.fn.split(words[1], ":")
-
-  local project = ""
-  local _table = ""
-  if #pieces == 2 then
-    project = " -p " .. pieces[1]
-    _table = pieces[2]
-  else
-    _table = pieces[1]
-  end
-
-  vim.cmd(".!prodb " .. project .. " generate insert " .. _table)
-end, mapopts("expand insert: [project:]table")) -- }}}
 -- {{{ tSQLt - run tests and test-suites
 -- run test
 vim.keymap.set("n", "<localleader>tt", function()
