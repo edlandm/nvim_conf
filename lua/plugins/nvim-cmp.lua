@@ -79,6 +79,7 @@ return {
         { name = 'neorg' },
         { name = 'luasnip' },
         { name = 'buffer' },
+        { name = 'path' },
         { name = 'tmux',
           option = {
             -- Source from all panes in session instead of adjacent panes
@@ -106,7 +107,7 @@ return {
         { name = 'path' },
         { name = 'cmdline',
           option = {
-            ignore_cmds = { 'Man', '!', 'write', 'DB'},
+            ignore_cmds = { 'Man', '!', 'write', 'DB', 's', 'g'},
           },
         },
         -- { name = 'cmdline_history' },
