@@ -13,7 +13,7 @@ return {
           keymaps = {
               init_selection = "<CR>",
               node_incremental = "<CR>",
-              node_decremental = "<BS>",
+              node_decremental = "<S-CR>",
           },
           filetype_exclude = { "qf" }, --keymaps will be unset in excluding filetypes
       })
