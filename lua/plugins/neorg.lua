@@ -57,7 +57,6 @@ return {
           end,
         }
       },
-      ['core.export'] = {},
       ['core.journal'] = {
         config = {
           strategy = "flat",
