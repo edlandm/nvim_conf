@@ -16,6 +16,7 @@ return {
           workspaces[#workspaces+1] = workspace
         end
       end
+      table.sort(workspaces)
 
       -- Open Neorg workspace when entering one of the initial drawers for the first time
       vim.api.nvim_create_autocmd("User", {
