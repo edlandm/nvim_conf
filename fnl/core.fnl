@@ -45,6 +45,7 @@
   ;; TODO: find a way to write this in lua
   ; [:foldtext "util#get_foldtext()"]
   [:formatoptions "tcq1nb"]
+  [:grepprg "rg --vimgrep $*"]
   [:helplang "en"]
   [:lcs "tab:¦ ,trail:·"]
   [:maxmapdepth 20]
