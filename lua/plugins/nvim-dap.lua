@@ -36,8 +36,8 @@ return {
             end
           end
         end
-        api.nvim_set_keymap(
-          'n', 'K', '<cmd>lua require("dap.ui.widgets").hover()<cr>', { silent = true })
+        api.nvim_buf_set_keymap(
+          0, 'n', 'K', '<cmd>lua require("dap.ui.widgets").hover()<cr>', { silent = true })
       end
 
       dap.listeners.after['event_terminated']['me'] = function()
