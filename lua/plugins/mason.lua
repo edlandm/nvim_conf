@@ -57,6 +57,15 @@ return {
           }
         })
       end,
+
+      ["csharp_ls"] = function()
+        local util = require('lspconfig.util')
+        lspconfig.csharp_ls.setup({
+          root_dir = function(fname)
+            return util.root_pattern '*.sln'(fname) or util.root_pattern '*.csproj'(fname)
+          end
+        })
+      end,
     })
   end
 }
