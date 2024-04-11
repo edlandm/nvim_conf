@@ -5,7 +5,7 @@ vim.bo.tabstop    = 4
 vim.wo.foldmethod = "syntax"
 -- {{{ mappings
 local mapopts = function(desc, opts) -- {{{ shorthand for adding the description
-  _t = {buffer = true, noremap = true, desc = desc}
+  local _t = {buffer = true, noremap = true, desc = desc}
   if opts then
     for k,v in pairs(opts) do
       _t[k] = v
