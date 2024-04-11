@@ -1,5 +1,6 @@
 return {
   'nvim-neorg/neorg',
+  lazy = false,
   opts = {
     load = {
       ['core.defaults'] = {},
@@ -66,7 +67,8 @@ return {
   },
   dependencies = {
     'nvim-treesitter/nvim-treesitter',
+    'vhyrro/luarocks.nvim',
   },
-  ft = 'norg',
-  cmd = 'Neorg',
+  version = "*",
+  config = true,
 }
