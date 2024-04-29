@@ -74,6 +74,19 @@ vim.api.nvim_create_user_command("SqlFixCommas",
     range = true,
   })
 
+vim.api.nvim_buf_create_user_command(0, "SqlFixStrings", function ()
+  -- NOTE: this pattern is imperfect; if multiple strings are on the same
+  -- line, the following ones will have N prepended to their closing quote.
+  -- I do not think there is a fix for that using regular expressions.
+  local pattern = "[^N]\\zs'\\ze[^']\\{-\\}'"
+  vim.cmd("keeppatterns %s/" .. pattern .. "/N&/e")
+end, {desc = "Add the N prefix to every string that is missing it in the current buffer"})
+
+vim.api.nvim_buf_create_user_command(0, "SqlSuggestNolocks", function ()
+  local pattern = "FROM [^)]\\{-\\} \\zs\\ze\\(WHERE\\|\\n\\)"
+  vim.cmd("keeppatterns %s/" .. pattern .. "/WITH (NOLOCK) /ce")
+end, {desc = "Find every FROM without a NOLOCK and offer to add it (not perfect)"})
+
 local rename_var = function(old, new)
   -- rename a sql variable without moving the cursor
   local cursor = vim.fn.getpos(".")
