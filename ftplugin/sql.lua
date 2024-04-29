@@ -11,7 +11,7 @@ vim.cmd.setlocal("tabstop=4")
 -- }}}
 -- {{{ commands
 local range_cmd = function(opts) return "keeppatterns " .. opts.line1 .. ","  .. opts.line2 end
-vim.api.nvim_create_user_command("SqlAssignColumnsToVariables",
+vim.api.nvim_buf_create_user_command(0, "SqlAssignColumnsToVariables",
   function(opts)
     vim.cmd((range_cmd(opts) .. "s/\\(\\w\\{-}\\.\\)\\(\\S\\+\\)$/@\\2 = &/e"))
   end,
@@ -19,7 +19,7 @@ vim.api.nvim_create_user_command("SqlAssignColumnsToVariables",
     range = true,
   })
 
-vim.api.nvim_create_user_command("SqlWhereMatchColumnsToVariables",
+vim.api.nvim_buf_create_user_command(0, "SqlWhereMatchColumnsToVariables",
   function(opts)
     print(opts.line1 .. " - " .. opts.line2)
     vim.cmd((range_cmd(opts) .. "v/=/s/\\(\\w\\{-}\\.\\)\\(\\S\\+\\)$/& = @\\2/e"))
@@ -28,7 +28,7 @@ vim.api.nvim_create_user_command("SqlWhereMatchColumnsToVariables",
     range = true,
   })
 
-vim.api.nvim_create_user_command("SqlVarsToInParams",
+vim.api.nvim_buf_create_user_command(0, "SqlVarsToInParams",
   function(opts)
     vim.cmd((range_cmd(opts) .. "s/@/@in_/ge"))
   end,
@@ -36,7 +36,7 @@ vim.api.nvim_create_user_command("SqlVarsToInParams",
     range = true,
   })
 
-vim.api.nvim_create_user_command("SqlVarsToOutParams",
+vim.api.nvim_buf_create_user_command(0, "SqlVarsToOutParams",
   function(opts)
     vim.cmd((range_cmd(opts) .. "s/@\\S\\+/@out_& = &/ge"))
   end,
@@ -44,7 +44,7 @@ vim.api.nvim_create_user_command("SqlVarsToOutParams",
     range = true,
   })
 
-vim.api.nvim_create_user_command("SqlSelectAliases",
+vim.api.nvim_buf_create_user_command(0, "SqlSelectAliases",
   function(opts)
     -- automatically give [aliases] to all highlighted columns
     -- SELECT                     -> SELECT
@@ -56,7 +56,7 @@ vim.api.nvim_create_user_command("SqlSelectAliases",
     range = true,
   })
 
-vim.api.nvim_create_user_command("SqlFixCommas",
+vim.api.nvim_buf_create_user_command(0, "SqlFixCommas",
   function(opts)
     -- I prefer commas at the beginning of lines
     local mods = "silent keeppatterns "
@@ -94,7 +94,7 @@ local rename_var = function(old, new)
   vim.fn.setpos(".", cursor)
 end
 
-vim.api.nvim_create_user_command("SqlRenameVariable",
+vim.api.nvim_buf_create_user_command(0, "SqlRenameVariable",
   function(opts)
     local old = nil
     local new = nil
@@ -230,7 +230,6 @@ end, mapopts("tSQLt run test suite tSQLt run current file", {silent = true}))
 -- }}}
 vim.keymap.set("n", "<localleader>rv", "<cmd>SqlRenameVariable<cr>", mapopts("rename variable: @old to @new"))
 vim.keymap.set("n", "<localleader>cs", _G.sql_snake_case_cword, mapopts("convert variable to snake_case"))
--- }}}
 -- }}}
 local function line_wrapper_fn(wrap1, wrap2, indent_contents) -- {{{ return a function that wraps lines
   if not wrap2 then
