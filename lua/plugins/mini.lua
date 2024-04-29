@@ -29,8 +29,6 @@ return {
         move_with_alt = false,
       }
     })
-    -- delete the keymaps I don't like
-    vim.keymap.del({'n', 'i', 'v'}, '<c-s>')
     -- }}}
 
     require("mini.bracketed").setup() -- go forward/backward with [brackets]
