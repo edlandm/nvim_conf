@@ -41,7 +41,7 @@ return {
     require("mini.comment").setup({
       options = {
         ignore_blank_line = true,
-        custom_commentstring = function(pos)
+        custom_commentstring = function()
           if vim.bo.commentstring then
             return vim.bo.commentstring
           end
@@ -91,17 +91,18 @@ return {
       }}) -- }}}
 
     -- statusline
-    require("mini.statusline").setup({
+    local statusline = require("mini.statusline")
+    statusline.setup({
       content = {
         active = function()
-          local mode, mode_hl = MiniStatusline.section_mode({ trunc_width = 120 })
-          local git           = MiniStatusline.section_git({ trunc_width = 75 })
-          local diagnostics   = MiniStatusline.section_diagnostics({ trunc_width = 75 })
-          local filename      = MiniStatusline.section_filename({ trunc_width = 140 })
-          local fileinfo      = MiniStatusline.section_fileinfo({ trunc_width = 120 })
-          local location      = MiniStatusline.section_location({ trunc_width = 75 })
+          local mode, mode_hl = statusline.section_mode({ trunc_width = 120 })
+          local git           = statusline.section_git({ trunc_width = 75 })
+          local diagnostics   = statusline.section_diagnostics({ trunc_width = 75 })
+          local filename      = statusline.section_filename({ trunc_width = 140 })
+          local fileinfo      = statusline.section_fileinfo({ trunc_width = 120 })
+          local location      = statusline.section_location({ trunc_width = 75 })
 
-          return MiniStatusline.combine_groups({
+          return statusline.combine_groups({
             { hl = mode_hl,                  strings = { mode } },
             { hl = 'MiniStatuslineDevinfo',  strings = { git, diagnostics } },
             '%<', -- Mark general truncate point
@@ -157,17 +158,19 @@ return {
         content_from_bottom = true,
       },
     })
-    require('mini.extra').setup()
+
+    local extra = require('mini.extra')
+    extra.setup()
 
     local dir_explorer = function()
-      MiniExtra.pickers.explorer(
+      extra.pickers.explorer(
         { filter = function(e) return e.fs_type == "directory" end },
         {
           mappings = {
             cd_selected_dir = {
               char = '<C-e>',
               func = function()
-                local dir = MiniPick.get_picker_matches().current
+                local dir = pick.get_picker_matches().current
                 vim.cmd.cd(dir.path)
                 vim.cmd.echo('"Changed directory: '..dir.path..'"')
               end
@@ -175,7 +178,7 @@ return {
             cd_open_dir = {
               char = '<C-o>',
               func = function()
-                local cwd = MiniPick.get_picker_opts().source.cwd
+                local cwd = pick.get_picker_opts().source.cwd
                 vim.cmd.cd(cwd)
                 vim.cmd.echo('"Changed directory: '..cwd..'"')
               end
