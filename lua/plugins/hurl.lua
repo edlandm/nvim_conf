@@ -16,6 +16,7 @@ local function setmaps()
   nmap("<localleader>ef", "<cmd>HurlRunner<cr>", "Hurl: [e]xecute [f]ile")
   nmap("<localleader>er", "<cmd>HurlRunnerAt<cr>", "Hurl: [e]xecute [r]equest")
   nmap("<localleader>et", "<cmd>HurlRunnerToEntry<cr>", "Hurl: [e]xecute up [t]o request")
+  nmap("<localleader>e<cr>", "<cmd>HurlShowLastResponse<cr>", "Hurl: show last response")
 
   -- environment variables
   nmap("<localleader>he", ":HurlSetVariable ", "Hurl: Set [e]nvironment variable")
