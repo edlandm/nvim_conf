@@ -232,6 +232,44 @@ vim.keymap.set("n", "<localleader>rv", "<cmd>SqlRenameVariable<cr>", mapopts("re
 vim.keymap.set("n", "<localleader>cs", _G.sql_snake_case_cword, mapopts("convert variable to snake_case"))
 -- }}}
 -- }}}
+local function line_wrapper_fn(wrap1, wrap2, indent_contents) -- {{{ return a function that wraps lines
+  if not wrap2 then
+    wrap2 = assert(wrap1, "at least one argument is required")
+  end
+  return function()
+    local line1, line2 = vim.fn.line("'["), vim.fn.line("']")
+    if line1 > line2 then
+      line1, line2 = line2, line1
+    end
+
+    local lines = vim.api.nvim_buf_get_lines(0, line1 - 1, line2, false)
+    local indent = string.match(lines[1], "^%s*")
+
+    local indent_step = ""
+    if indent_contents then
+      indent_step = "\t"
+      if vim.bo.expandtab then
+        indent_step = string.rep(" ", vim.bo.shiftwidth or 4)
+      end
+    end
+
+    local wrapped_lines = { indent .. wrap1 }
+    for i = 1, #lines do
+      wrapped_lines[i + 1] = indent .. indent_step .. lines[i]
+    end
+    wrapped_lines[#wrapped_lines + 1] = indent .. wrap2
+
+    vim.api.nvim_buf_set_lines(0, line1 - 1, line2, false, wrapped_lines)
+  end
+end -- }}}
+
+_G.sql_wrap_begin_end = line_wrapper_fn("BEGIN", "END", true)
+vim.keymap.set("n", "<localleader>wb", function()
+  vim.go.operatorfunc = "v:lua.sql_wrap_begin_end"
+  vim.api.nvim_feedkeys( "g@", "i", false)
+end,
+  { desc = "wrap {motion} in BEGIN/END" }
+)
 -- {{{ VISUAL
 -- vim.keymap.set("v", "", "", mapopts(""))
 vim.keymap.set("v", "<localleader>U", "!sql uppercase<cr>", mapopts("uppercase SQL keywords", {silent = true}))
