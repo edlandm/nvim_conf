@@ -52,6 +52,6 @@ return {
     'CloakDisable',
   },
   keys = {
-    {"<leader>tC", "<cmd>CloakToggle<cr>", "Toggle Cloak"}
+    {"<leader>tC", "<cmd>lua require('cloak').toggle()<cr>", "Toggle Cloak"}
   }
 }
