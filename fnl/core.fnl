@@ -47,6 +47,7 @@
   [:formatoptions "tcq1nb"]
   [:grepprg "rg --vimgrep $*"]
   [:helplang "en"]
+  [:inccommand :split]
   [:lcs "tab:¦ ,trail:·"]
   [:maxmapdepth 20]
   [:nrformats "hex"]
