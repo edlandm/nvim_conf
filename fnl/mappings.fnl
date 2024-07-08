@@ -133,7 +133,7 @@
 
 (define-mappings "n"
   ["'" "`" {:desc "jump to line+column of a mark"}]
-  [:<c-c> #(vim.cmd "echo ''") {:desc "clear status-line"}]
+  [:<c-c> "<cmd>copen<cr>" {:desc "open quickfix window"}]
   [:<c-e> :3<c-e> {:desc "scroll up"}]
   [:<c-w><c-d> toggle-window-diff {:expr true :desc "toggle diff-mode in current tab"}]
   [:<c-w><c-v> "<cmd>vertical wincmd f<cr>" {:desc "open file under cursor in vertical split"}]
