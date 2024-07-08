@@ -37,28 +37,6 @@ return {
     vim.keymap.del('n', '[d')
     vim.keymap.del('n', '[D')
 
-    -- {{{ Comments - toggle comments on objects+motions
-    require("mini.comment").setup({
-      options = {
-        ignore_blank_line = true,
-        custom_commentstring = function()
-          if vim.bo.commentstring then
-            return vim.bo.commentstring
-          end
-        end
-      },
-      mappings = {
-        comment      = '<leader>c',
-        comment_line = '<leader>cc',
-        textobject   = '<leader>c',
-      }
-    })
-    vim.keymap.set('n', '<leader>cy', 'yy<leader>cc',
-      { remap = true, silent = true, desc = "yank line and comment it" })
-    vim.keymap.set('i', ';c', '<cmd>lua MiniComment.toggle_lines(vim.fn.line("."), vim.fn.line("."))<cr>',
-    { desc = "comment current line" })
-    -- }}}
-
     require("mini.cursorword").setup() -- underline word under cursor
 
     -- {{{ HiPatterns - highlight patterns in text
