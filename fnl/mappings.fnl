@@ -202,13 +202,9 @@
 ;;;; }}}
 ;;;; {{{ Insert Mode Mappings
 (define-mappings "i"
-  [:hh "<esc>" {:desc "exit insert mode"}]
-  [:hs "<esc>" {:desc "exit insert mode"}]
-  [";]" #(do (set vim.o.paste true) (vim.cmd "call system(\"tmux paste-buffer\")") (set vim.o.paste false)) {:desc "paste from tmux clipboard"}]
-  [";l" "<c-o>b<c-o>guiw<c-o>e<c-o>a" {:desc "lowercase current word"}]
-  [";s" "<c-o>z=" {:desc "correct mispelled word"}]
-  [";u" "<c-o>b<c-o>gUiw<c-o>e<c-o>a" {:desc "uppercase current word"}]
-  [";=" "<c-o>==" {:desc "indent current line with `=`"}]
+  ;; these two are now handled by better-escape plugin
+  ; [:hh "<esc>" {:desc "exit insert mode"}]
+  ; [:hs "<esc>" {:desc "exit insert mode"}]
   [:<c-a> :<c-o>^ {:desc "move cursor to beginning of line"}]
   [:<c-e> :<c-o>$ {:desc "move cursor to end of line"}]
   ["<c-r><c-r>" :<c-r>+ {:desc "paste from system clipboard"}]
