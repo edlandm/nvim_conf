@@ -129,12 +129,6 @@
      (nvim.feedkeys "g@" "i" false)))
 
 (set _G.operator operator)
-
-(defn- grep []
-  (let [reply (vim.fn.input {:prompt "Grep>" :default nil :cancelreturn nil})]
-    (when reply
-      (vim.cmd (.. "silent grep! " reply))
-      (vim.cmd "copen"))))
 ;;; }}}
 
 (define-mappings "n"
@@ -151,7 +145,6 @@
   [:<leader>* "<cmd>let @/ = expand(\"<cword>\") .. \"\\\\>\" | set hlsearch<cr>" {:desc "search for word under cursor without moving cursor"}]
   [:<leader>< "V`]<" {:desc "outdent what was just pasted"}]
   [:<leader>> "V`]>" {:desc "indent what was just pasted"}]
-  [:<leader>/ grep {:desc "grep and open quickfix list"}]
   [:<leader>bb :<c-^> {:desc "jump to []counth buffer in the buffer list"}]
   [:<leader>bB :<cmd>blast<cr> {:desc "jump to last buffer in buffer-list"}]
   [:<leader>bd "<cmd>bp|silent!<cr> bwipeout #<cr>" {:desc "delete buffer (keep splits)"}]
