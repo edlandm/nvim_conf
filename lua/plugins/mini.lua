@@ -172,7 +172,6 @@ return {
     vim.keymap.set('n', '<tab>:', "<cmd>Pick history scope='cmd'<cr>", { desc = "Pick: command history" })
     vim.keymap.set('n', '<tab>b', "<cmd>Pick buffers include_current=false<cr>", { desc = "Pick: buffers" })
     vim.keymap.set('n', '<tab>c', "<cmd>Pick commands<cr>", { desc = "Pick: commands" })
-    vim.keymap.set('n', '<tab>d', "<cmd>Pick diagnostic<cr>", { desc = "Pick: lsp diagnostics" })
     vim.keymap.set('n', '<tab>gb', "<cmd>Pick git_branches<cr>", { desc = "Pick: git branches" })
     vim.keymap.set('n', '<tab>gc', "<cmd>Pick git_commits<cr>", { desc = "Pick: git commits" })
     vim.keymap.set('n', '<tab>gh', "<cmd>Pick git_hunks<cr>", { desc = "Pick: git diff hunks" })
