@@ -123,6 +123,10 @@
 (ac.augroup :toggle-insert
   [[:InsertEnter] {:pattern :* :command "set nolist"}]
   [[:InsertLeave] {:pattern :* :command "set list"}]) ; }}}
+;; {{{ terminal buffer settings
+(ac.augroup :term-settings
+  [[:TermOpen] {:pattern :* :command "setlocal nonumber norelativenumber"}]
+  [[:TermOpen] {:pattern :* :command "startinsert"}]) ; }}}
 ;;; }}}
 
 ;; set default color-scheme (if it was not set in local config)
