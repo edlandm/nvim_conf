@@ -20,6 +20,12 @@ return {
       close  = { timing = animate.gen_timing.quadratic({ duration = 10 }) },
     }) -- }}}
 
+    -- {{{ Icons
+    require("mini.icons").setup({
+      style = "glyph",
+    })
+    -- }}}
+
     -- {{{ Basics - common configuration presets
     require("mini.basics").setup({
       mappings = {
