@@ -1,6 +1,5 @@
 return {
-  {
-    "marko-cerovac/material.nvim",
+  { "marko-cerovac/material.nvim", -- good standard dark-theme
     lazy = false,
     opts = {
       contrast = {
@@ -62,7 +61,20 @@ return {
       -- vim.g.material_style = "palenight"
       -- vim.g.material_style = "deep ocean"
       require("material").setup(opts)
-      vim.cmd("colorscheme material")
     end
+  },
+  {
+    "neanias/everforest-nvim",
+    version = false,
+    lazy = false,
+    priority = 1000, -- make sure to load this before all the other start plugins
+    -- Optional; default configuration will be used if setup isn't called.
+    main = "everforest",
+    opts = {
+      italics = true,
+      ui_contrast = "high",
+      dim_inactive_windows = true,
+    },
+    config = true,
   },
 }
