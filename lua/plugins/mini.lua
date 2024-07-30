@@ -184,11 +184,11 @@ return {
     end
 
     vim.keymap.set('n', '<c-p>', "<cmd>Pick files<cr>", { desc = "Pick: files" })
-    vim.keymap.set('n', '<tab><tab>', "<cmd>Pick resume<cr>", { desc = "Resume previous picker" })
+    -- vim.keymap.set('n', '<tab><tab>', "<cmd>Pick resume<cr>", { desc = "Resume previous picker" })
     vim.keymap.set('n', '<tab>.', dir_explorer, { desc = "Pick: explorer" })
     vim.keymap.set('n', '<tab>/', "<cmd>Pick history scope='search'<cr>", { desc = "Pick: search history" })
     vim.keymap.set('n', '<tab>:', "<cmd>Pick history scope='cmd'<cr>", { desc = "Pick: command history" })
-    vim.keymap.set('n', '<tab>b', "<cmd>Pick buffers include_current=false<cr>", { desc = "Pick: buffers" })
+    -- vim.keymap.set('n', '<tab>b', "<cmd>Pick buffers include_current=false<cr>", { desc = "Pick: buffers" })
     vim.keymap.set('n', '<tab>c', "<cmd>Pick commands<cr>", { desc = "Pick: commands" })
     vim.keymap.set('n', '<tab>gb', "<cmd>Pick git_branches<cr>", { desc = "Pick: git branches" })
     vim.keymap.set('n', '<tab>gc', "<cmd>Pick git_commits<cr>", { desc = "Pick: git commits" })
@@ -216,7 +216,6 @@ return {
     -- }}}
   end,
   dependencies = {
-    'nvim-tree/nvim-web-devicons',
     'lewis6991/gitsigns.nvim',
     -- 'folke/noice.nvim',
   }
