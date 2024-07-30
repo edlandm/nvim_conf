@@ -6,5 +6,6 @@ return {
   config = function()
     -- abbreviations go here
     vim.cmd({ cmd = "Abolish", args = { "deploymenst", "deployments" } })
+    vim.cmd({ cmd = "Abolish", args = { "alais{,es}", "alias{,es}" } })
   end
 }
