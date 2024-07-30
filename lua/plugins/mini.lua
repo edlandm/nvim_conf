@@ -28,6 +28,9 @@ return {
 
     -- {{{ Basics - common configuration presets
     require("mini.basics").setup({
+      autocommands = {
+        basic = false
+      },
       mappings = {
         option_toggle_prefix = [[<leader>o]],
         basics        = true,
