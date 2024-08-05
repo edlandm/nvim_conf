@@ -35,6 +35,10 @@ return {
           strategy = "flat",
         }
       },
+      ['core.qol.todo_items'] = {
+        create_todo_items = true,
+        create_todo_parents = false,
+      },
     },
   },
   dependencies = {
