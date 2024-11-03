@@ -3,6 +3,6 @@ return {
   opts = {
     default_file_explorer = true,
   },
-  event = "VimEnter",
+  event = "VeryLazy",
   config = true,
 }
