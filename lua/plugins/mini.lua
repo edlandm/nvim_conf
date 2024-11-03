@@ -10,16 +10,6 @@ return {
         search_method = 'cover_or_prev',
     })
 
-    -- {{{ Animate - animations when scrolling, moving cursor, resizing windows
-    local animate = require("mini.animate")
-    animate.setup({
-      cursor = { timing = animate.gen_timing.exponential({ duration = 3 }) },
-      scroll = { timing = animate.gen_timing.quartic({ duration = 3 }) },
-      resize = { timing = animate.gen_timing.exponential({ duration = 3 }) },
-      open   = { timing = animate.gen_timing.quadratic({ duration = 10 }) },
-      close  = { timing = animate.gen_timing.quadratic({ duration = 10 }) },
-    }) -- }}}
-
     -- {{{ Icons
     require("mini.icons").setup({
       style = "glyph",
