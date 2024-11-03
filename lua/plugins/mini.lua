@@ -33,7 +33,7 @@ return {
       },
       mappings = {
         option_toggle_prefix = [[<leader>o]],
-        basics        = true,
+        basics        = false,
         windows       = true,
         move_with_alt = false,
       }
