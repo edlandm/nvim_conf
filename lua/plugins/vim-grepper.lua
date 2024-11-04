@@ -9,11 +9,12 @@ return {
     "Grepper",
   },
   keys = {
-    { "<leader>/", "<cmd>Grepper<cr>", desc = "Grepper search" },
-    { "<leader>?", "<cmd>Grepper<cr>", desc = "Grepper search buffer" },
-    { "g/", "<plug>(GrepperOperator)", desc = "Grepper search [motion]" },
-    { "g?", "<plug>(GrepperOperator)", desc = "Grepper search buffer [motion]" },
-    { "g*", "<cmd>Grepper -cword -noprompt<cr>", desc = "Grepper search [cword]" },
-    { "g#", "<cmd>Grepper -cword -noprompt -buffer<cr>", desc = "Grepper search buffer [cword]" },
+    { "<leader>ss", "<cmd>Grepper<cr>", desc = "Grepper search" },
+    { "<leader>SS", "<cmd>Grepper -buffers<cr>", desc = "Grepper search (open buffers)" },
+    { "<leader>s",  "<plug>(GrepperOperator)", desc = "Grepper search <motion>" },
+    { "<leader>S",  "<plug>(GrepperOperator -buffers)", desc = "Grepper search <motion> (open buffers)" },
+    { "<leader>s*", "<cmd>Grepper -cword -noprompt<cr>", desc = "Grepper search <cword>" },
+    { "<leader>s#", "<cmd>Grepper -cword -noprompt -buffer<cr>", desc = "Grepper search buffer <cword>" },
+    { "<leader>s",  "<plug>(GrepperOperator)", mode = "x", desc = "Grepper search <motion>" },
   },
 }
