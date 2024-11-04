@@ -11,12 +11,18 @@ return {
     local neorg = require("neorg")
     if neorg then -- set up neorg workspace hook
       local dirman = neorg.modules.get_module("core.dirman")
+      local neorg_workspaces = { }
       for _, workspace in ipairs(dirman.get_workspace_names()) do
-        if workspace ~= "default" then
-          workspaces[#workspaces+1] = workspace
+        if workspace ~= "default" and workspace ~= "home" then
+          table.insert(neorg_workspaces, workspace)
         end
       end
-      table.sort(workspaces)
+
+      table.sort(neorg_workspaces)
+
+      for _, workspace in ipairs(neorg_workspaces) do
+        table.insert(workspaces, workspace)
+      end
 
       -- Open Neorg workspace when entering one of the initial drawers for the first time
       vim.api.nvim_create_autocmd("User", {
@@ -40,6 +46,8 @@ return {
           dirman.open_workspace(drawer)
         end,
       })
+    else
+      workspaces[1] = "home"
     end
 
     cabinet:setup({
@@ -168,8 +176,6 @@ return {
       { desc = "Echo Current Drawer" })
     vim.keymap.set("n", prefix("l"), "<cmd>DrawerList<cr>",
       { desc = "List Drawers" })
-    vim.keymap.set("n", prefix("b"), "<cmd>DrawerListBuffers<cr>",
-      { desc = "List Buffers in Current Drawer" })
 
     -- select a drawer and perform an action
     vim.keymap.set("n", prefix("x"),
