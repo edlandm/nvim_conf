@@ -4,16 +4,7 @@ return {
     vim.g.grepper = {
       tools = { "rg", "git", "grep" },
     }
-    vim.cmd(([[
-        aug Grepper
-            au!
-            au User Grepper ++nested %s
-        aug END
-    ]]):format([[call setqflist([], 'r', {'context': {'bqf': {'pattern_hl': '\%#' . getreg('/')}}})]]))
   end,
-  dependencies = {
-    "kevinhwang91/nvim-bqf",
-  },
   cmd = {
     "Grepper",
   },
