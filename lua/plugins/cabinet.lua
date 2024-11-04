@@ -148,6 +148,19 @@ return {
 
     vim.keymap.set("n", prefix("c"), ":DrawerNew ",
       { desc = "Create New Drawer" })
+
+    vim.keymap.set("n", prefix("C"), function ()
+      local input = vim.fn.input({prompt = 'Create Drawer: ', cancelreturn = ''})
+      if vim.fn.empty(input) == 1 then return end
+      local current = cabinet.drawer_current()
+      vim.cmd({ cmd = "DrawerNew", args = { input } })
+      cabinet.drawer_select(current)
+      vim.cmd({ cmd = "DrawerBufMove", args = { input } })
+      vim.cmd.edit("#")
+      cabinet.drawer_select(input)
+    end,
+      { desc = "Create New Drawer with <cbuf>" })
+
     vim.keymap.set("n", prefix("r"), ":DrawerRename ",
       { desc = "Rename Current Drawer" })
 
