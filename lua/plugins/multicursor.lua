@@ -21,8 +21,10 @@ return {
       { 'Enable Multi-Cursor Mode', mappings.leader('n'),
         function () MULTI_MODE:activate() end },
       { 'Restore Multi-Cursor Mode', mappings.leader('gn'), function ()
-        MULTI_MODE:activate()
         mc.restoreCursors()
+        if not MULTI_MODE:active() then
+          MULTI_MODE:activate()
+        end
       end },
     })
 
@@ -40,6 +42,7 @@ return {
           function ()
             if mc.hasCursors() then
               mc.clearCursors()
+              return
             end
             if MULTI_MODE then
               MULTI_MODE:deactivate()
@@ -110,10 +113,10 @@ return {
         {
           '<c-q>',
           function ()
-            if mc.numDisabledCursors() > 0 then
-              mc.enableCursors()
-            else
+            if mc.cursorsEnabled() then
               mc.disableCursors()
+            else
+              mc.enableCursors()
             end
           end,
           { desc = 'Disable/Enable cursor movement' },
@@ -130,17 +133,6 @@ return {
           function () mc.matchAddCursor(-1) end,
           { desc = 'Add cursor and jump to previous word under cursor' }
         },
-        {
-          '<c-q>',
-          function ()
-            if mc.numDisabledCursors() > 0 then
-              mc.enableCursors()
-            else
-              mc.disableCursors()
-            end
-          end,
-          { desc = 'Disable/Enable cursor movement' },
-        }
       },
     })
   end
