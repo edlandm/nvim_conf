@@ -1,14 +1,16 @@
 return {
-  "williamboman/mason.nvim",
+  'williamboman/mason.nvim',
   lazy = false,
   dependencies = {
-    "williamboman/mason-lspconfig.nvim",
-    "neovim/nvim-lspconfig",
+    'williamboman/mason-lspconfig.nvim',
+    'neovim/nvim-lspconfig',
+    'folke/lazydev.nvim',
+    'Decodetalkers/csharpls-extended-lsp.nvim',
   },
   config = function()
-    local mason = require("mason")
-    local mason_lspconfig = require("mason-lspconfig")
-    local lspconfig = require("lspconfig")
+    local mason = require('mason')
+    local mason_lspconfig = require('mason-lspconfig')
+    local lspconfig = require('lspconfig')
 
     mason.setup()
     mason_lspconfig.setup()
@@ -24,12 +26,14 @@ return {
       -- ["rust_analyzer"] = function ()
       --   require("rust-tools").setup {}
       -- end
-      ["lua_ls"] = function()
+      ['lua_ls'] = function()
         lspconfig.lua_ls.setup({
           on_init = function(client)
-            local path = client.workspace_folders[1].name
-            if vim.loop.fs_stat(path..'/.luarc.json') or vim.loop.fs_stat(path..'/.luarc.jsonc') then
-              return
+            if client.workspace_folders then
+              local path = client.workspace_folders[1].name
+              if vim.loop.fs_stat(path..'/.luarc.json') or vim.loop.fs_stat(path..'/.luarc.jsonc') then
+                return
+              end
             end
 
             client.config.settings.Lua = vim.tbl_deep_extend('force', client.config.settings.Lua, {
@@ -58,13 +62,21 @@ return {
         })
       end,
 
-      ["csharp_ls"] = function()
+      ['csharp_ls'] = function()
         local util = require('lspconfig.util')
-        lspconfig.csharp_ls.setup({
+        local ext_handler = require('csharpls_extended').handler
+        local config = {
+          handlers = {
+            ['textDocument/definition']     = ext_handler,
+            ['textDocument/typeDefinition'] = ext_handler,
+          },
           root_dir = function(fname)
-            return util.root_pattern '*.sln'(fname) or util.root_pattern '*.csproj'(fname)
+            return vim.fs.root(fname, function(name)
+              return name:match('%.csproj$') ~= nil or name:match('%.sln$') ~= nil
+            end)
           end
-        })
+        }
+        lspconfig.csharp_ls.setup(config)
       end,
     })
   end
