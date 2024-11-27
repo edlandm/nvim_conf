@@ -1,16 +1,21 @@
 return {
   "folke/which-key.nvim",
-  event = "UIEnter",
-  init = function()
-    vim.o.timeout = true
-    vim.o.timeoutlen = 200
-  end,
-  opts = {
-    plugins = {
-      registers = false,
+  event = 'VeryLazy',
+  opts = {},
+  keys = {
+    {
+      "<localleader><localleader>",
+      function()
+        require("which-key").show({ global = false })
+      end,
+      desc = "Buffer Local Keymaps (which-key)",
     },
-    triggers_blacklist = {
-      i = { "h", ";", "<", ">"},
-    }
-  }
+    {
+      "<leader><leader>",
+      function()
+        require("which-key").show({ global = true })
+      end,
+      desc = "Global Keymaps (which-key)",
+    },
+  },
 }
