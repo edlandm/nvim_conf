@@ -55,7 +55,14 @@ return {
           (method_declaration)   @method_capture
           ]],
           offsets = {},
-        }
+        },
+        markdown = {
+          target_query = [[
+          (section) @section_capture
+          (code_fence_content) @code_fence_capture
+          ]],
+          offsets = {},
+        },
       },
     })
   end,
