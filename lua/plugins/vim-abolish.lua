@@ -1,15 +1,25 @@
 -- find, sub, and abbreviate variations of words
 return {
   'tpope/vim-abolish',
-  lazy = false,
-  ft = {'gitcommit', 'markdown', 'text', 'norg'},
+  event = 'VeryLazy',
   init = function ()
     -- I decided to use gregorias/coerce.nvim for the coerce functionality
     vim.g.abolish_no_mappings = true
   end,
   config = function()
-    -- abbreviations go here
-    vim.cmd({ cmd = "Abolish", args = { "deploymenst", "deployments" } })
-    vim.cmd({ cmd = "Abolish", args = { "alais{,es}", "alias{,es}" } })
+    ---define a list of abolish abbreviations/corrections all at once
+    ---@param _pairs [string, string][]
+    local function abolish(_pairs)
+      for _, pair in ipairs(_pairs) do
+        vim.cmd({ cmd = "Abolish", args = { pair[1], pair[2] } })
+      end
+    end
+
+    abolish({
+      { 'deploymenst', 'deployments' },
+      { 'alais{,es}',  'alias{,es}'  },
+      { 'dafeult{,s}', 'default{,s}' },
+      { 'mappig{,s}',  'mapping{,s}' },
+    })
   end
 }
