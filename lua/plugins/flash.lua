@@ -50,22 +50,22 @@ return {
       }
     }
   },
-  event = "VimEnter",
+  event = "VeryLazy",
   config = true,
   keys = {
     { "_j",  "<cmd>lua require('flash').jump({ search = { forward = true, multi_window = true, wrap = false } })<cr>",
       mode = {"n", "x", "o" }, desc = "flash: jump forward (down)" },
     { "_k",  "<cmd>lua require('flash').jump({ search = { forward = false, multi_window = true, wrap = false } })<cr>",
       mode = {"n", "x", "o" }, desc = "flash: jump backward (up)" },
-    { "_n", flash_cword, mode = {"n", "x", "o" },
-        desc = "flash: initialize with cword" },
-    { "_t", "<cmd>lua require('flash').treesitter()<cr>", mode = {"n", "x", "o"},
-        desc = "flash: treesitter nodes" },
-    { "__", "<cmd>lua require('flash').jump({continue = true})<cr>", mode = {"n", "x", "o"},
-        desc = "flash: continue last jump" },
+    { "_*", flash_cword, mode = {"n", "x", "o" },
+        desc = "flash: cword" },
+    { "<cr>", "<cmd>lua require('flash').treesitter()<cr>", mode = {"n", "x", "o"},
+        desc = "flash: Treesitter mode" },
+    { "__", "<cmd>lua require('flash').treesitter_search()<cr>", mode = {"n", "x", "o"},
+        desc = "flash: Treesitter nodes" },
     { "r", "<cmd>lua require('flash').remote()<cr>", mode = "o",
         desc = "flash: remote" },
-    { "R", "<cmd>lua require('flash').treesitter_search()<cr>", mode = "o",
+    { "__", "<cmd>lua require('flash').treesitter_search()<cr>", mode = "o",
         desc = "flash: Treesitter Search" },
   }
 }
