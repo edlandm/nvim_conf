@@ -1,5 +1,4 @@
 local api = vim.api
-local fun = vim.fn
 local not_empty = require('util').not_empty
 
 ---create a new augroup for the given autocmds
@@ -17,38 +16,45 @@ local function augroup(name, commands)
   end
 end
 
-augroup('JUMP_LAST_EDIT', {
-  { {'BufReadPost'}, { pattern = '*',
-    desc = 'return to last edit position when opening files',
-    command = "silent! call setpos('.', getpos(\"'\\\"\"))",
-  }}
-})
+local function setup()
+  augroup('JUMP_LAST_EDIT', {
+    { {'BufReadPost'}, { pattern = '*',
+      desc = 'return to last edit position when opening files',
+      command = "silent! call setpos('.', getpos(\"'\\\"\"))",
+    }}
+  })
 
-augroup('COLOR_COLUMN', {
-  { {'BufReadPost', 'BufNew'}, { pattern = '*', command = 'set colorcolumn=80' } },
-})
+  augroup('COLOR_COLUMN', {
+    { {'BufReadPost', 'BufNew'}, { pattern = '*', command = 'set colorcolumn=80' } },
+  })
 
-augroup('TOGGLE_HLSEARCH', {
-  { {'InsertEnter'}, { pattern = '*', command = 'set nohlsearch' } },
-  { {'CmdlineEnter'}, { pattern = '?', command = 'set hlsearch' } },
-  { {'CmdlineEnter'}, { pattern = '/', command = 'set hlsearch' } },
-})
+  augroup('TOGGLE_HLSEARCH', {
+    { {'InsertEnter'}, { pattern = '*', command = 'set nohlsearch' } },
+    { {'CmdlineEnter'}, { pattern = '?', command = 'set hlsearch' } },
+    { {'CmdlineEnter'}, { pattern = '/', command = 'set hlsearch' } },
+  })
 
-augroup('CURSOR_LINE', {
-  { {'WinEnter'}, { pattern = '*', command = 'set cursorline' } },
-  { {'WinLeave'}, { pattern = '*', command = 'set nocursorline nocursorcolumn' } },
-})
+  augroup('CURSOR_LINE', {
+    { {'WinEnter'}, { pattern = '*', command = 'set cursorline' } },
+    { {'WinLeave'}, { pattern = '*', command = 'set nocursorline nocursorcolumn' } },
+  })
 
-augroup('TOGGLE_LIST_CHARS', {
-  { {'InsertEnter'}, { pattern = '*', command = 'set nolist' } },
-  { {'InsertLeave'}, { pattern = '*', command = 'set list' } },
-})
+  augroup('TOGGLE_LIST_CHARS', {
+    { {'InsertEnter'}, { pattern = '*', command = 'set nolist' } },
+    { {'InsertLeave'}, { pattern = '*', command = 'set list' } },
+  })
 
-augroup('TERMINAL_ENTER', {
-  { {'TermOpen'}, { pattern = '*', command = 'setlocal nonumber norelativenumber' } },
-  { {'TermOpen'}, { pattern = '*', command = 'startinsert' } },
-})
+  augroup('TERMINAL_ENTER', {
+    { {'TermOpen'}, { pattern = '*', command = 'setlocal nonumber norelativenumber' } },
+    { {'TermOpen'}, { pattern = '*', command = 'startinsert' } },
+  })
+
+  augroup('GITREBASE_FileType', {
+    { {'FileType'}, { pattern = 'gitrebase', command = 'g/\\<fixup!/s/^pick\\ze\\>/fixup/' } },
+  })
+end
 
 return {
   augroup = augroup,
+  setup = setup,
 }
