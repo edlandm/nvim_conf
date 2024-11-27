@@ -5,8 +5,9 @@ return {
     -- or leave it empty to use the default settings
     -- refer to the configuration section below
     window = {
-      height = 0.97,
-      width = 0.97,
+      backdrop = 0.95, -- shade the backdrop of the Zen window. Set to 1 to keep the same as Normal
+      height = 1,
+      width = .65,
     },
     plugins = {
       options = {
