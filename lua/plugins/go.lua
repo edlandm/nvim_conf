@@ -1,3 +1,9 @@
+local function set_maps()
+  require("mappings").nmap({
+    { "Run Go Tests", "<localleader>t", "<cmd>GoTest<cr>" },
+  })
+end
+
 return {
   "ray-x/go.nvim",
   dependencies = {  -- optional packages
@@ -6,19 +12,17 @@ return {
     "nvim-treesitter/nvim-treesitter",
   },
   build = ':lua require("go.install").update_all_sync()', -- if you need to install/update all binaries
-  event = {"CmdlineEnter"},
   ft = {"go", 'gomod'},
-  config = function()
-    require("go").setup()
-    -- format on write
-    local format_sync_grp = vim.api.nvim_create_augroup("GoFormat", {})
-    vim.api.nvim_create_autocmd("BufWritePre", {
-      pattern = "*.go",
-      callback = function() vim.cmd("GoFmt") end,
-      group = format_sync_grp,
+  init = function ()
+    require('autocmd').augroup('GOLANG', {
+      { { 'BufEnter', 'BufNewFile' }, { pattern = '*.go', callback = set_maps } },
+      { { 'FileType' }, { pattern = 'go', callback = set_maps } },
+      { { 'BufWritePre' }, { pattern = '*.go', command = 'GoFmt' } },
     })
   end,
-  keys = {
-    {'<localleader>t', '<cmd>GoTest<cr>', 'n', desc = 'Run Tests'},
-  },
+  config = function()
+    require("go").setup({
+      lsp_codelense = false,
+    })
+  end,
 }
