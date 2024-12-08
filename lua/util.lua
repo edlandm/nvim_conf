@@ -57,9 +57,9 @@ local function prompt_yn(msg, default)
   assert(msg, 'msg is required')
   if default == nil then default = false end
 
-  local prompt = '*&Yes*\n&No'
+  local _prompt = '*&Yes*\n&No'
   if default == false then
-    prompt = '&Yes\n*&No*'
+    _prompt = '&Yes\n*&No*'
   end
 
   local default_choice = 1
@@ -67,7 +67,7 @@ local function prompt_yn(msg, default)
     default_choice = 2
   end
 
-  local response = fun.confirm(msg, prompt, default_choice, 'Question')
+  local response = fun.confirm(msg, _prompt, default_choice, 'Question')
   if response == 1 then
     return true
   end
@@ -184,13 +184,37 @@ local function indent_lines(lines)
   return _lines
 end
 
+---attempt to find a matching ancestor of a given node
+---@param types string[]
+---@param node TSNode
+---@return TSNode?
+local function find_node_ancestor(types, node)
+  assert(types, 'find_node_ancestor :: `types required`')
+
+  if not node then
+    return nil
+  end
+
+  if vim.tbl_contains(types, node:type()) then
+    return node
+  end
+
+  local parent = node:parent()
+  if not parent then
+    return nil
+  end
+
+  return find_node_ancestor(types, parent)
+end
+
 return {
-  curl         = curl,
-  echo_error   = echo_error,
-  indent_lines = indent_lines,
-  not_empty    = not_empty,
-  prompt       = prompt,
-  prompt_yn    = prompt_yn,
-  test         = test,
-  try          = try,
+  curl            = curl,
+  echo_error      = echo_error,
+  indent_lines    = indent_lines,
+  not_empty       = not_empty,
+  prompt          = prompt,
+  prompt_yn       = prompt_yn,
+  test            = test,
+  try             = try,
+  get_parent_node = find_node_ancestor,
 }
