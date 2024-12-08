@@ -46,6 +46,7 @@ return {
       -- Where to place the ui window
       -- Can be any of "topleft", "bottomleft", "topright", "bottomright", "center", "cursor" (sets under the current cursor pos)
       position = "center",
+      preselect_current = false,
     },
     hints = {
       -- Characters to use for hints (NOTE: make sure they don't collide with the navigation keymaps)
@@ -77,12 +78,13 @@ return {
   config = function(conf)
     local opts = conf.opts
     local snipe = require('snipe')
-    snipe.setup(conf)
+    snipe.setup(opts)
 
     local default_config = {
       dictionary = opts.hints.dictionary,
       position = opts.ui.position,
       navigate = opts.navigate,
+      preselect = nil,
     }
 
     snipe.ui_select_menu = require("snipe.menu"):new(default_config)
