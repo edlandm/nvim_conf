@@ -1,62 +1,237 @@
 -- vim:fdm=marker
--- {{{ buffer settings
-vim.cmd.setlocal("commentstring=--\\ %s")
-vim.cmd.setlocal("expandtab")
-vim.cmd.setlocal("foldignore=")
-vim.cmd.setlocal("foldmethod=indent")
-vim.cmd.setlocal("noshiftround")
-vim.cmd.setlocal("shiftwidth=4")
-vim.cmd.setlocal("suffixesadd=.sql")
-vim.cmd.setlocal("tabstop=4")
+-- {{{ Settings ==============================================================
+local setopts = require('settings').setopts
+
+setopts('o', {
+  { 'shiftround', false },
+})
+
+setopts('wo', {
+  { 'foldmethod', 'indent' },
+  { 'foldignore', '' },
+})
+
+setopts('bo', {
+  'expandtab',
+  { 'commentstring', '--\\ %s' },
+  { 'shiftwidth',    4 },
+  { 'suffixesadd',   '.sql' },
+  { 'tabstop',       4 },
+})
 -- }}}
--- {{{ commands
-local range_cmd = function(opts) return "keeppatterns " .. opts.line1 .. ","  .. opts.line2 end
-vim.api.nvim_buf_create_user_command(0, "SqlAssignColumnsToVariables",
-  function(opts)
-    vim.cmd((range_cmd(opts) .. "s/\\(\\w\\{-}\\.\\)\\(\\S\\+\\)$/@\\2 = &/e"))
-  end,
-  {desc = "Assign columns (in a SELECT statement) to variables",
-    range = true,
-  })
+-- {{{ Functions
+local test = require('util').test
+---expand column shorthand into an aliased column or variable assignment
+---- ""                     -> "NULL"
+---- "value"                -> "value"
+---- "value:ident"          -> "[ident] = value"
+---- "tbl.value:ident"      -> "[ident] = tbl.value"
+---- "value:"               -> "[value] = value"
+---- "tbl.value:"           -> "[value] = tbl.value"
+---- ":ident"               -> "[ident] = NULL"
+---- "'value:ident':alias"  -> "[alias] = 'value:ident'"
+---- "usr.name@username"    -> "@username = usr.name"
+---- "@username"            -> "@username = NULL"
+---- "username@"            -> "@username = username"
+---- "usr.name@"            -> "@name = usr.name"
+---- "@in_wh_id@in_vchWhID" -> "@in_vchWhID = @in_wh_id"
+---@param str string
+---@return string
+local function sql_expand_column(str) -- {{{
+  assert(str, "argument `str` is required")
+  local col = vim.fn.trim(str)
+  if col == "" then return "NULL" end
 
-vim.api.nvim_buf_create_user_command(0, "SqlWhereMatchColumnsToVariables",
-  function(opts)
-    print(opts.line1 .. " - " .. opts.line2)
-    vim.cmd((range_cmd(opts) .. "v/=/s/\\(\\w\\{-}\\.\\)\\(\\S\\+\\)$/& = @\\2/e"))
-  end,
-  {desc = "Match columns (in a WHERE clause) to variables",
-    range = true,
-  })
+  local iscolumn = vim.fn.match(col, ":") > -1
+  local isassign = vim.fn.match(col, "@") > -1
 
-vim.api.nvim_buf_create_user_command(0, "SqlVarsToInParams",
-  function(opts)
-    vim.cmd((range_cmd(opts) .. "s/@/@in_/ge"))
-  end,
-  {desc = "Convert variables to @in_ parameters",
-    range = true,
-  })
+  local isstring = vim.fn.match(col, "'") == 0 or vim.fn.match(col, "N'") == 1
+  local string_end
+  if isstring then
+    string_end = vim.fn.match(col, "'", 0, 2)
+    iscolumn = vim.fn.match(col, ":", string_end) > -1
+    isassign = vim.fn.match(col, "@", string_end) > -1
+  end
 
-vim.api.nvim_buf_create_user_command(0, "SqlVarsToOutParams",
-  function(opts)
-    vim.cmd((range_cmd(opts) .. "s/@\\S\\+/@out_& = &/ge"))
-  end,
-  {desc = "Assign variables to @out_ parameters",
-    range = true,
-  })
+  if not iscolumn and not isassign then return col end
 
-vim.api.nvim_buf_create_user_command(0, "SqlSelectAliases",
-  function(opts)
-    -- automatically give [aliases] to all highlighted columns
-    -- SELECT                     -> SELECT
-    --    @pick_id                ->    [@pick_id]          = @pick_id
-    --   ,@pick_qty_in_tote       ->   ,[@pick_qty_in_tote] = @pick_qty_in_tote
-    vim.cmd((range_cmd(opts) .. "s/\\s*,\\?\\zs\\(\\w\\+\\.\\)\\?\\(@\\?\\w\\+\\)/[\\2] = \\1\\2/e"))
-  end,
-  {desc = "Generate colums aliases (in a SELECT statement)",
-    range = true,
-  })
+  local sep
+  if iscolumn then
+    sep = ":"
+  elseif isassign then
+    sep = "@"
+  end
 
-vim.api.nvim_buf_create_user_command(0, "SqlFixCommas",
+  local value, ident
+  if isstring then
+    if vim.fn.match(col, sep, string_end) == -1 then return col end
+    value = vim.fn.slice(col, 0, string_end+1)
+    ident = vim.fn.slice(col, vim.fn.match(col, sep, string_end+1)+1)
+  else
+    if vim.fn.match(col, sep) == -1 then return col end
+    local sep_index = vim.fn.match(col, sep)
+    if vim.fn.count(col, sep) > 1 then
+      sep_index = vim.fn.match(col, sep, 2)
+    end
+    value = vim.fn.slice(col, 0, sep_index)
+    ident = vim.fn.slice(col, vim.fn.match(col, sep, sep_index)+1)
+  end
+
+  if ident == "" then
+    local field = vim.fn.split(value, "\\.")
+    ident = field[#field]
+  end
+
+  if value == "" then
+    value = "NULL"
+  end
+
+  if iscolumn then
+    return "["..ident.."] = " .. value
+  end
+  return "@"..ident.. " = " .. value
+end -- }}}
+---unit tests for sql_expand_column()
+---@return boolean
+---@see sql_expand_column
+local function test_sql_expand_column() -- {{{
+  return test("sql_expand_column", sql_expand_column, {
+    { input = "",                     expected = "NULL" },
+    { input = "value",                expected = "value" },
+    { input = "value:ident",          expected = "[ident] = value" },
+    { input = "tbl.value:ident",      expected = "[ident] = tbl.value" },
+    { input = "value:",               expected = "[value] = value" },
+    { input = "tbl.value:",           expected = "[value] = tbl.value" },
+    { input = ":ident",               expected = "[ident] = NULL" },
+    { input = "'value:ident':alias",  expected = "[alias] = 'value:ident'" },
+    { input = "usr.name@username",    expected = "@username = usr.name" },
+    { input = "@username",            expected = "@username = NULL" },
+    { input = "username@",            expected = "@username = username" },
+    { input = "usr.name@",            expected = "@name = usr.name" },
+    { input = "@in_wh_id@in_vchWhID", expected = "@in_vchWhID = @in_wh_id" },
+  })
+end -- }}}
+---expand a line of shorthand columns into a full list of columns
+---@param line string
+---@return string[]
+local function sql_expand_select_columns(line) -- {{{
+  assert(line, "text not provided")
+  local text = vim.fn.trim(line)
+  assert(vim.fn.match(text, "\n") == -1, "only one line should be provided")
+
+  if #text == 0 then return {} end
+
+  local expanded_lines = {}
+  local columns = vim.fn.split(text, ",", true)
+  for i, col in ipairs(columns) do
+    local prefix = ","
+    if i == 1 then prefix = " " end
+    local c = assert(sql_expand_column(col), "error expanding col: '"..col.."'" )
+    table.insert(expanded_lines, prefix .. c)
+  end
+
+  return expanded_lines
+end -- }}}
+---unit tests for sql_expand_select_columns
+---@return boolean
+---@see sql_expand_select_columns
+local function test_sql_expand_select_columns() -- {{{ () -> bool
+  return test("sql_expand_select_columns", sql_expand_select_columns, {
+    { input = "", expected = {} },
+    { input = "hello", expected = { " hello" } },
+    { input = "hello,world", expected = { " hello", ",world" } },
+    { input = "\thello, world", expected = { " hello", ",world" } },
+    { input = "hello,'hello,world':msg", expected = { ",[msg] = 'hello,world']" } },
+  })
+end -- }}}
+---expand the select columns on the current line
+---@see sql_expand_select_columns
+local function expand_cols_cur_line()
+  local linenum = vim.fn.line(".")
+  local text = vim.fn.getline(linenum)
+  local lines = require('util').indent_lines(sql_expand_select_columns(text))
+  if #lines == 0 then return end
+
+  -- setting undolevels (even to itself) sets an undo-break so that pressing
+  -- `u` in normal mode will undo the expansion.
+  vim.bo.undolevels = vim.bo.undolevels
+  vim.api.nvim_buf_set_lines(0, vim.fn.line(".")-1, vim.fn.line("."), false, lines)
+  vim.api.nvim_win_set_cursor(0, {linenum+(#lines-1), vim.v.maxcol})
+end
+---rename a sql variable without moving the cursor
+---@param old string
+---@param new string
+local rename_var = function(old, new) -- {{{
+  local cursor = vim.fn.getpos(".")
+  vim.cmd("keeppatterns %s/@\\zs" .. old .. "\\ze\\>/" .. new .. "/g")
+  vim.fn.setpos(".", cursor)
+end -- }}}
+-- }}}
+-- {{{ Operator Functions
+_G.sql_snake_case_cword = function() -- {{{
+  local old = vim.fn.expand("<cword>")
+  assert(#old > 0, "cursor not on a word")
+  vim.cmd.normal('crs') -- coerce to snake_case
+  local snek = vim.fn.expand("<cword>")
+  assert(#snek > 0, "failed to convert to snake_case")
+  vim.cmd.undo()
+  rename_var(old, snek)
+  -- setting the operatorfunc allows this function to be dot-repeatable
+  -- NOTE: this needs to be last because the coerce command also sets the operatorfunc
+  vim.go.operatorfunc = "v:lua.sql_snake_case_cword"
+end -- }}}
+-- }}}
+-- {{{ commands ==============================================================
+---shorthand for creating buffer-local user commands
+---@param name string
+---@param desc string
+---@param fn function
+---@param _opts? vim.api.keyset.cmd_opts
+local function user_cmd(name, desc, fn, _opts)
+  local opts = vim.tbl_deep_extend('keep', {desc = desc}, (_opts or {}))
+  vim.api.nvim_buf_create_user_command(0, name, fn, opts)
+end
+
+---create a function that runs a vim command over a range
+---@param cmd string
+---@return fun(opts:any)
+local range_cmd = function(cmd)
+  return function(opts)
+    vim.cmd('keeppatterns ' .. opts.line1 .. ','  .. opts.line2 .. cmd)
+  end
+end
+
+user_cmd('SqlAssignColumnsToVariables',
+  'Assign columns (in a SELECT statement) to variables',
+  range_cmd('s/\\(\\w\\{-}\\.\\)\\(\\S\\+\\)$/@\\2 = &/e'),
+  { range = true })
+
+user_cmd('SqlWhereMatchColumnsToVariables',
+  'Match columns (in a WHERE clause) to variables',
+  range_cmd('v/=/s/\\(\\w\\{-}\\.\\)\\(\\S\\+\\)$/& = @\\2/e'),
+  { range = true })
+
+user_cmd('SqlVarsToInParams',
+  'Convert variables to @in_ parameters',
+  range_cmd('s/@/@in_/ge'),
+  { range = true })
+
+user_cmd('SqlVarsToOutParams',
+  'Assign variables to @out_ parameters',
+  range_cmd('s/@\\S\\+/@out_& = &/ge'),
+  { range = true })
+
+-- automatically give [aliases] to all highlighted columns
+-- SELECT                     -> SELECT
+--    @pick_id                ->    [@pick_id]          = @pick_id
+--   ,@pick_qty_in_tote       ->   ,[@pick_qty_in_tote] = @pick_qty_in_tote
+user_cmd('SqlSelectAliases',
+  'Generate colums aliases (in a SELECT statement)',
+  range_cmd('s/\\s*,\\?\\zs\\(\\w\\+\\.\\)\\?\\(@\\?\\w\\+\\)/[\\2] = \\1\\2/e'),
+  { range = true })
+
+user_cmd("SqlFixCommas",
+  "Add commas to the beginning of each line of a list of columns in a SELECT statement",
   function(opts)
     -- I prefer commas at the beginning of lines
     local mods = "silent keeppatterns "
@@ -70,34 +245,30 @@ vim.api.nvim_buf_create_user_command(0, "SqlFixCommas",
     -- remove trailing commas
     vim.cmd(mods .. l1 .. "," .. l2 .. "s/,\\s*$//e")
   end,
-  {desc = "Add commas to the beginning of each line of a list of columns in a SELECT statement",
-    range = true,
-  })
+  { range = true, })
 
-vim.api.nvim_buf_create_user_command(0, "SqlFixStrings", function ()
+user_cmd("SqlFixStrings",
+  "Add the N prefix to every string that is missing it in the current buffer",
+  function()
   -- NOTE: this pattern is imperfect; if multiple strings are on the same
   -- line, the following ones will have N prepended to their closing quote.
   -- I do not think there is a fix for that using regular expressions.
   local pattern = "[^N]\\zs'\\ze[^']\\{-\\}'"
   vim.cmd("keeppatterns %s/" .. pattern .. "/N&/e")
-end, {desc = "Add the N prefix to every string that is missing it in the current buffer"})
+end)
 
-vim.api.nvim_buf_create_user_command(0, "SqlSuggestNolocks", function ()
-  local pattern = "FROM [^)]\\{-\\} \\zs\\ze\\(WHERE\\|\\n\\)"
-  vim.cmd("keeppatterns %s/" .. pattern .. "/WITH (NOLOCK) /ce")
-end, {desc = "Find every FROM without a NOLOCK and offer to add it (not perfect)"})
+user_cmd("SqlSuggestNolocks",
+  "Find every FROM without a NOLOCK and offer to add it (not perfect)",
+  function ()
+    local pattern = "FROM [^)]\\{-\\} \\zs\\ze\\(WHERE\\|\\n\\)"
+    vim.cmd("keeppatterns %s/" .. pattern .. "/WITH (NOLOCK) /ce")
+  end)
 
-local rename_var = function(old, new)
-  -- rename a sql variable without moving the cursor
-  local cursor = vim.fn.getpos(".")
-  vim.cmd("%s/@\\zs" .. old .. "\\ze\\>/" .. new .. "/g")
-  vim.fn.setpos(".", cursor)
-end
-
-vim.api.nvim_buf_create_user_command(0, "SqlRenameVariable",
+user_cmd("SqlRenameVariable",
+  "Rename a sql variable in the current buffer",
   function(opts)
-    local old = nil
-    local new = nil
+    ---@type string
+    local old, new
     if #opts.fargs == 2 then
       old = opts.fargs[1]
       new = opts.fargs[2]
@@ -114,170 +285,59 @@ vim.api.nvim_buf_create_user_command(0, "SqlRenameVariable",
     assert(#new > 0, "invalid new name provided")
     rename_var(old, new)
   end,
-  { desc = "Rename a sql variable in the current buffer",
-    nargs = "*",
-  })
-
-_G.sql_snake_case_cword = function()
-  local old = vim.fn.expand("<cword>")
-  assert(#old > 0, "cursor not on a word")
-  vim.cmd.normal('crs') -- coerce to snake_case
-  local snek = vim.fn.expand("<cword>")
-  assert(#snek > 0, "failed to convert to snake_case")
-  vim.cmd.undo()
-  rename_var(old, snek)
-  -- setting the operatorfunc allows this function to be dot-repeatable
-  -- NOTE: this needs to be last because the coerce command also sets the operatorfunc
-  vim.go.operatorfunc = "v:lua.sql_snake_case_cword"
-end
+  { nargs = "*", })
 -- }}}
 -- {{{ mappings
-local mapopts = function(desc, opts) -- {{{ shorthand for adding the description
-  local _t = {buffer = true, noremap = true, desc = desc}
-  if opts then
-    for k,v in pairs(opts) do
-      _t[k] = v
-    end
-  end
-  return _t
-end -- }}}
--- {{{ INSERT
-vim.keymap.set("i", "A<tab>", "AND<space>", mapopts("expand: AND"))
-vim.keymap.set("i", "B<tab>", "BEGIN<cr>END<esc>O", mapopts("expand: BEGIN...END"))
-vim.keymap.set("i", "BC<tab>", "<esc>!!cat ~/templates/trycatch_template.sql<cr>V`]=o", mapopts("expand: TRY...CATCH"))
-vim.keymap.set("i", "BT<tab>", "BEGIN TRAN<cr><cr><cr>WHILE @@TRANCOUNT > 0 ROLLBACK TRAN<esc><<kO", mapopts("expand: BEGIN TRAN...END TRAN"))
-vim.keymap.set("i", "C<tab>", "CASE<space>WHEN<esc>o<tab>END<esc>kA<space>", mapopts("expand: CASE WHEN...END"))
-vim.keymap.set("i", "CR<tab>", "CONVERT()<left>", mapopts("expand: CONVERT"))
-vim.keymap.set("i", "D<tab>", "DECLARE<cr><tab>", mapopts("expand: DECLARE"))
-vim.keymap.set("i", "E<tab>", "EXISTS<space>(<cr><tab>SELECT<space>1<cr>FROM t_<cr>)<esc>kA", mapopts("expand: EXISTS (SELECT...FROM)"))
-vim.keymap.set("i", "F<tab>", "FROM t_", mapopts("expand: FROM t_"))
--- automatically add a group-by clause that uses all non-aggregate fields from
--- the select statement
--- imap     <buffer> G>  GROUP BY<esc>yis'.p:keepp .,/\(\n\s*\(having\<bar>order by\)\<bar>\n\n\<bar>\%$\)/g/[()]/d<cr>
-vim.keymap.set("i", "H<tab>", "HAVING<tab>", mapopts("expand: HAVING"))
-vim.keymap.set("i", "I<tab>", "INSERT<space>INTO", mapopts("expand: INSERT INTO"))
-vim.keymap.set("i", "L<tab>", "LEFT<space>OUTER<space>JOIN<space>t_<cr>ON<tab><esc>>>kA", mapopts("expand: LEFT OUTER JOIN t_ ON"))
-vim.keymap.set("i", "N<tab>", "INNER<space>JOIN<space>t_<cr>ON<tab><esc>>>kA", mapopts("expand: INNER JOIN t_ ON"))
-vim.keymap.set("i", "NV", "NVARCHAR()<left>", mapopts("expand: NVARCHAR()"))
-vim.keymap.set("i", "O<tab>", "ORDER<space>BY<cr><tab>", mapopts("expand: ORDER BY"))
-vim.keymap.set("i", "P<tab>", "PARTITION<space>BY<space>", mapopts("expand: PARTITION BY"))
-vim.keymap.set("i", "SS<tab>", "SELECT 1", mapopts("expand: SELECT 1"))
-vim.keymap.set("i", "ST<tab>", "SELECT TOP 1<cr><tab>", mapopts("expand: SELECT TOP 1"))
-vim.keymap.set("i", "S<tab>", "SELECT<cr><tab>", mapopts("expand: SELECT"))
-vim.keymap.set("i", "U<tab>", "UPDATE<space><cr>SET<tab><esc>kA", mapopts("expand: UPDATE"))
-vim.keymap.set("i", "V<tab>", "OVER<space>()<left>", mapopts("expand: OVER ()"))
-vim.keymap.set("i", "W<tab>", "WHERE<space>", mapopts("expand: WHERE"))
-vim.keymap.set("i", "WN", "WITH<space>(NOLOCK)", mapopts("expand: WITH (NOLOCK)"))
-vim.keymap.set("i", "X<tab>", "ISNULL(,<space>'')<c-o>F,", mapopts("expand: ISNULL(, '')"))
+-- {{{ INSERT ================================================================
+require('mappings').imap({
+  { 'expand: AND',                    'A<tab>',  'AND<space>' },
+  { 'expand: CASE WHEN...END',        'C<tab>',  'CASE<space>WHEN<esc>o<tab>END<esc>kA<space>' },
+  { 'expand: CONVERT',                'CR<tab>', 'CONVERT()<left>' },
+  { 'expand: DECLARE',                'D<tab>',  'DECLARE<cr><tab>' },
+  { 'expand: FROM t_',                'F<tab>',  'FROM t_' },
+  { 'expand: GROUP BY',               'G<tab>',  'GROUP BY<cr><tab> ' },
+  { 'expand: HAVING',                 'H<tab>',  'HAVING<tab>' },
+  { 'expand: INSERT INTO',            'I<tab>',  'INSERT<space>INTO' },
+  { 'expand: LEFT OUTER JOIN t_ ON',  'L<tab>',  'LEFT<space>OUTER<space>JOIN<space>t_<cr>ON<tab><esc>>>kA' },
+  { 'expand: INNER JOIN t_ ON',       'N<tab>',  'INNER<space>JOIN<space>t_<cr>ON<tab><esc>>>kA' },
+  { 'expand: ORDER BY',               'O<tab>',  'ORDER<space>BY<cr><tab>' },
+  { 'expand: PARTITION BY',           'P<tab>',  'PARTITION<space>BY<space>' },
+  { 'expand: SELECT 1',               'SS<tab>', 'SELECT 1' },
+  { 'expand: SELECT TOP 1',           'ST<tab>', 'SELECT TOP 1<cr><tab>' },
+  { 'expand: SELECT',                 'S<tab>',  'SELECT<cr><tab> ' },
+  { 'expand: UPDATE',                 'U<tab>',  'UPDATE<space><cr>SET<tab><esc>kA' },
+  { 'expand: OVER ()',                'V<tab>',  'OVER<space>()<left>' },
+  { 'expand: WHERE',                  'W<tab>',  'WHERE<space>' },
+  { 'expand: WITH (NOLOCK)',          'WN',      'WITH<space>(NOLOCK)' },
+  { 'expand SELECT column shorthand', '<c-s>',   expand_cols_cur_line },
+})
 -- }}}
--- {{{ NORMAL
--- vim.keymap.set("n", "", "", mapopts(""))
-vim.keymap.set("n", "<localleader>so", "<cmd>!sql mappredicate sio<cr>", -- {{{ swap operands
-  mapopts("swap operands of the expression on the current line", {silent = true})) -- }}}
--- {{{ Yank commands: <localleader>y
--- TODO: rewrite these with treesitter
-vim.keymap.set("n", "<localleader>yt", function()
-    vim.cmd("keeppatterns 0/BEGIN TRY/+1,0/END TRY/-1y\"")
-    print("Yanked: main TRY-Block contents")
-  end,
-  mapopts("yank contents of first TRY block", {silent = true}))
-vim.keymap.set("n", "<localleader>yp", function()
-    vim.cmd("keeppatterns 0/CREATE PROCEDURE/+1,/^\\s*AS\\s*$/-1y\"")
-    print("Yanked: Sproc Params")
-  end,
-  mapopts("yank sproc parameters", {silent = true}))
-vim.keymap.set("n", "<localleader>ys", function()
-    vim.cmd("let @\"=system(\"sql ss '\"..expand('%:p')..\"'\")")
-    print("Yanked: Sproc Signature")
-  end,
-  mapopts("yank sproc signature", {silent = true}))
-vim.keymap.set("n", "<localleader>ya", function()
-    vim.cmd("let @\"=system(\"sql ss -a '\"..expand('%:p')..\"'\")")
-    print("Yanked: Sproc Architect DBAction")
-  end,
-  mapopts("yank Architect DBAction sproc signature", {silent = true}))
-vim.keymap.set("n", "<localleader>yw", function()
-    vim.cmd("let @\"=system(\"sql ss -w '\"..expand('%:p')..\"'\")")
-    print("Yanked: Sproc Webwise Execute")
-  end,
-  mapopts("yank sproc Webwise execute signature", {silent = true}))
-vim.keymap.set("n", "<localleader>yW", function()
-    vim.cmd("let @\"=system(\"sql ss -W '\"..expand('%:p')..\"'\")")
-    print("Yanked: Sproc Workflow Parameter Mapping")
-  end,
-  mapopts("yank sproc Workflow Parameter Mapping", {silent = true}))
+-- {{{ NORMAL ================================================================
+local lleader = require('mappings').lleader
+require('mappings').nmap({
+  { 'Swap WHERE operands', lleader('so'), '<cmd>!sql mappredicate sio<cr>'},
+  -- table definitions can take the form of
+  -- @table_var_name(field1, field2)
+  -- #temp_table_name(field1, field2)
+  -- or
+  -- @table_var_name:field1, field2
+  -- #temp_table_name:field1, field2
+  { 'Expand Table Definition (#temp or @variable)', lleader('et'), '<cmd>.!prodb expand table<cr>' },
+  { 'Rename Variable (<cword>)', lleader('rv'), '<cmd>SqlRenameVariable<cr>' },
+  { 'Convert <cword> to snake_case', lleader('cs'), _G.sql_snake_case_cword },
+  -- { '', lleader(''), '' },
+})
 -- }}}
-vim.keymap.set("n", "<localleader>et", "<cmd>.!prodb expand table<cr>", -- {{{ expand temp-table/table-variable from shorthand
--- table definitions can take the form of
--- @table_var_name(field1, field2)
--- #temp_table_name(field1, field2)
--- or
--- @table_var_name:field1, field2
--- #temp_table_name:field1, field2
-  mapopts("expand: @table_var_name:field1, field2")) -- }}}
--- {{{ tSQLt - run tests and test-suites
--- run test
-vim.keymap.set("n", "<localleader>tt", function()
-  local testsuite = vim.fn.expand("%:p:h:t")
-  local testname  = vim.fn.expand("%:p:t:r")
-  vim.cmd("DB EXEC tSQLt.Run '" .. testsuite .. ".[" .. testname .. "]'")
-end, mapopts("run current test", {silent = true}))
--- run testsuite
-vim.keymap.set("n", "<localleader>tT", function()
-  local testsuite = vim.fn.expand("%:p:h:t")
-  vim.cmd("DB EXEC tSQLt.Run '" .. testsuite .. "'")
-end, mapopts("tSQLt run test suite tSQLt run current file", {silent = true}))
--- }}}
-vim.keymap.set("n", "<localleader>rv", "<cmd>SqlRenameVariable<cr>", mapopts("rename variable: @old to @new"))
-vim.keymap.set("n", "<localleader>cs", _G.sql_snake_case_cword, mapopts("convert variable to snake_case"))
--- }}}
-local function line_wrapper_fn(wrap1, wrap2, indent_contents) -- {{{ return a function that wraps lines
-  if not wrap2 then
-    wrap2 = assert(wrap1, "at least one argument is required")
-  end
-  return function()
-    local line1, line2 = vim.fn.line("'["), vim.fn.line("']")
-    if line1 > line2 then
-      line1, line2 = line2, line1
-    end
-
-    local lines = vim.api.nvim_buf_get_lines(0, line1 - 1, line2, false)
-    local indent = string.match(lines[1], "^%s*")
-
-    local indent_step = ""
-    if indent_contents then
-      indent_step = "\t"
-      if vim.bo.expandtab then
-        indent_step = string.rep(" ", vim.bo.shiftwidth or 4)
-      end
-    end
-
-    local wrapped_lines = { indent .. wrap1 }
-    for i = 1, #lines do
-      wrapped_lines[i + 1] = indent .. indent_step .. lines[i]
-    end
-    wrapped_lines[#wrapped_lines + 1] = indent .. wrap2
-
-    vim.api.nvim_buf_set_lines(0, line1 - 1, line2, false, wrapped_lines)
-  end
-end -- }}}
-
-_G.sql_wrap_begin_end = line_wrapper_fn("BEGIN", "END", true)
-vim.keymap.set("n", "<localleader>wb", function()
-  vim.go.operatorfunc = "v:lua.sql_wrap_begin_end"
-  vim.api.nvim_feedkeys( "g@", "i", false)
-end,
-  { desc = "wrap {motion} in BEGIN/END" }
-)
--- {{{ VISUAL
--- vim.keymap.set("v", "", "", mapopts(""))
-vim.keymap.set("v", "<localleader>U", "!sql uppercase<cr>", mapopts("uppercase SQL keywords", {silent = true}))
-vim.keymap.set("v", "<localleader>=", "!prodb expand statement<cr>", mapopts("format/expand the selected statement/shorthand"))
-vim.keymap.set("v", "<localleader>sa", ":SqlSelectAliases<cr>", mapopts("Generate colums aliases (in a SELECT statement)"))
-vim.keymap.set("v", "<localleader>fc", ":SqlFixCommas<cr>", mapopts("format commas in SQL list", {silent = true}))
-vim.keymap.set("v", "<localleader>sv", ":SqlAssignColumnsToVariables<cr>", mapopts("Assign columns (in a SELECT statement) to variables"))
-vim.keymap.set("v", "<localleader>wv", ":SqlWhereMatchColumnsToVariables<cr>", mapopts("Match columns (in a WHERE clause) to variables"))
-vim.keymap.set("v", "<localleader>vi", ":SqlVarsToInParams<cr>", mapopts("Convert variables to @in_ parameters"))
-vim.keymap.set("v", "<localleader>vo", ":SqlVarsToInParams<cr>", mapopts("Assign variables to @out parameters"))
+-- {{{ VISUAL ================================================================
+require('mappings').xmap({
+  -- TODO: find a way to do this with Treesitter
+  { 'Uppercase SQL keywords', lleader('U'), '!sql uppercase<cr>' },
+  { 'Generate colums aliases (in a SELECT statement)', lleader('sa'), ':SqlSelectAliases<cr>' },
+  { 'Format commas in SQL list', lleader('fc'), ':SqlFixCommas<cr>' },
+  { 'Assign columns (in a SELECT statement) to variables', lleader('sv'), ':SqlAssignColumnsToVariables<cr>' },
+  { 'Match columns (in a WHERE clause) to variables', lleader('wv'), ':SqlWhereMatchColumnsToVariables<cr>' },
+  { 'Convert variables to @in_ parameters', lleader('vi'), ':SqlVarsToInParams<cr>' },
+  { 'Convert variables to @out_ parameters', lleader('vi'), ':SqlVarsToOutParams<cr>' },
+})
 -- }}}
 -- }}}
