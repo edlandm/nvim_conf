@@ -207,14 +207,46 @@ local function find_node_ancestor(types, node)
   return find_node_ancestor(types, parent)
 end
 
+---read the file at `path` and return a dictionary full of values
+---the file is expected to contain a list of space-separated key-value pairs
+---(one pair per line)
+---@param path path
+---@return { [string]: string }
+local function read_key_val_file(path)
+  assert(path, 'path required')
+  assert(vim.fn.filereadable(path) == 1, ('file not readable: %s'):format(path))
+
+  ---@type { [string]: string }
+  local dict = {}
+  local i = 0
+  for line in io.lines(path) do
+    i = i + 1
+    if not (line:match('^#') or line:match('^%s*$')) then
+      local s, e = line:find('%s+')
+      assert(s and s > 1, ('parse error: line %d: %s\n'):format(i, line))
+
+      local key = line:sub(1, s-1)
+      local val = line:sub(e+1)
+      assert(not dict[key],
+        ('duplicate key: %s on line %d'):format(key, i))
+
+      dict[key] = val
+    end
+  end
+
+  return dict
+end
+
+
 return {
-  curl            = curl,
-  echo_error      = echo_error,
-  indent_lines    = indent_lines,
-  not_empty       = not_empty,
-  prompt          = prompt,
-  prompt_yn       = prompt_yn,
-  test            = test,
-  try             = try,
-  get_parent_node = find_node_ancestor,
+  curl              = curl,
+  echo_error        = echo_error,
+  indent_lines      = indent_lines,
+  not_empty         = not_empty,
+  prompt            = prompt,
+  prompt_yn         = prompt_yn,
+  test              = test,
+  try               = try,
+  get_parent_node   = find_node_ancestor,
+  read_key_val_file = read_key_val_file,
 }
