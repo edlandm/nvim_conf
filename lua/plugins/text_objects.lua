@@ -4,7 +4,7 @@ return {
   opts = {
     keymaps = {
       useDefaults = true,
-      disabledKeymaps = {
+      disabledDefaults = {
         'ar', 'ir', 'r', 'n',
       },
     },
