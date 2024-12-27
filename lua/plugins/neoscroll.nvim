@@ -1,7 +1,0 @@
--- Smooth scrolling.
-return {
-  "karb94/neoscroll.nvim",
-  event = 'VimEnter',
-  opts = {},
-  main = 'neoscroll',
-}
