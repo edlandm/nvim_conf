@@ -1,19 +1,13 @@
--- vim:fdm=marker
-vim.o.foldmethod = "indent"
-vim.bo.tabstop = 4
-vim.bo.shiftwidth = 4
+require('settings').setopts('o', {
+  { 'foldmethod', 'indent' }
+})
 
--- mappings
-local mapopts = function(desc, opts) -- {{{ shorthand for adding the description
-  local _t = {buffer = true, noremap = true, desc = desc}
-  if opts then
-    for k,v in pairs(opts) do
-      _t[k] = v
-    end
-  end
-  return _t
-end -- }}}
+require('settings').setopts('bo', {
+  { 'tabstop', 4 },
+  { 'shiftwidth', 4 },
+  { 'makeprg', 'dotnet build' },
+})
 
--- {{{ NORMAL
--- vim.keymap.set("n", "", "", mapopts(""))
--- }}}
+require('mappings').nmap({
+  { 'Start Debugger', '<F5>', '<cmd>lua require("dap").continue()<cr>' }
+}, true)
