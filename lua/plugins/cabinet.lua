@@ -54,9 +54,9 @@ return {
       initial_drawers = workspaces,
     })
 
-		local save = require("cabinet.save")
-		save.save_cmd()
-		save.load_cmd()
+    local save = require("cabinet.save")
+    save.save_cmd()
+    save.load_cmd()
 
     -- Switch to drawer on creation
     vim.api.nvim_create_autocmd("User", {
