@@ -31,7 +31,7 @@ local function try(result, resolve, reject)
 end
 
 ---prompt for input then call `callback` on the response
----@param _prompt string | { prompt: string, cancelreturn: string }
+---@param _prompt string | { prompt: string|table, cancelreturn: string? }
 ---@param callback fun(response: string)
 local function prompt(_prompt, callback)
   assert(_prompt, "prompt required")
@@ -41,11 +41,11 @@ local function prompt(_prompt, callback)
   if type(_prompt) == 'string' then
     opts = { prompt = _prompt, cancelreturn = '<CANCELRETURN>' }
   else
-    opts = _prompt
+    opts = vim.tbl_deep_extend('keep', _prompt, { cancelreturn = '<CANCELRETURN>' })
   end
 
   local response = fun.input(opts)
-  if response == '<CANCELRETURN>' then return end
+  if response == opts.cancelreturn then return end
   callback(response)
 end
 
