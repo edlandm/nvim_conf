@@ -1,7 +1,17 @@
 return {
   "folke/which-key.nvim",
   event = 'VeryLazy',
-  opts = {},
+  opts = {
+    defer = function(ctx)
+      if ctx.mode == "V" or ctx.mode == "<C-V>" then
+        return true
+      end
+
+      if vim.list_contains({ "d", "y" }, ctx.operator) then
+        return true
+      end
+    end,
+  },
   keys = {
     {
       "<localleader><localleader>",
