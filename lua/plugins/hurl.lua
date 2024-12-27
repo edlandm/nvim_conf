@@ -5,7 +5,7 @@ local function setmaps()
     { "Hurl: execute buffer", "<F5>", "<cmd>%HurlRunner<cr>" },
     { "Hurl: execute buffer", "<localleader>eb", "<cmd>%HurlRunner<cr>" },
     { "Hurl: [e]xecute [f]ile", "<localleader>ef", "<cmd>HurlRunner<cr>" },
-    { "Hurl: [e]xecute [r]equest", "<localleader>er", "vip<esc>:'<,'>HurlRunner" },
+    { "Hurl: [e]xecute [r]equest", "<localleader>er", "vip:HurlRunner<cr>" },
     { "Hurl: [e]xecute up [t]o request", "<localleader>et",
       function ()
         vim.cmd.normal('vip')
@@ -19,11 +19,11 @@ local function setmaps()
     },
     { "Hurl: show last response", "<localleader>e<cr>", "<cmd>HurlShowLastResponse<cr>" },
     -- environment variables
-    { "Hurl: Set [e]nvironment variable", "<localleader>he", ":HurlSetVariable " },
+    { "Hurl: Set [e]nvironment variable", "<localleader>he", ":HurlSetVariable " , { silent = false  }},
     -- NOTE: for now this buffer is only for viewing variables, but modifying is on the roadmap
     { "Hurl: View environment [V]ariables", "<localleader>hV", "<cmd>HurlManageVariable<cr>" },
     -- NOTE: can be comma-separated list
-    { "Hurl: Set environment [f]ile", "<localleader>hf", ":HurlSetEnvFile " },
+    { "Hurl: Set environment [f]ile", "<localleader>hf", ":HurlSetEnvFile ", { silent = false  }},
     -- modes
     { "Hurl: Toggle popup/[s]plit mode", "<localleader>hs", "<cmd>HurlToggleMode<cr>" },
     { "Hurl: Toggle [v]erbose mode", "<localleader>hv", "<cmd>HurlToggleMode<cr>" },
@@ -64,8 +64,5 @@ return {
     local groupid = vim.api.nvim_create_augroup("HURL", { clear = true })
     vim.api.nvim_create_autocmd({ "BufEnter", "BufNewFile" }, { pattern = "*.hurl", group = groupid, callback = setmaps })
     vim.api.nvim_create_autocmd("FileType", { pattern = "hurl", group = groupid, callback = setmaps })
-  end,
-  config = function (opts)
-    require('hurl').setup(opts)
   end,
 }
