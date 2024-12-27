@@ -211,22 +211,25 @@ end
 ---the file is expected to contain a list of space-separated key-value pairs
 ---(one pair per line)
 ---@param path path
+---@param _sep string?
 ---@return { [string]: string }
-local function read_key_val_file(path)
+local function read_key_val_file(path, _sep)
   assert(path, 'path required')
   assert(vim.fn.filereadable(path) == 1, ('file not readable: %s'):format(path))
+  local sep = _sep or ' '
 
   ---@type { [string]: string }
   local dict = {}
   local i = 0
-  for line in io.lines(path) do
+  for _line in io.lines(path) do
+    local line = vim.trim(_line)
     i = i + 1
     if not (line:match('^#') or line:match('^%s*$')) then
-      local s, e = line:find('%s+')
+      local s, e = line:find(sep)
       assert(s and s > 1, ('parse error: line %d: %s\n'):format(i, line))
 
       local key = line:sub(1, s-1)
-      local val = line:sub(e+1)
+      local val = line:sub(e+#sep)
       assert(not dict[key],
         ('duplicate key: %s on line %d'):format(key, i))
 
@@ -237,16 +240,16 @@ local function read_key_val_file(path)
   return dict
 end
 
-
 return {
-  curl              = curl,
-  echo_error        = echo_error,
-  indent_lines      = indent_lines,
-  not_empty         = not_empty,
-  prompt            = prompt,
-  prompt_yn         = prompt_yn,
-  test              = test,
-  try               = try,
-  get_parent_node   = find_node_ancestor,
-  read_key_val_file = read_key_val_file,
+  curl               = curl,
+  echo_error         = echo_error,
+  indent_lines       = indent_lines,
+  not_empty          = not_empty,
+  prompt             = prompt,
+  prompt_yn          = prompt_yn,
+  test               = test,
+  try                = try,
+  get_parent_node    = find_node_ancestor,
+  read_key_val_file  = read_key_val_file,
+  find_node_ancestor = find_node_ancestor,
 }
