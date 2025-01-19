@@ -44,8 +44,10 @@ return {
               mc.clearCursors()
               return
             end
-            if MULTI_MODE then
-              MULTI_MODE:deactivate()
+            if MULTI_MODE and MULTI_MODE._active then
+              -- silence errors because I have no idea why this sometimes
+              -- doesn't work
+              pcall(MULTI_MODE.deactivate, MULTI_MODE)
             end
           end,
           { desc = 'Exit Multi-Cursor Mode' }
