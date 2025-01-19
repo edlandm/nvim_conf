@@ -420,7 +420,24 @@ function M.setup()
     { 'Scroll Up', '<c-e>', '3<c-e>' },
     { 'Scroll Down', '<c-y>', '3<c-y>' },
     { 'Open <cfile> (vsplit)', '<c-w><c-v>', cmd 'vertical wincmd f' },
-    { 'Next Tab', '<c-t>', cmd 'tabnext' },
+    { 'Next Tab (Buf if only one tab)', ')',
+      function()
+        if #vim.api.nvim_list_tabpages() == 1 then
+          vim.cmd('bnext')
+        else
+          vim.cmd('tabnext')
+        end
+      end
+    },
+    { 'Prev Tab (Buf if only one tab)', '(',
+      function()
+        if #vim.api.nvim_list_tabpages() == 1 then
+          vim.cmd('bNext')
+        else
+          vim.cmd('tabNext')
+        end
+      end
+    },
     { 'Run previous :command', leader ':', '@:' },
     { 'CD to <cfile> dir', leader '.', cmd "cd %:p:h | echo 'cd -> '.getcwd()" },
     { 'CD up one dir', leader ',', cmd "cd .. | echo 'cd -> '.getcwd()" },
