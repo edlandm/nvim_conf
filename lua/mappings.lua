@@ -447,6 +447,11 @@ function M.setup()
     { 'Buffer Delete',  leader 'bd', cmd 'b#|bwipeout #' },
     { 'Buffer Delete!', leader 'bD', cmd 'b#|bwipeout! #' },
     { 'Buffer Only',    leader 'bo', cmd "execute \"silent! tabonly|silent! %bd|e#|bd#\" | echo 'Closed all buffers (and tabs) except current'" },
+    { 'Quickfix Next',      '<M-j>',   cmd 'cnext' },
+    { 'Quickfix Next File', '<M-S-J>', cmd 'cnfile' },
+    { 'Quickfix Prev',      '<M-k>',   cmd 'cprevious' },
+    { 'Quickfix Prev File', '<M-S-K>', cmd 'cpfile' },
+    -- fallbacks in the event that the terminal doesn't support <M-S-*> mappings
     { 'Quickfix Next',      leader 'cn', cmd 'cnext' },
     { 'Quickfix Next File', leader 'cN', cmd 'cnfile' },
     { 'Quickfix Prev',      leader 'cp', cmd 'cprevious' },
