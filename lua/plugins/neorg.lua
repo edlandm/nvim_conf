@@ -35,7 +35,11 @@ end
 
 return {
   'nvim-neorg/neorg',
-  lazy = false,
+  dependencies = {
+    'nvim-treesitter/nvim-treesitter',
+    'vhyrro/luarocks.nvim',
+    'gregorias/coop.nvim',
+  },
   opts = {
     load = {
       ['core.defaults'] = {},
@@ -48,19 +52,13 @@ return {
             ('%s/workspaces.txt'):format(vim.fn.stdpath('config'))
           ) or {},
           default_workspace = "nvim",
-          },
         },
       },
-      ['core.completion'] = {
-        config = {
-          engine = "nvim-cmp",
-        }
-      },
-      ['core.presenter'] = {
-        config = {
-          zen_mode = "zen-mode",
-        }
-      },
+      -- ['core.completion'] = {
+      --   config = {
+      --     engine = "nvim-cmp",
+      --   }
+      -- },
       -- ['core.ui.calendar'] = {},
       ['core.keybinds'] = {
         config = {
@@ -73,15 +71,17 @@ return {
         }
       },
       ['core.qol.todo_items'] = {
-        create_todo_items = true,
-        create_todo_parents = false,
+        config = {
+          create_todo_items = true,
+          create_todo_parents = false,
+        },
       },
-    },
+    }
   },
-  dependencies = {
-    'nvim-treesitter/nvim-treesitter',
-    'vhyrro/luarocks.nvim',
+  ft = {
+    'norg',
   },
-  version = "*",
-  config = true,
+  cmd = {
+    'Neorg',
+  },
 }
