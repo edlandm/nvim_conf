@@ -221,10 +221,41 @@ return {
       },
     },
     picker = {
-      config = function(opts, defaults)
-        -- TODO: I want a directory picker that can either cd/lcd to the
-        -- chosen directory or open it (with oil, though that should
-        -- be implicit)
+      win = {
+        input = {
+          keys = {
+            ["<Esc>"] = { "close", mode = { "n", "i" } },
+            ["<C-c>"] = { "norm", mode = "i" },
+            ["<C-_>"] = { "flash", mode = { "n", "i" } },
+            ["_"]     = { "flash" },
+          },
+        },
+        preview = {
+          wo = {
+            foldenable = false,
+          },
+        },
+      },
+      actions = {
+        flash = function(picker)
+          require("flash").jump({
+            pattern = "^",
+            label = { after = { 0, 0 } },
+            search = {
+              mode = "search",
+              exclude = {
+                function(win)
+                  return vim.bo[vim.api.nvim_win_get_buf(win)].filetype ~= "snacks_picker_list"
+                end,
+              },
+            },
+            action = function(match)
+              local idx = picker.list:row2idx(match.pos[1])
+              picker.list:_move(idx, true, true)
+            end,
+          })
+        end,
+      },
         Snacks.picker.directories = custom_pickers.directories
 
         -- TODO: Cabinet workspace picker
