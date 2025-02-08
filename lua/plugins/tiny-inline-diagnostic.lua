@@ -1,14 +1,22 @@
 return {
   "rachartier/tiny-inline-diagnostic.nvim",
-  event = "VeryLazy",
-  config = function ()
-    require("tiny-inline-diagnostic").setup()
-
-    local groupid = vim.api.nvim_create_augroup("tiny-inline-diagnostic", { clear = true })
-    vim.api.nvim_create_autocmd({ "BufEnter", "BufNewFile" },
-      { pattern = "*", group = groupid,
-      callback = function ()
-        vim.diagnostic.config({ virtual_text = false })
-      end })
+  lazy = false,
+  init = function()
+    vim.diagnostic.config({ virtual_text = false })
   end,
+  opts = {
+    options = {
+      use_icons_from_diagnostic = true,
+      add_messages = true,
+      multiple_diag_under_cursor = true,
+      show_all_diags_on_cursorline = true,
+      multilines = {
+        -- Enable multiline diagnostic messages
+        enabled = true,
+        -- Always show messages on all lines for multiline diagnostics
+        always_show = true,
+      },
+    },
+    disabled_ft = {},
+  },
 }
