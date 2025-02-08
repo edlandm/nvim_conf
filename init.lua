@@ -1,21 +1,23 @@
-vim.g.mapleader = " "
-vim.g.maplocalleader = vim.api.nvim_replace_termcodes('<BS>', false, false, true)
+vim.g.mapleader = ' ' ---@diagnostic disable-line
+vim.g.maplocalleader = vim.api.nvim_replace_termcodes('<BS>', false, false, true)  ---@diagnostic disable-line
 
 require("settings").setup()
 require("autocmd").setup()
 require("commands")
 require("mappings").setup()
 
+local fs_stat = (vim.uv or vim.loop).fs_stat ---@diagnostic disable-line
+
 -- Bootstrap lazy.nvim
-local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-if not (vim.uv or vim.loop).fs_stat(lazypath) then
-  local lazyrepo = "https://github.com/folke/lazy.nvim.git"
-  local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
+local lazypath = vim.fs.joinpath(vim.fn.stdpath('data'), 'lazy', 'lazy.nvim')
+if not fs_stat(lazypath) then
+  local lazyrepo = 'https://github.com/folke/lazy.nvim.git'
+  local out = vim.fn.system({ 'git', 'clone', '--filter=blob:none', '--branch=stable', lazyrepo, lazypath })
   if vim.v.shell_error ~= 0 then
     vim.api.nvim_echo({
-      { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
-      { out, "WarningMsg" },
-      { "\nPress any key to exit..." },
+      { 'Failed to clone lazy.nvim:\n', 'ErrorMsg' },
+      { out, 'WarningMsg' },
+      { '\nPress any key to exit...' },
     }, true, {})
     vim.fn.getchar()
     os.exit(1)
@@ -23,7 +25,7 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
-require("lazy").setup("plugins", {
+require('lazy').setup('plugins', {
   defaults = {
     lazy = true,
   },
@@ -39,18 +41,17 @@ require("lazy").setup("plugins", {
     notify = false, -- get a notification when changes are found
   },
   install = { colorschemes = { 'everforest', 'default' } },
-  checker = { enabled = true },
+  checker = { enabled = false },
 })
 
--- Local Plugins And Config
-require('plugin-projects')
-
 local function safe_source(path)
-  if vim.loop.fs_stat(path) then
+  ---@diagnostic disable-next-line
+  if fs_stat(path) then
     vim.cmd.source(path)
   end
 end
 
-safe_source(vim.fn.stdpath('config') .. '/lua/neovide_settings.lua')
-safe_source(vim.fn.stdpath('config') .. '/lua/local.lua')
+local config = vim.fn.stdpath('config')
+safe_source(vim.fs.joinpath(config, 'lua', 'neovide_settings.lua'))
+safe_source(vim.fs.joinpath(config, 'lua', 'local.lua'))
 safe_source(vim.fn.expand('~/.nvim.local.lua'))
