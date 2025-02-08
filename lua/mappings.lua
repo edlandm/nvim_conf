@@ -493,7 +493,8 @@ function M.setup()
     { 'Execute Q Macro', 'Q', '@q' },
     { 'Repeat Last Command On Next Line', 'S', 'j@:' },
     { 'Repeat Last Edit On Next Line', 's', repeat_edit_on_next_line },
-    { 'Yank To The End Of The Line', 'Y', 'y$' }
+    { 'Yank To The End Of The Line', 'Y', 'y$' },
+    { 'Format To End Of Pasted Text', '=p', '=`]' },
   })
   ---- Insert Mode =============================================================
   M.imap({
