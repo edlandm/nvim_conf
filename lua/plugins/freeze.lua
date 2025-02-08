@@ -1,6 +1,6 @@
 local function pref(s)   return '<leader>f' .. (s or '') end
 local function cmd(s)    return ('<cmd>%s<cr>'):format(s) end
-local function freeze(s) return ('lua require("freeze").%s()'):format(s) end
+local function freeze(s) return ('lua require("freeze"):%s()'):format(s) end
 return {
   'edlandm/freeze.nvim', -- I wrote this one :)
   event = 'VeryLazy',
