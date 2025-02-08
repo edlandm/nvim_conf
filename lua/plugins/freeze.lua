@@ -1,3 +1,6 @@
+local function pref(s)   return '<leader>f' .. (s or '') end
+local function cmd(s)    return ('<cmd>%s<cr>'):format(s) end
+local function freeze(s) return ('lua require("freeze").%s()'):format(s) end
 return {
   'edlandm/freeze.nvim', -- I wrote this one :)
   event = 'VeryLazy',
@@ -8,21 +11,10 @@ return {
     default_theme = 'dark',
     filename      = '{timestamp}-{filename}-{start_line}-{end_line}.png',
   },
-  config = function (context)
-    local freeze = require('freeze')
-    freeze.setup(context)
-
-    local mappings = require('mappings')
-    local pref = mappings.leader('f')
-
-    mappings.nmap({
-      { 'Freeze: take screenshot of <operator> range', pref,      freeze.freeze_operator  },
-      { 'Freeze: take screenshot of current buffer',   pref..'f', freeze.freeze },
-      { 'Freeze: toggle light/dark/theme',             pref..'t', freeze.toggle_theme },
-    })
-
-    mappings.xmap({
-      { 'Freeze: take screenshot of selected range', pref, freeze.freeze_visual },
-    })
-  end,
+  keys = {
+    { pref(),   cmd(freeze 'freeze_operator'), desc = 'Freeze: take screenshot of <operator> range'  },
+    { pref 'f', cmd(freeze 'freeze'),          desc = 'Freeze: take screenshot of current buffer' },
+    { pref 't', cmd(freeze 'toggle_theme'),    desc = 'Freeze: toggle light/dark/theme' },
+    { pref(),   cmd(freeze 'freeze_visual'),   desc = 'Freeze: take screenshot of selected range', mode = 'x' },
+  },
 }
