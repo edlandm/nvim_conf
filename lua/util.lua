@@ -1,16 +1,18 @@
+local M = {}
+
 local api = vim.api
 local fun = vim.fn
 
 ---returns true if x is not null or empty
 ---@param x string | any[]
 ---@return boolean
-local function not_empty(x)
+function M.not_empty(x)
   return x ~= nil and fun.empty(x) == 0
 end
 
 ---echo a `msg` with error highlighting
 ---@param msg string
-local echo_error = function (msg)
+function M.echo_error(msg)
   api.nvim_echo({ { msg, 'ErrorMsg' } }, false, {})
 end
 
@@ -24,7 +26,7 @@ end
 ---@param resolve fun(result: T): A?
 ---@param reject fun(string): B?
 ---@return (A | B)?
-local function try(result, resolve, reject)
+function M.try(result, resolve, reject)
   local err, val = result[1], result[2]
   if err then return reject(err) end
   return resolve(val)
@@ -33,7 +35,7 @@ end
 ---prompt for input then call `callback` on the response
 ---@param _prompt string | { prompt: string|table, cancelreturn: string? }
 ---@param callback fun(response: string)
-local function prompt(_prompt, callback)
+function M.prompt(_prompt, callback)
   assert(_prompt, "prompt required")
   assert(callback, "callback required")
 
@@ -53,7 +55,7 @@ end
 ---@param msg string
 ---@param default boolean
 ---@return boolean
-local function prompt_yn(msg, default)
+function M.prompt_yn(msg, default)
   assert(msg, 'msg is required')
   if default == nil then default = false end
 
@@ -79,7 +81,7 @@ end
 ---@param res fun(response: string) success callback (resolve)
 ---@param rej fun(err: string) error callback (reject)
 ---@param opts table? curl options
-local function curl(url, res, rej, opts)
+function M.curl(url, res, rej, opts)
   assert(url, "url required")
   assert(res, "resolution callback required")
   assert(rej, "rejection callback required")
@@ -103,7 +105,7 @@ local function curl(url, res, rej, opts)
       stderr:read_stop()
 
       if code ~= 0 then
-        echo_error("curl exited unexpectedly: " .. code .. " " .. signal)
+        M.echo_error("curl exited unexpectedly: " .. code .. " " .. signal)
       end
 
       if error ~= "" then
@@ -133,7 +135,7 @@ end
 ---@param fn fun(input: A): B
 ---@param tests { input: A, expected: B }[]
 ---@return boolean
-local function test(name, fn, tests)
+function M.test(name, fn, tests)
   local run = function (input, expected)
     local actual = fn(input)
     local returned_type = type(actual)
@@ -169,7 +171,7 @@ end
 
 ---apply the current line's indent to each given line
 ---@param lines string[]
-local function indent_lines(lines)
+function M.indent_lines(lines)
   local linenum = vim.fn.line(".")
   local indent_count = vim.fn.indent(linenum)
   assert(indent_count > 0, "invalid line")
@@ -188,7 +190,7 @@ end
 ---@param types string[]
 ---@param node TSNode
 ---@return TSNode?
-local function find_node_ancestor(types, node)
+function M.find_node_ancestor(types, node)
   assert(types, 'find_node_ancestor :: `types required`')
 
   if not node then
@@ -204,7 +206,7 @@ local function find_node_ancestor(types, node)
     return nil
   end
 
-  return find_node_ancestor(types, parent)
+  return M.find_node_ancestor(types, parent)
 end
 
 ---read the file at `path` and return a dictionary full of values
@@ -213,7 +215,7 @@ end
 ---@param path path
 ---@param _sep string?
 ---@return { [string]: string }
-local function read_key_val_file(path, _sep)
+function M.read_key_val_file(path, _sep)
   assert(path, 'path required')
   assert(vim.fn.filereadable(path) == 1, ('file not readable: %s'):format(path))
   local sep = _sep or ' '
@@ -240,16 +242,16 @@ local function read_key_val_file(path, _sep)
   return dict
 end
 
-return {
-  curl               = curl,
-  echo_error         = echo_error,
-  indent_lines       = indent_lines,
-  not_empty          = not_empty,
-  prompt             = prompt,
-  prompt_yn          = prompt_yn,
-  test               = test,
-  try                = try,
-  get_parent_node    = find_node_ancestor,
-  read_key_val_file  = read_key_val_file,
-  find_node_ancestor = find_node_ancestor,
-}
+---load a lua file and return the object it contains
+---@param path path path to lua file
+---@return table
+function M.load_lua_table(path)
+  local chunk, err = loadfile(path)
+  assert(chunk, ('%s: %s'):format(args[0]), err)
+
+  local obj = chunk()
+  assert(obj, ('%s: %s'):format(args[0], 'lua file did not return an object'))
+  return obj
+end
+
+return M
