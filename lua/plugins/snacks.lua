@@ -5,9 +5,9 @@ local commands = {
   find = { ".", "-type", "d", "-not", "-path", "*/.git/*" },
 }
 
----@param opts snacks.picker.files.Config
+---@param opts { hidden:boolean, ignored:boolean, follow:boolean }:snacks.picker.Config
 ---@param filter snacks.picker.Filter
-local function get_cmd(opts, filter)
+local function get_dir_find_cmd(opts, filter)
   local cmd, args ---@type string, string[]
   if vim.fn.executable("fd") == 1 then
     cmd, args = "fd", commands.fd
@@ -54,22 +54,6 @@ local function get_cmd(opts, filter)
     end
   end
 
-  -- dirs
-  if opts.dirs and #opts.dirs > 0 then
-    local dirs = vim.tbl_map(vim.fs.normalize, opts.dirs) ---@type string[]
-    if is_fd and not pattern then
-      args[#args + 1] = "."
-    end
-    if is_find then
-      table.remove(args, 1)
-      for _, d in pairs(dirs) do
-        table.insert(args, 1, d)
-      end
-    else
-      vim.list_extend(args, dirs)
-    end
-  end
-
   return cmd, args
 end
 
@@ -78,12 +62,13 @@ local custom_pickers = {}
 function custom_pickers.directories()
   local picker = require('snacks.picker')
   picker.pick {
-    ---@param opts snacks.picker.files.Config
-    ---@param filter snacks.picker.Filter
     source = 'Directories',
-    finder = function(opts, filter)
-      local cwd = not (opts.dirs and #opts.dirs > 0) and vim.fs.normalize(opts and opts.cwd or uv.cwd() or ".") or nil
-      local cmd, args = get_cmd(opts, filter)
+    ---@param opts snacks.picker.Config
+    ---@param ctx snacks.picker.finder.ctx
+    finder = function(opts, ctx)
+      local filter = ctx.filter
+      local cwd = vim.fs.normalize(opts and opts.cwd or uv.cwd() or ".")
+      local cmd, args = get_dir_find_cmd(opts, filter)
       return require("snacks.picker.source.proc").proc(vim.tbl_deep_extend("force", {
         cmd = cmd,
         args = args,
@@ -92,11 +77,12 @@ function custom_pickers.directories()
           item.cwd = cwd
           item.file = item.text
         end,
-      }, opts or {}))
+      }, opts or {}), ctx)
     end,
     -- TODO: update input window title to include cwd
     actions = {
       back = {
+        desc = 'Move up/back one directory',
         action = function(self, item)
           local parent_dir = (item and item.cwd or self.opts.cwd):match('^(.+)/.+$')
           if not parent_dir then
@@ -107,9 +93,9 @@ function custom_pickers.directories()
           self:find()
           return true
         end,
-        desc = 'Move up/back one directory',
       },
       forward = {
+        desc = 'Move into selected directory',
         action = function(self, item)
           if not item or item.file == '/' then
             return false
@@ -119,21 +105,33 @@ function custom_pickers.directories()
           self:find()
           return true
         end,
-        desc = 'Move into selected directory',
       },
       cd = {
+        desc = 'Move into selected directory',
         action = function(self, item)
           if not item or item.file == '/' then
             return false
           end
-          local path = vim.fs.joinpath(item.cwd, item.file)
           self:close()
+          local path = vim.fs.joinpath(item.cwd, item.file)
           vim.cmd('cd ' .. path)
           print("cd -> " .. item.file)
           return true
         end,
-        desc = 'Move into selected directory',
       },
+      term = {
+        desc = 'open a terminal in the selected directory',
+        action = function(self, item)
+          if not item then return false end
+          self:close()
+          local path = vim.fs.joinpath(item.cwd, item.file)
+          dd(item)
+          Snacks.terminal.open(nil, {
+            cwd = path,
+            interactive = true,
+          })
+        end
+      }
     },
     win = {
       input = {
@@ -141,6 +139,7 @@ function custom_pickers.directories()
           ['<c-left>'] = { 'back', mode = { 'i', 'n' } },
           ['<c-right>'] = { 'forward', mode = { 'i', 'n' } },
           ['<c-e>'] = { 'cd', mode = { 'i', 'n' } },
+          ['<c-t>'] = { 'term', mode = { 'i', 'n' } },
         },
       },
     },
@@ -256,6 +255,13 @@ return {
           })
         end,
       },
+      config = function(_)
+        -- custom picker to list only directories
+        -- cd to selected dir with <c-e>
+        -- <cr> opens the directory in oil
+        -- TODO: currently an empty buffer is opened and you need to re-edit
+        -- it with `:e` to get oil to open up; not sure why
+        ---@diagnostic disable
         Snacks.picker.directories = custom_pickers.directories
 
         -- TODO: Cabinet workspace picker
