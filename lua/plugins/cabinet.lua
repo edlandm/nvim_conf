@@ -1,5 +1,5 @@
 return {
-  "smilhey/cabinet.nvim",
+  'unphased/cabinet.nvim',
   dependencies = {
     'nvim-neorg/neorg',
   },
