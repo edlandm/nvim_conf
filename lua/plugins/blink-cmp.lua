@@ -1,3 +1,9 @@
+-- do not enable blink in the following filetypes
+local blacklist = {
+  'typr',
+  'org-roam-select',
+}
+
 return {
   'saghen/blink.cmp',
   lazy = false,
@@ -5,25 +11,40 @@ return {
   version = '*',
   dependencies = {
     { 'saghen/blink.compat', opts = { version = '*', opts = {}, } },
+    'xzbdmw/colorful-menu.nvim', -- this makes it prettier
+    -- sources
     'L3MON4D3/LuaSnip',
     'saadparwaiz1/cmp_luasnip',
-    'xzbdmw/colorful-menu.nvim', -- this makes it prettier
-    'saghen/blink.cmp',
+    'niuiic/blink-cmp-rg.nvim',
+    'michhernand/rolodex.nvim',
   },
   opts = {
+    enabled = function ()
+      return not vim.tbl_contains(blacklist, vim.bo.filetype)
+        and vim.bo.buftype ~= 'prompt'
+        and vim.b.completion ~= false
+    end,
+
     -- for keymap, all values may be string | string[]
     -- use an empty table to disable a keymap
     keymap = {
       preset = 'default',
-      ['<Right>'] = { 'select_and_accept', 'fallback' },
-      ['<Up>'] = { 'select_prev', 'fallback' },
+      ['<C-y>'] = { 'select_and_accept', 'fallback' },
+
+      ['<C-n>'] = { 'select_next', 'fallback' },
       ['<Down>'] = { 'select_next', 'fallback' },
+
+      ['<C-p>'] = { 'select_prev', 'fallback' },
+      ['<Up>'] = { 'select_prev', 'fallback' },
 
       ['<C-Right>'] = { 'snippet_forward', 'fallback' },
       ['<C-Left>'] = { 'snippet_backward', 'fallback' },
 
       ['<Tab>'] = {},
       ['<S-Tab>'] = {},
+
+      ['<C-s>']     = { function(cmp) cmp.show({ providers = { 'snippets' } }) end },
+      ['<C-space>'] = { function(cmp) cmp.show({ providers = { 'codeium' } }) end },
     },
 
     completion = {
@@ -62,7 +83,18 @@ return {
     },
 
     sources = {
-      default = { 'snippets', 'path', 'lsp', 'buffer', 'codeium' },
+      default = function(ctx)
+        local ft = vim.bo.filetype
+        if ft == 'codecompanion' then
+          return { 'codecompanion' }
+        elseif ft == 'oil' then
+          return { 'path' }
+        elseif ft == 'org' then
+          return { 'path', 'buffer', 'rolodex' }
+        end
+
+        return { 'path', 'lsp', 'buffer', 'ripgrep' }
+      end,
       providers = {
         snippets = {
           score_offset = 2,
@@ -71,6 +103,56 @@ return {
           name = 'codeium',
           module = 'blink.compat.source',
           score_offset = 1,
+          enabled = vim.schedule_wrap(function()
+            return not (
+              vim.api.nvim_buf_get_name(0):match('^neorg://code%-block')
+            )
+          end)
+        },
+        ripgrep = {
+          module = "blink-cmp-rg",
+          name = "Ripgrep",
+          score_offset = -1,
+          -- options below are optional, these are the default values
+          ---@type blink-cmp-rg.Options
+          opts = {
+            -- `min_keyword_length` only determines whether to show completion items in the menu,
+            -- not whether to trigger a search. And we only has one chance to search.
+            prefix_min_len = 4,
+            get_command = function(_, prefix)
+              return {
+                "rg",
+                "--no-config",
+                "--json",
+                "--word-regexp",
+                "--ignore-case",
+                "--",
+                prefix .. "[\\w_-]+",
+                vim.fs.root(0, ".git") or vim.fn.getcwd(),
+              }
+            end,
+            get_prefix = function(context)
+              return context.line:sub(1, context.cursor[2]):match("[%w_-]+$") or ""
+            end,
+          },
+          enabled = vim.schedule_wrap(function()
+            return not (
+              -- I sometimes just open nvim in my homedir to type out an
+              -- email in a scratch buffer, and running ripgrep in my homedir ends
+              -- up taking a lot of RAM.
+              vim.bo.filetype == ''
+            )
+          end)
+        },
+        rolodex = {
+          name = 'rolodex',
+          module = 'blink.compat.source',
+          should_show_items = function(ctx)
+            return ctx.trigger.initial_character == '@'
+          end,
+          opts = {
+            cmp_name = 'cmp_rolodex',
+          },
         },
       },
       cmdline = { 'path' }
