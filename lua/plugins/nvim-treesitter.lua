@@ -1,3 +1,12 @@
+-- fixes for markdown files with 'csharp' codeblocks (vim filetype is 'cs')
+vim.treesitter.language.register('cs', { 'csharp' })
+
+vim.filetype.add({
+  extension = {
+    csharp = "cs",
+  },
+})
+
 return {
   'nvim-treesitter/nvim-treesitter',
   version = false,
@@ -109,6 +118,7 @@ return {
       "markdown_inline",
       "norg",
       "python",
+      "org",
       "regex",
       "rust",
       "sql",
