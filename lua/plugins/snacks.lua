@@ -115,6 +115,11 @@ return {
         ---@diagnostic disable
         Snacks.picker.directories = custom_pickers.directories
 
+        -- custom picker to list Lazy plugins
+        -- <c-r> reloads the plugin
+        ---@diagnostic disable
+        Snacks.picker.plugins = custom_pickers.plugins
+
         -- TODO: Cabinet workspace picker
         -- selecting the workspace opens it (duh)
         -- should have a keymap to edit the workspace file
@@ -145,6 +150,7 @@ return {
     { 'Pick Man Pages',         tab('m'),     run(pick 'man') },
     { 'Pick Undo Tree',         tab('u'),     run(pick 'undo') },
     { 'Pick Spelling',          tab('z'),     run(pick 'spelling') },
+    { 'Pick Plugins',           tab('p'),     run(pick 'plugins') },
     -- git
     { 'Pick Git Branches',      tab('gb'),    run(pick 'git_branches') },
     { 'Pick Git Diff',          tab('gd'),    run(pick 'git_diff') },

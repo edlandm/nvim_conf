@@ -2,9 +2,13 @@ local modname = 'pickers'
 package.loaded[modname] = {}
 local M = package.loaded[modname]
 
+---@class Snacks.pickers.custom
+---@field directories snacks.Picker easily navigate to directories, cd to them, open a terminal there, or open in oil
+---@field plugins snacks.Picker list all Lazy plugins, reload, update, open github url in browser
+
 local uv = vim.uv or vim.loop
 
-local commands = {
+local directory_finder_commands = {
   fd = { "--type", "d", "--color", "never", "-E", ".git" },
   find = { ".", "-type", "d", "-not", "-path", "*/.git/*" },
 }
@@ -14,11 +18,11 @@ local commands = {
 local function get_dir_find_cmd(opts, filter)
   local cmd, args ---@type string, string[]
   if vim.fn.executable("fd") == 1 then
-    cmd, args = "fd", commands.fd
+    cmd, args = "fd", directory_finder_commands.fd
   elseif vim.fn.executable("fdfind") == 1 then
-    cmd, args = "fdfind", commands.fd
+    cmd, args = "fdfind", directory_finder_commands.fd
   elseif vim.fn.executable("find") == 1 and vim.fn.has("win-32") == 0 then
-    cmd, args = "find", commands.find
+    cmd, args = "find", directory_finder_commands.find
   else
     error("No supported finder found")
   end
@@ -61,9 +65,9 @@ local function get_dir_find_cmd(opts, filter)
   return cmd, args
 end
 
+--- easily navigate to directories, cd to them, open a terminal there, or open in oil
 function M.directories()
-  local picker = require('snacks.picker')
-  picker.pick {
+  require('snacks.picker').pick {
     source = 'Directories',
     ---@param opts snacks.picker.Config
     ---@param ctx snacks.picker.finder.ctx
@@ -127,7 +131,6 @@ function M.directories()
           if not item then return false end
           self:close()
           local path = vim.fs.joinpath(item.cwd, item.file)
-          dd(item)
           Snacks.terminal.open(nil, {
             cwd = path,
             interactive = true,
@@ -151,4 +154,103 @@ function M.directories()
   }
 end
 
+--- list all Lazy plugins, reload, update, open github url in browser
+function M.plugins()
+  local items = vim.tbl_map(
+    function(plugin)
+      -- dir = "/home/miles/.local/share/nvim/lazy/nvim-dap-go",
+      -- name = "nvim-dap-go",
+      -- url = "https://github.com/leoluz/nvim-dap-go.git",
+
+      local readmes = {
+        'README.md',
+        'readme.md',
+        'README.markdown',
+        'README.adoc',
+        'README.org',
+        'readme.org',
+      }
+
+      local file
+      for _, r in ipairs(readmes) do
+        local readme = vim.fs.joinpath(plugin.dir, r)
+        if uv.fs_stat(readme) then
+          file = r
+          break
+        end
+      end
+
+      return {
+        text = plugin.name,
+        file = file,
+        cwd  = plugin.dir,
+        url  = plugin.url,
+      }
+    end,
+    require('lazy').plugins())
+
+  require('snacks.picker').pick {
+    source = 'Plugins',
+    items = items,
+    actions = {
+      update = {
+        desc = 'update the selected plugin',
+        action = function(self, item)
+          if not item then return false end
+          self:close()
+          -- for some reason this doesn't work with two arguments, it needs to
+          -- be passed as one string
+          vim.cmd({ cmd = 'Lazy', args = { 'update ' .. item.text } })
+        end
+      },
+      reload = {
+        desc = 'reload the selected plugin',
+        action = function(self, item)
+          if not item then return false end
+          self:close()
+          -- for some reason this doesn't work with two arguments, it needs to
+          -- be passed as one string
+          vim.cmd({ cmd = 'Lazy', args = { 'reload ' .. item.text } })
+        end
+      },
+      term = {
+        desc = 'reload the selected plugin',
+        action = function(self, item)
+          if not item then return false end
+          self:close()
+          Snacks.terminal.open(nil, {
+            cwd = item.cwd,
+            interactive = true,
+          })
+        end
+      },
+      open_url = {
+        desc = 'open the url of the selected plugin with vim.ui.open',
+        action = function(self, item)
+          if not item then return false end
+          self:close()
+          vim.ui.open(item.url)
+        end
+      },
+    },
+    win = {
+      input = {
+        keys = {
+          ['<c-s>'] = { 'update',   mode = { 'i', 'n' } },
+          ['<c-r>'] = { 'reload',   mode = { 'i', 'n' } },
+          ['<c-t>'] = { 'term',     mode = { 'i', 'n' } },
+          ['<c-o>'] = { 'open_url', mode = { 'i' } },
+          ['o']     = { 'open_url', mode = { 'n' } },
+        },
+      },
+      list = {
+        keys = {
+        },
+      },
+    },
+    format = 'text',
+  }
+end
+
+---@type Snacks.pickers.custom
 return M
