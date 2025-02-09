@@ -18,6 +18,9 @@ return {
   "folke/snacks.nvim",
   priority = 1000,
   lazy = false,
+  dependencies = {
+    'edlandm/holster.nvim'
+  },
   ---@type snacks.Config
   opts = {
     bigfile = { enabled = true },
@@ -119,6 +122,13 @@ return {
         -- <c-r> reloads the plugin
         ---@diagnostic disable
         Snacks.picker.plugins = custom_pickers.plugins
+
+        -- custom picker to read `.nvim.lua` and present a list of
+        -- commands from the returned object (the file needs to return a table
+        -- with a ['commands'] key containing a list of commands:
+        -- { commands: [ { name:string, cmd:func } ] }
+        ---@diagnostic disable
+        Snacks.picker.holster_commands = require('holster').pickers.commands
 
         -- TODO: Cabinet workspace picker
         -- selecting the workspace opens it (duh)
