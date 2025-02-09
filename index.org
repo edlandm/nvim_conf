@@ -1,0 +1,10 @@
+:PROPERTIES:
+:TITLE: NeoVim
+:AUTHOR: Miles Edland
+:END:
+#+Title: NeoVim
+* Links
+  - [[https://github.com/rockerBOO/awesome-neovim/blob/main/README.md][Awesome Neovim list]]
+  - [[https://nui-components.grapp.dev/][Nui-Components documentation]]
+  - [[https://fennel-lang.org/reference][Fennel Language Reference]]
+  - [[https://luals.github.io/wiki/annotations/][Lua LS - Annotations Reference]]

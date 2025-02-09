@@ -34,7 +34,7 @@ return {
   'catgoose/nvim-colorizer.lua',
   event = 'BufReadPre',
   opts = {
-    filetypes = { "*" },
+    filetypes = { "*", '!org' },
     user_default_options = {
       names = true, -- "Name" codes like Blue or red.  Added from `vim.api.nvim_get_color_map()`
       names_opts = { -- options for mutating/filtering names.
