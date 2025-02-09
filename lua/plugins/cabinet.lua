@@ -1,62 +1,108 @@
 return {
   'unphased/cabinet.nvim',
-  dependencies = {
-    'nvim-neorg/neorg',
-  },
   lazy = false,
-  config = function()
+  dependencies = {
+    'folke/snacks.nvim'
+  },
+  opts = {
+    ---@diagnostic disable I know that stdpath returns a string here
+    workspace_file = vim.fs.joinpath(vim.fn.stdpath('data'), 'workspaces.txt'),
+  },
+  config = function(_, opts)
     local cabinet = require("cabinet")
-    local workspaces = { "home" }
+    cabinet.workspaces_file = opts.workspace_file
+    function cabinet:get_workspaces()
+      local path = self.workspaces_file
+      assert(vim.fn.filereadable(path) == 1, ('file not readable: %s'):format(path))
 
-    local neorg = require("neorg")
-    if neorg then -- set up neorg workspace hook
-      local dirman = neorg.modules.get_module("core.dirman")
-      local neorg_workspaces = { }
-      for _, workspace in ipairs(dirman.get_workspace_names()) do
-        if workspace ~= "default" and workspace ~= "home" then
-          table.insert(neorg_workspaces, workspace)
+      ---@type { [string]: path }
+      local workspaces = {}
+      local i = 0
+      for line in io.lines(path) do
+        i = i + 1
+        if not (line:match('^#') or line:match('^%s*$')) then
+          local s, e = line:find('%s+')
+          assert(s and s > 1, ('parse error: line %d: %s\n'):format(i, line))
+
+          local name = line:sub(1, s-1)
+          local dir = line:sub(e+1)
+          assert(not workspaces[name],
+            ('duplicate workspace: %s on line %d'):format(name, i))
+
+          ---@type path
+          local _dir = vim.fn.expand(dir)
+          assert(vim.fn.isdirectory(_dir) == 1,
+            ('fs error line %d: directory not found: '):format(i, _dir))
+
+          workspaces[name] = _dir
         end
       end
 
-      table.sort(neorg_workspaces)
-
-      for _, workspace in ipairs(neorg_workspaces) do
-        table.insert(workspaces, workspace)
-      end
-
-      -- Open Neorg workspace when entering one of the initial drawers for the first time
-      vim.api.nvim_create_autocmd("User", {
-        nested = true,
-        pattern = "DrawNewEnter",
-        callback = function(event)
-          local drawer = event.data[2]
-          print('Drawer: ' .. drawer)
-
-          local drawer_index
-          for i,name in ipairs(cabinet.drawer_list()) do
-            if name == drawer then
-              drawer_index = i
-              break
-            end
-          end
-
-          assert(drawer_index, "Drawer not found in list")
-          if #cabinet.drawer_list_buffers(drawer_index) > 1 then return end
-          if not dirman.get_workspace(drawer) then return end
-          dirman.open_workspace(drawer)
-        end,
-      })
-    else
-      workspaces[1] = "home"
+      return workspaces
     end
 
-    cabinet:setup({
-      initial_drawers = workspaces,
+    vim.api.nvim_create_autocmd("User", {
+      nested = true,
+      pattern = "DrawNewEnter",
+      callback = function(event)
+        local drawer = event.data[2]
+        print('Drawer: ' .. drawer)
+
+        local drawer_index
+        for i,name in ipairs(cabinet.drawer_list()) do
+          if name == drawer then
+            drawer_index = i
+            break
+          end
+        end
+
+        assert(drawer_index, "Drawer not found in list")
+        if #cabinet.drawer_list_buffers(drawer_index) > 1 then return end
+
+        local workspaces = cabinet:get_workspaces()
+        local workspace = workspaces[drawer]
+        if workspace then
+          vim.cmd {
+            cmd = 'edit',
+            args = { vim.fs.joinpath(workspaces[drawer], 'index.org') }
+          }
+          vim.cmd { cmd = 'cd', args = { workspace, } }
+        end
+      end,
     })
 
-    local save = require("cabinet.save")
-    save.save_cmd()
-    save.load_cmd()
+    ---@diagnostic disable
+    local starting_file = vim.fn.argv(0)
+    local starting_file_dir = vim.fs.dirname(vim.fs.abspath(starting_file))
+    local starting_drawer
+    local drawers = { 'scratch' }
+    local workspaces = cabinet:get_workspaces()
+    for _, name in ipairs(vim.tbl_keys(workspaces)) do
+      table.insert(drawers, name)
+      if not starting_drawer and starting_file ~= '' then
+        if vim.fn.expand(workspaces[name]) == vim.fs.dirname(vim.fs.abspath(starting_file)) then
+          starting_drawer = name
+        end
+      end
+    end
+
+    if not starting_drawer then
+      starting_drawer = 'scratch'
+    end
+
+    -- ensure that the starting_drawer is the first one
+    table.sort(drawers, function(a, b)
+      if a == starting_drawer then
+        return true
+      elseif b == starting_drawer then
+        return false
+      end
+      return a < b
+    end)
+
+    cabinet:setup({
+      initial_drawers = drawers,
+    })
 
     -- Switch to drawer on creation
     vim.api.nvim_create_autocmd("User", {
@@ -68,15 +114,6 @@ return {
         cabinet.drawer_select(new_drawer_name)
       end,
     })
-
-    -- Open a terminal when entering a new drawer
-    -- vim.api.nvim_create_autocmd("User", {
-    -- 	nested = true,
-    -- 	pattern = "DrawNewEnter",
-    -- 	callback = function(event)
-    -- 		vim.cmd("term")
-    -- 	end,
-    -- })
 
     local print_only_one_drawer = function()
       vim.cmd.echo('"Cabinet: only one drawer"')
@@ -94,34 +131,94 @@ return {
           return
         end
 
-        local select = vim.ui.select
-        local minipick = package.loaded._G.MiniPick
-        if minipick then
-          -- TODO: add preview to list buffers in drawer
-          -- (not sure if currently possible via cabinet's api)
-          select = minipick.ui_select
+        local success, picker = pcall(require, 'snacks.picker')
+        if not success then
+          select(drawers, {
+            prompt = prompt..": ",
+          }, function(choice)
+              if not choice then return end
+              vim.cmd.redraw()
+              callback(choice)
+            end)
+          return
         end
 
-        select(drawers, {
-          prompt = prompt..": ",
-        }, function(choice)
-            if not choice then return end
-            vim.cmd.redraw()
-            callback(choice)
-          end)
+        Snacks.picker.pick {
+          source = 'Cabinet Drawers',
+          layout = 'sidebar',
+          title = prompt,
+          actions = {
+            edit = {
+              action = function(self)
+                assert(cabinet.workspaces_file, 'opts.workspaces_file not defined')
+                self:close()
+                vim.cmd({ cmd = 'edit', args = { cabinet.workspaces_file } })
+                vim.api.nvim_create_autocmd('BufWritePost', {
+                  desc = 'reload workspaces/drawers',
+                  buffer = 0,
+                  callback = function()
+                    -- TODO
+                    -- if any new drawers were added, we want to add them to
+                    -- the drawer-list
+                    print('Workspaces Updated')
+                    return
+                  end
+                })
+              end,
+              desc = 'edit workspaces file',
+            },
+          },
+          confirm = callback,
+          items = vim.tbl_map(function(drawername)
+            local drawer
+            for _, _drawer in ipairs(cabinet.drawer_manager.drawers) do
+              if _drawer.name == drawername then
+                drawer = _drawer
+                break
+              end
+            end
+            assert(drawer, 'Unable to find drawer: ' .. drawername)
+
+            local preview = '# ' .. drawername
+            if #drawer.buffers > 0 then
+              preview = preview .. table.concat(
+                vim.tbl_map(vim.api.nvim_buf_get_name, drawer.buffers),
+                '\n')
+            end
+            return {
+              text = drawername,
+              file = workspaces[drawername] or drawername,
+              preview = { text = preview, ft = 'markdown' },
+            }
+          end, drawers),
+          preview = 'preview',
+          format = function (item) return { { item.text, 'SnacksPickerFile' } } end,
+          win = {
+            input = {
+              keys = {
+                ['<c-e>'] = { 'edit', mode = { 'i', 'n' } },
+              },
+            },
+          },
+        }
       end
     end
 
-    local open_drawer = function(drawer_name)
-      cabinet.drawer_select(drawer_name)
+    local open_drawer = function(picker, item)
+      picker:close()
+      cabinet.drawer_select(item.text)
     end
 
-    local delete_drawer = function(drawer_name)
+    local delete_drawer = function(picker, item)
+      picker:close()
+      local drawer_name = item.text
       cabinet.drawer_delete(drawer_name)
       vim.cmd.echo('"Deleted Drawer: '..drawer_name..'"')
     end
 
-    local move_cur_buf_to_drawer = function(drawer_name)
+    local move_cur_buf_to_drawer = function(picker, item)
+      picker:close()
+      local drawer_name = item.text
       vim.cmd({ cmd = "DrawerBufMove", args = { drawer_name } })
       vim.cmd.echo('"Buffer moved to: '..drawer_name..'"')
     end
