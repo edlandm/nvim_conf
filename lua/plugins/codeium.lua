@@ -7,5 +7,10 @@ return {
   opts = {
     config_path = vim.fn.expand("~/.local/codeium.conf"),
     enable_chat = true,
+    virtual_text = {
+      filetypes = {
+        oil = false,
+      }
+    },
   },
 }
