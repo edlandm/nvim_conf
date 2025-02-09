@@ -30,7 +30,7 @@ local function setup()
     'wrap',
     { 'cdpath',         '~/,.,./*' },
     { 'completeopt',    'longest,menuone,preview' },
-    { 'diffopt',        'filler,vertical,iwhite,hiddenoff' },
+    { 'diffopt',        'internal,filler,closeoff,iwhite,vertical,linematch:60' },
     { 'display',        'lastline,uhex' },
     { 'equalalways',    false },
     { 'fileencodings',  'utf-8,default,latin1' },
