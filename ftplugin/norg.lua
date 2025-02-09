@@ -163,7 +163,7 @@ local function run_codeblock()
         -- optionally allow a line to contain a path to an env file
         local path = vim.fn.expand(line)
         local success, _, err = vim.uv.fs_stat(path)
-        assert(success, err)
+        assert(success, ('file not found: %s'):format(err))
         local dict = require('util').read_key_val_file(path, '=')
         for k,v in pairs(dict) do
           vim.fn.setenv(k,v)
