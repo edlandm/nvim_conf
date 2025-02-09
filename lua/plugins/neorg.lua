@@ -49,7 +49,7 @@ return {
       ['core.dirman'] = {
         config = {
           workspaces = read_workspaces(
-            ('%s/workspaces.txt'):format(vim.fn.stdpath('config'))
+            vim.fs.joinpath(vim.fn.stdpath('data'), 'workspaces.txt')
           ) or {},
           default_workspace = "nvim",
         },
