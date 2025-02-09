@@ -16,6 +16,9 @@ return {
         enabled = false,
       },
     },
+    autocmds = {
+      skipEnteringNoNeckPainBuffer = true,
+    },
   },
   keys = {
     { "<c-n>", "<cmd>lua require('no-neck-pain').toggle()<cr>", desc = "NoNeckPain" },
