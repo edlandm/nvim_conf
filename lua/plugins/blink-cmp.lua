@@ -16,7 +16,7 @@ return {
     'L3MON4D3/LuaSnip',
     'saadparwaiz1/cmp_luasnip',
     'niuiic/blink-cmp-rg.nvim',
-    'michhernand/rolodex.nvim',
+    'michhernand/RLDX.nvim',
   },
   opts = {
     enabled = function ()

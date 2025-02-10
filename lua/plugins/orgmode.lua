@@ -160,7 +160,7 @@ return {
     dependencies = {
       'nvim-orgmode/org-bullets.nvim',
       'hamidi-dev/org-list.nvim',
-      'michhernand/rolodex.nvim',
+      'michhernand/RLDX.nvim',
     },
     specs = {
       {

@@ -1,5 +1,5 @@
 return {
-  'michhernand/rolodex.nvim',
+  'michhernand/RLDX.nvim',
   ft = { 'org' },
   opts = {
     ---@diagnostic disable
