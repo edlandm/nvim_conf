@@ -19,8 +19,8 @@ return {
       },
       {
         file_pattern = { '*.org', },
-        cloak_pattern = { '(src_pass{(.+)})', },
-        replace = 'secret: ',
+        cloak_pattern = { 'src_pass{(.+)}', },
+        replace = '',
       },
     },
   },
