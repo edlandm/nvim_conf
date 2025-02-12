@@ -220,6 +220,7 @@ return {
           org_cycle = 'za',
           org_todo = '<localleader>t',
           org_todo_prev = false,
+          org_edit_special = '<localleader>e',
         },
       },
     },
