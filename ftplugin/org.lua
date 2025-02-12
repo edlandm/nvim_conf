@@ -42,10 +42,30 @@ local function org_link_to_pwd()
 end
 
 vim.api.nvim_buf_create_user_command(0, 'OrgLinkToPWD', org_link_to_pwd, {
-  desc     = 'Link file to :PWD:/index.org',
+  desc = 'Link file to :PWD:/index.org',
 })
 
 vim.api.nvim_buf_set_keymap(0, 'n', '<localleader>.', '', {
   desc = 'ORG: CD to :PWD:',
   callback = org_cd_to_pwd,
+})
+
+local function selection_to_link()
+  -- leave visual mode so that '< and '> get set
+  vim.api.nvim_feedkeys(
+    vim.api.nvim_replace_termcodes('<esc>', true, false, true),
+    'itx',
+    false)
+  local s = vim.api.nvim_buf_get_mark(0, '<')
+  local e = vim.api.nvim_buf_get_mark(0, '>')
+  local clip = vim.fn.getreg('+', false)
+  local label = vim.api.nvim_buf_get_text(0, s[1]-1, s[2], e[1]-1, e[2]+1, {})
+  local text = ('[[%s][%s]]'):format(clip, table.concat(label, '\n'))
+  vim.api.nvim_buf_set_text(0, s[1]-1, s[2], e[1]-1, e[2]+1, { text })
+  -- vim.cmd.normal('V')
+end
+
+vim.api.nvim_buf_set_keymap(0, 'x', '<localleader>l', '', {
+  desc = 'Turn selection into a link to <clipboard>',
+  callback = selection_to_link
 })
