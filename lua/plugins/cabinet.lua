@@ -145,7 +145,7 @@ return {
 
         Snacks.picker.pick {
           source = 'Cabinet Drawers',
-          layout = 'sidebar',
+          layout = 'select',
           title = prompt,
           actions = {
             edit = {
