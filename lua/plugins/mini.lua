@@ -109,7 +109,7 @@ return {
     -- {{{ Trailspace - trim trailing spaces/empty-lines from the current buffer
     local trailspace = require("mini.trailspace")
     trailspace.setup()
-    vim.keymap.set('n', '<leader>ts', '<cmd>lua MiniTrailspace.trim(); MiniTrailspace.trim_last_lines()<cr>',
+    vim.keymap.set('n', '<leader>S', '<cmd>lua MiniTrailspace.trim(); MiniTrailspace.trim_last_lines()<cr>',
       { silent = true, desc = "removing trailing spaces and trailing empty lines"})
     -- }}}
   end,
