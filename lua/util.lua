@@ -39,6 +39,15 @@ function M.prompt(_prompt, callback)
   assert(_prompt, "prompt required")
   assert(callback, "callback required")
 
+  if package.loaded['snacks.input'] then
+    local p = _prompt.prompt or _prompt
+    if type(p) == 'table' then
+      p = table.concat(p, '\n')
+    end
+    require('snacks.input')({ prompt=p }, callback)
+    return
+  end
+
   local opts
   if type(_prompt) == 'string' then
     opts = { prompt = _prompt, cancelreturn = '<CANCELRETURN>' }
