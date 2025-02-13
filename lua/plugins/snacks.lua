@@ -21,11 +21,12 @@ return {
   ---@type snacks.Config
   opts = {
     bigfile = { enabled = true },
-    zen = { enabled = true },
-    dim = { enabled = true },
-    debug = { enabled = true },
-    scroll = { enabled = true },
-    win = { enabled = true },
+    zen     = { enabled = true },
+    dim     = { enabled = true },
+    debug   = { enabled = true },
+    scroll  = { enabled = true },
+    win     = { enabled = true },
+    input   = { enabled = true, win = { style = 'input', title_pos = 'left' } },
     indent = {
       enabled = true,
       -- |¦‖｜￤∥ǀ∣│❘┃
