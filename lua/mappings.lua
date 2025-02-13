@@ -265,6 +265,7 @@ end
 local function cword_prompt_replace()
   M.cword(function(word)
     prompt('Replace: ', function(response)
+      if not response then return end
       M.replace(1, '$', '\\<' .. word .. '\\>', response)
     end)
   end)
@@ -275,6 +276,7 @@ local function cword_operator_prompt_replace()
   M.cword(function(word)
     M.operator(function(positions)
       prompt('Replace: ', function(response)
+        if not response then return end
         M.replace(positions.top, positions.bottom, '\\<' .. word .. '\\>', response)
       end)
     end, {jump = 'origin'})
