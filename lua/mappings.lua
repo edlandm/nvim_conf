@@ -108,6 +108,7 @@ end
 function M.operator(callback, _opts)
   local opts = _opts or {}
 
+  local starting_window = vim.api.nvim_get_current_win()
   local cursor = fun.getcurpos()
   _G.op_fn = function ()
     local positions = {
@@ -148,7 +149,7 @@ function M.operator(callback, _opts)
         only necessary if the operatorfunc moved the cursor
       --]]
       end
-      api.nvim_win_set_cursor(0, {cursor[2], cursor[3]})
+      api.nvim_win_set_cursor(starting_window, {cursor[2], cursor[3]})
     end
   end
 
