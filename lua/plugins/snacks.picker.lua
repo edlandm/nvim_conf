@@ -87,6 +87,7 @@ return {
     { 'Pick Files',             '<c-p>',     run(pick 'files') },
     { 'Pick Directories',       tab '.',     run(pick 'directories') },
     { 'Pick Resume',            tab '<tab>', run(pick 'resume') },
+    { 'Pick Buffers',           tab 'b',     run(pick 'buffers') },
     { 'SmartPicker',            tab ' ',     run(pick 'smart') },
     { 'Pick Holster',           tab 'e',     run(pick 'holster_commands') },
     { 'Pick Diagnostics <buf>', tab 'd',     run(pick 'diagnostics_buffer') },
