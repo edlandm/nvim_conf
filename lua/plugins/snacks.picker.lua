@@ -21,10 +21,10 @@ return {
       win = {
         input = {
           keys = {
-            ["<Esc>"] = { "close", mode = { "n", "i" } },
-            ["<C-c>"] = { "norm", mode = "i" },
-            ["<C-_>"] = { "flash", mode = { "n", "i" } },
-            ["_"]     = { "flash" },
+            ["<Esc>"]     = { "close", mode          = { "n", "i" } },
+            ["<C-c>"]     = { "norm",  mode          = "i" },
+            ["<C-space>"] = { "flash_open_buf", mode = "i" },
+            ["_"]         = { "flash", mode          = 'n' },
           },
         },
         preview = {
@@ -38,6 +38,7 @@ return {
           require("flash").jump({
             pattern = "^",
             label = { after = { 0, 0 } },
+            labels = "htsnaeicdomjlurk",
             search = {
               mode = "search",
               exclude = {
@@ -49,6 +50,27 @@ return {
             action = function(match)
               local idx = picker.list:row2idx(match.pos[1])
               picker.list:_move(idx, true, true)
+            end,
+          })
+        end,
+        flash_open_buf = function(picker)
+          require("flash").jump({
+            pattern = "^",
+            label = { after = { 0, 0 } },
+            labels = "htsnaeicdomjlurk",
+            search = {
+              mode = "search",
+              exclude = {
+                function(win)
+                  return vim.bo[vim.api.nvim_win_get_buf(win)].filetype ~= "snacks_picker_list"
+                end,
+              },
+            },
+            action = function(match)
+              picker:close()
+              local idx = picker.list:row2idx(match.pos[1])
+              local item = picker:items()[idx]
+              vim.api.nvim_win_set_buf(0, item.buf)
             end,
           })
         end,
