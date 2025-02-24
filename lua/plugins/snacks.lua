@@ -21,7 +21,7 @@ return {
   ---@type snacks.Config
   opts = {
     bigfile = { enabled = true },
-    zen     = { enabled = true },
+    zen     = { enabled = true, win = { backdrop = { transparent = false } } },
     dim     = { enabled = true },
     debug   = { enabled = true },
     scroll  = { enabled = true },
