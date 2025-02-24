@@ -3,6 +3,7 @@
 return {
   {
     "Olical/conjure",
+    branch = 'main',
     event = 'VeryLazy',
     dependencies = {
       'Olical/aniseed',
