@@ -71,10 +71,10 @@ return {
       enable_reverse=true,
       hopout=false,
       --{(|)} > fastwarp > {(}|)
-      map='<C-S-Right>', --string or table
-      rmap='<C-S-Left>', --string or table
-      cmap='<A-e>', --string or table
-      rcmap='<A-E>', --string or table
+      map='<a-l>', --string or table
+      rmap='<a-h>', --string or table
+      cmap='<a-l>', --string or table
+      rcmap='<a-h>', --string or table
       multiline=true,
       --(|) > fastwarp > (\n|)
       nocursormove=true,
