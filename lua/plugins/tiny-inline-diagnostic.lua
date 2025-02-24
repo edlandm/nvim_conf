@@ -19,4 +19,9 @@ return {
     },
     disabled_ft = {},
   },
+  keys = {
+    { '<leader>od', '<cmd>lua require("tiny-inline-diagnostic").toggle()<cr>',
+      desc = 'Toggle Inline Diagnostics' -- sometimes I need some goddamn peace and quiet
+    }
+  },
 }
