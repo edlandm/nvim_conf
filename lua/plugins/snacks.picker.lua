@@ -13,6 +13,7 @@ local function run(c)    return ('<cmd>lua %s<cr>'):format(c) end
 local function tab(s)    return '<tab>'..s end
 local function leader(s) return '<leader>'..s end
 local function pick(s)   return ('Snacks.picker.%s()'):format(s) end
+local with_ivy = { layout = 'ivy_split' }
 
 return {
   "folke/snacks.nvim",
@@ -112,8 +113,8 @@ return {
     { 'Pick Buffers',           tab 'b',     run(pick 'buffers') },
     { 'SmartPicker',            tab ' ',     run(pick 'smart') },
     { 'Pick Holster',           tab 'e',     run(pick 'holster_commands') },
-    { 'Pick Diagnostics <buf>', tab 'd',     run(pick 'diagnostics_buffer') },
-    { 'Pick Diagnostics',       tab 'D',     run(pick 'diagnostics') },
+    { 'Pick Diagnostics <buf>', tab 'd',     function() Snacks.picker.diagnostics_buffer(with_ivy) end },
+    { 'Pick Diagnostics',       tab 'D',     function() Snacks.picker.diagnostics(with_ivy) end },
     { 'Pick Commands',          tab 'C',     run(pick 'commands') },
     { 'Pick Command History',   tab ':',     run(pick 'command_history') },
     { 'Pick Search History',    tab '/',     run(pick 'search_history') },
@@ -148,6 +149,6 @@ return {
     { 'References',           'grr',  run(pick 'lsp_references') },
     { 'Goto Implementation',  'gi',   run(pick 'lsp_implementations') },
     { 'Goto Type Definition', 'gt',   run(pick 'lsp_definitions') },
-    { 'LSP Symbols',          'gs',   run(pick 'lsp_symbols') },
+    { 'LSP Symbols',          'gs',   function() Snacks.picker.lsp_symbols(with_ivy) end },
   },
 }
