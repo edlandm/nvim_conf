@@ -26,6 +26,7 @@ return {
     debug   = { enabled = true },
     scroll  = { enabled = true },
     win     = { enabled = true },
+    image   = { enabled = true },
     input   = { enabled = true, win = { style = 'input', title_pos = 'left' } },
     indent = {
       enabled = true,
