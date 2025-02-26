@@ -1,6 +1,6 @@
 return {
   'rachartier/tiny-glimmer.nvim',
-  pin = true,
+  enabled = true,
   event = 'VeryLazy',
   init = function()
     vim.api.nvim_del_keymap('n', 'n')
@@ -13,14 +13,6 @@ return {
       search = {
         enabled = true,
         default_animation = "pulse",
-        next_mapping = function()
-          local keys = { 'N', 'n' }
-          return keys[(vim.v.searchforward+1)] .. 'zzzv'
-        end,
-        prev_mapping = function()
-          local keys = { 'n', 'N' }
-          return keys[(vim.v.searchforward+1)] .. 'zzzv'
-        end,
       },
       paste = {
         enabled = true,
@@ -43,22 +35,14 @@ return {
       },
     }
   },
-  -- keys = {
-  --   { 'n', function()
-  --     local g = require('tiny-glimmer')
-  --     if vim.v.searchforward == 1 then
-  --       g.search_next()
-  --     else
-  --       g.search_prev()
-  --     end
-  --   end, desc = 'Search Forward (glimmer)' },
-  --   { 'N', function()
-  --     local g = require('tiny-glimmer')
-  --     if vim.v.searchforward == 0 then
-  --       g.search_next()
-  --     else
-  --       g.search_prev()
-  --     end
-  --   end, desc = 'Search Backward' },
-  -- },
+  keys = {
+    { 'n', function()
+      vim.fn.search(vim.fn.getreg("/"), 'w')
+      require('tiny-glimmer').search_next()
+    end, desc = 'Search Forward (glimmer)' },
+    { 'N', function()
+      vim.fn.search(vim.fn.getreg("/"), 'wb')
+      require('tiny-glimmer').search_prev()
+    end, desc = 'Search Backward' },
+  },
 }
