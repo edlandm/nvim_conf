@@ -503,7 +503,7 @@ function M.setup()
   M.imap({
     { 'Move Cursor To The Start Of Line',   '<c-a>',      '<c-o>^' },
     { 'Move Cursor To The End Of Line',     '<c-e>',      '<c-o>$' },
-    { 'Paste From System Clipboard',        '<c-r><c-r>', '<c-r>+' },
+    { 'Paste From System Clipboard',        '<c-r><c-r>', '<c-r>+', { silent = false } },
     { 'Insert a new line above the cursor', '<c-o><c-o>', '<c-o>O' },
     { 'Insert Current Line',                '<c-r><c-e>', "<c-r>=getline('.')<cr>" },
     { 'Insert Current File Name',           '<c-r><c-n>', "<c-r>=expand('%:t:r')<cr>" },
