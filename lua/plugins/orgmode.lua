@@ -198,7 +198,7 @@ return {
       org_default_notes_file = '~/org/index.org',
       org_startup_folded = 'content',
       org_hide_emphasis_markers = true,
-      org_todo_keywords = { 'TODO(t)', 'DOING(i)', '|', 'WAITING(w)', 'DELEGATED(g)', 'DONE(d)', 'CANCELLED(c)' },
+      org_todo_keywords = { 'TODO(t)', 'DOING(i)', '|', 'AMBIGUOUS(a)', 'WAITING(w)', 'DELEGATED(g)', 'DONE(d)', 'CANCELLED(c)' },
       -- FIXME: currently not able to get this working at all
       -- TODO: I'd like to set these colors to highlight groups if possible
       -- TODO      = ':foreground @comment.error :weight bold',
