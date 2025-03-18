@@ -70,10 +70,12 @@ return {
         },
       },
     },
+    notifier = { enabled = true, level = vim.log.levels.INFO },
   },
   keys = make_mappings({
     { 'Zen Mode', '<leader>z', run 'Snacks.zen()' },
     { 'Zoom',     '<leader>Z', run 'Snacks.zen.zoom()' },
+    { 'Notification History', '<leader>N', run 'Snacks.notifier.show_history()' },
   }),
   init = function()
     vim.api.nvim_create_autocmd("User", {
@@ -120,7 +122,6 @@ return {
           conceallevel = 3,
         },
       })
-
     end, { desc = 'Open Neovim News in floating window' })
   end,
 }
