@@ -1,7 +1,6 @@
 return {
   "laytan/cloak.nvim",
   lazy = false,
-  -- event = 'VeryLazy',
   opts = {
     enabled = true,
     cloak_character = '*',
@@ -30,6 +29,6 @@ return {
     'CloakDisable',
   },
   keys = {
-    {"<leader>C", "<cmd>lua require('cloak').toggle()<cr>", "Toggle Cloak" }
+    -- managed with snacks.toggle
   }
 }
