@@ -161,6 +161,7 @@ return {
       'nvim-orgmode/org-bullets.nvim',
       'hamidi-dev/org-list.nvim',
       'michhernand/RLDX.nvim',
+      'folke/snacks.nvim',
     },
     specs = {
       {
@@ -247,6 +248,7 @@ return {
   },
   {
     "chipsenkbeil/org-roam.nvim",
+    main = 'org-roam',
     event = 'VeryLazy',
     -- tag = '0.1.1',
     dependencies = {
@@ -277,6 +279,5 @@ return {
         find_node = '<localleader>f',
       },
     },
-    main = 'org-roam',
   },
 }
