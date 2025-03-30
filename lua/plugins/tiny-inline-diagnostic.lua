@@ -1,6 +1,7 @@
 return {
   "rachartier/tiny-inline-diagnostic.nvim",
   lazy = false,
+  enabled = false,
   init = function()
     vim.diagnostic.config({ virtual_text = false })
   end,

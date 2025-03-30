@@ -1,6 +1,6 @@
 ---set vim options
 ---@param namespace ('o' | 'bo' | 'g' | 'wo' | 'env')?
----@param options (string | [string, any)[]]
+---@param options (string | [string, any])[]
 local function setopts(namespace, options)
   local ns = namespace or 'o'
   for _, opt in ipairs(options) do
@@ -78,6 +78,11 @@ local function setup()
     { 'aniseed#env', true },
     { 'netrw_browsex_viewer', 'xdg-open' },
   })
+
+  vim.diagnostic.config {
+    virtual_lines = { current_line = true },
+    virtual_text = true,
+  }
 end
 
 return {
