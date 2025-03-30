@@ -310,7 +310,7 @@ require('mappings').imap({
   { 'expand: WHERE',                  'W<tab>',  'WHERE<space>' },
   { 'expand: WITH (NOLOCK)',          'WN',      'WITH<space>(NOLOCK)' },
   { 'expand SELECT column shorthand', '<c-s>',   expand_cols_cur_line },
-})
+}, true)
 -- }}}
 -- {{{ NORMAL ================================================================
 local lleader = require('mappings').lleader
@@ -326,7 +326,7 @@ require('mappings').nmap({
   { 'Rename Variable (<cword>)', lleader('rv'), '<cmd>SqlRenameVariable<cr>' },
   { 'Convert <cword> to snake_case', lleader('cs'), _G.sql_snake_case_cword },
   -- { '', lleader(''), '' },
-})
+}, true)
 -- }}}
 -- {{{ VISUAL ================================================================
 require('mappings').xmap({
@@ -338,6 +338,6 @@ require('mappings').xmap({
   { 'Match columns (in a WHERE clause) to variables', lleader('wv'), ':SqlWhereMatchColumnsToVariables<cr>' },
   { 'Convert variables to @in_ parameters', lleader('vi'), ':SqlVarsToInParams<cr>' },
   { 'Convert variables to @out_ parameters', lleader('vi'), ':SqlVarsToOutParams<cr>' },
-})
+}, true)
 -- }}}
 -- }}}
