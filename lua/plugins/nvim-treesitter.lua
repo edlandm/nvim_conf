@@ -118,7 +118,6 @@ return {
       "markdown_inline",
       "norg",
       "python",
-      "org",
       "regex",
       "rust",
       "sql",
