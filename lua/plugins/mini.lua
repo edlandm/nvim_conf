@@ -16,26 +16,6 @@ return {
     })
     -- }}}
 
-    -- {{{ Basics - common configuration presets
-    require("mini.basics").setup({
-      autocommands = {
-        basic = false
-      },
-      mappings = {
-        option_toggle_prefix = [[<leader>o]],
-        basics        = false,
-        windows       = false,
-        move_with_alt = false,
-      }
-    })
-    -- }}}
-
-    require("mini.bracketed").setup() -- go forward/backward with [brackets]
-    vim.keymap.del('n', ']d')
-    vim.keymap.del('n', ']D')
-    vim.keymap.del('n', '[d')
-    vim.keymap.del('n', '[D')
-
     require("mini.cursorword").setup() -- underline word under cursor
 
     -- {{{ Move - move selections of text
