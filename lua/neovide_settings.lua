@@ -1,5 +1,5 @@
 require('settings').setopts('g', {
-  { 'neovide_transparency',                  1 },
+  { 'neovide_opacity',                       1 },
   { 'neovide_floating_blur_amount_x',        2.0 },
   { 'neovide_floating_blur_amount_y',        2.0 },
   { 'neovide_floating_shadow',               true },
