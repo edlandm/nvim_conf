@@ -7,7 +7,7 @@ require('settings').setopts('g', {
   { 'neovide_light_angle_degrees',           45 },
   { 'neovide_light_radius',                  5 },
   { 'neovide_hide_mouse_when_typing',        true },
-  { 'neovide_cursor_animate_in_insert_mode', true },
-  { 'neovide_cursor_vfx_mode',               'pixiedust' },
+  { 'neovide_cursor_animate_in_insert_mode', false },
+  { 'neovide_cursor_vfx_mode',               'railgun' },
   { 'neovide_cursor_vfx_particle_density',   10.0 },
 })
