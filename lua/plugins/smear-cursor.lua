@@ -3,6 +3,9 @@ return {
   "sphamba/smear-cursor.nvim",
   -- enabled = false,
   event = 'VimEnter',
+  cond = function() -- disable if running Neovide
+    return _G['neovide'] == nil and true or false
+  end,
   opts  = {
     -- -- Smear cursor when switching buffers
     -- smear_between_buffers = false,
