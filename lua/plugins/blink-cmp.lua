@@ -8,7 +8,7 @@ return {
   'saghen/blink.cmp',
   lazy = false,
   build = 'cargo build --release',
-  version = '*',
+  -- tag = 'v0.1.0',
   dependencies = {
     { 'saghen/blink.compat', opts = { version = '*', opts = {}, } },
     'xzbdmw/colorful-menu.nvim', -- this makes it prettier
@@ -48,12 +48,9 @@ return {
     },
 
     completion = {
-      documentation = {
-        auto_show = true,
-      },
-      ghost_text = {
-        enabled = true,
-      },
+      menu          = { auto_show = true, },
+      documentation = { auto_show = true, },
+      ghost_text    = { enabled   = true, },
       trigger = {
         show_on_blocked_trigger_characters = function()
           if vim.api.nvim_get_mode().mode == 'c' then return {} end
@@ -83,18 +80,12 @@ return {
     },
 
     sources = {
-      default = function(ctx)
-        local ft = vim.bo.filetype
-        if ft == 'codecompanion' then
-          return { 'codecompanion' }
-        elseif ft == 'oil' then
-          return { 'path' }
-        elseif ft == 'org' then
-          return { 'path', 'buffer', 'rolodex' }
-        end
-
-        return { 'path', 'lsp', 'buffer', 'ripgrep' }
-      end,
+      default = { 'path', 'lsp', 'buffer', 'ripgrep' },
+      per_filetype = {
+        codecompanion = { 'codecompanion' },
+        oil           = { 'path' },
+        org           = { 'path', 'buffer', 'rolodex' },
+      },
       providers = {
         snippets = {
           score_offset = 2,
@@ -160,7 +151,6 @@ return {
 
     cmdline = {
       enabled = true,
-      keymap = nil, -- Inherits from top level `keymap` config when not set
       sources = function()
         local type = vim.fn.getcmdtype()
         -- Search forward and backward
@@ -193,8 +183,6 @@ return {
       use_frecency = true,
       -- proximity bonus boosts the score of items with a value in the buffer
       use_proximity = true,
-      -- controls which sorts to use and in which order, these three are currently the only allowed options
-      sorts = { 'label', 'kind', 'score' },
 
       prebuilt_binaries = {
         -- Whether or not to automatically download a prebuilt binary from github. If this is set to `false`
