@@ -52,6 +52,19 @@ local function setup()
   augroup('GITREBASE_FileType', {
     { {'FileType'}, { pattern = 'gitrebase', command = 'g/\\<fixup!/s/^pick\\ze\\>/fixup/' } },
   })
+
+  augroup('LSP_CLEANUP', {
+    { {'LspDetach'}, { desc = 'Stop lsp client when no buffer is attached',
+      callback = function(args)
+        local client = vim.lsp.get_client_by_id(args.data.client_id)
+        if not client or not client.attached_buffers then return end
+        for buf in pairs(client.attached_buffers) do
+          if buf ~= args.buf then return end
+        end
+        client:stop()
+      end
+    } }
+  })
 end
 
 return {
