@@ -422,6 +422,26 @@ function M.setup()
     { 'Move Cursor Up (visual line)', 'k', 'gk' },
     { 'Scroll Up', '<c-e>', '3<c-e>' },
     { 'Scroll Down', '<c-y>', '3<c-y>' },
+    { 'Jump or Scroll Up', '<c-u>',
+      function()
+        local cursor = vim.api.nvim_win_get_cursor(0)
+        local first_visible = vim.fn.line('w0')
+        local travel = math.floor(vim.api.nvim_win_get_height(0) / 2)
+        local is_jump_within_view = (cursor[1]-1 - travel) < first_visible
+        vim.cmd(('execute "normal! %d%s"') -- scroll with <c-y> or jump with k
+          :format(travel, is_jump_within_view and '' or 'k'))
+      end
+    },
+    { 'Jump or Scroll Up', '<c-d>',
+      function()
+        local cursor = vim.api.nvim_win_get_cursor(0)
+        local last_visible = vim.fn.line('w$')
+        local travel = math.floor(vim.api.nvim_win_get_height(0) / 2)
+        local is_jump_within_view = (cursor[1]-1 + travel) > last_visible
+        vim.cmd(('execute "normal! %d%s"') -- scroll with <c-e> or jump with j
+          :format(travel, is_jump_within_view and '' or 'j'))
+      end
+    },
     { 'Open <cfile> (vsplit)', '<c-w><c-v>', cmd 'vertical wincmd f' },
     { 'Next Tab (Buf if only one tab)', ')',
       function()
