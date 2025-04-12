@@ -5,8 +5,9 @@ return {
     signcolumn = true,
     word_diff = true,
     current_line_blame = false,
+    trouble = false,
     on_attach = function(bufnr)
-      local gs = package.loaded.gitsigns
+      local gs = require('gitsigns')
 
       local function map(mode, l, r, opts)
         opts = opts or {}
@@ -29,6 +30,8 @@ return {
 
       -- Text object
       map({'o', 'x'}, 'ih', ':<C-U>Gitsigns select_hunk<CR>')
+
+      map('n', 'dq', gs.setqflist, { desc = 'Send diff-hunks to quickfix' })
     end
   },
 }
