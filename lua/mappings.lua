@@ -498,6 +498,8 @@ function M.setup()
     { 'Repeat Last Edit On Next Line', 's', repeat_edit_on_next_line },
     { 'Yank To The End Of The Line', 'Y', 'y$' },
     { 'Format To End Of Pasted Text', '=p', '=`]' },
+    { 'Yank to system clipboard', 'gy', '"+y' },
+    { 'Paste from system clipboard', 'gp', '"+p' },
   })
   ---- Insert Mode =============================================================
   M.imap({
