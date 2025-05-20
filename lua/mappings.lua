@@ -571,6 +571,7 @@ function M.setup()
     { 'Switch Window Down',  '<c-j>',      '<c-\\><c-n><c-w>j' },
     { 'Switch Window Left',  '<c-h>',      '<c-\\><c-n><c-w>h' },
     { 'Switch Window Right', '<c-l>',      '<c-\\><c-n><c-w>l' },
+    { 'Kill terminal process', '<a-d><a-d><a-d>', '<cmd>lua vim.fn.jobstop(vim.bo[vim.api.nvim_get_current_buf()].channel)<cr>' },
   })
   ---- Command-line Mode =======================================================
   M.cmap({
