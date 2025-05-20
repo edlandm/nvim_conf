@@ -137,7 +137,22 @@ return {
   ---@type snacks.Config
   opts = {
     bigfile = { enabled = true },
-    zen     = { enabled = true, win = { backdrop = { transparent = false } } },
+    zen = {
+      enabled = true,
+      win = {
+        backdrop = { transparent = false },
+        keys = {
+          { '<leader>z', function() Snacks.toggle.dim():toggle() end, mode = 'n' },
+        },
+      },
+      on_open = function(win)
+      end,
+      on_close = function(win)
+        vim.api.nvim_buf_set_keymap(win.buf, 'n', '<leader>z', '', {
+          callback = function() Snacks.toggle.zen():toggle() end,
+        })
+      end,
+    },
     dim     = { enabled = true },
     debug   = { enabled = true },
     scroll  = { enabled = true },
