@@ -62,11 +62,22 @@ return {
         local workspaces = cabinet:get_workspaces()
         local workspace = workspaces[drawer]
         if workspace then
-          vim.cmd {
-            cmd = 'edit',
-            args = { vim.fs.joinpath(workspaces[drawer], 'index.org') }
-          }
           vim.cmd { cmd = 'cd', args = { workspace, } }
+
+          local index_files = { 'index.org', 'index.norg', 'index.md' }
+          local index_file
+          for _, f in ipairs(index_files) do
+            local path = vim.fs.joinpath(workspaces[drawer], f)
+            local stat = vim.uv.fs_stat(path)
+            if stat and stat.type == 'file' then
+              index_file = path
+              break
+            end
+          end
+
+          if index_file then
+            vim.cmd { cmd = 'edit', args = { index_file } }
+          end
         end
       end,
     })
