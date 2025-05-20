@@ -13,11 +13,13 @@ return {
     highlight = true,
 
     -- How long should above highlight last (in ms)
-    highlight_duration = 200,
+    highlight_duration = 300,
 
     -- The color of the above highlight. Must be a valid vim highlight group.
     -- (see :h highlight-group for options)
-    highlight_group = "ColorColumn",
+    highlight_group = "@string.special",
+
+    jumplist = 'left',
   },
   config = function(_, opts)
     local tw = require('treewalker')
@@ -38,10 +40,10 @@ return {
         { 'k',     cmd 'Treewalker Up',        { desc = 'Up (Prev sibling)',   silent = true }},
         { 'h',     cmd 'Treewalker Left',      { desc = 'Left (Out/Parent)',   silent = true }},
         { 'l',     cmd 'Treewalker Right',     { desc = 'Right (In/Child)',    silent = true }},
-        { '<c-j>', cmd 'Treewalker SwapDown',  { desc = 'Swap Down',           silent = true }},
-        { '<c-k>', cmd 'Treewalker SwapUp',    { desc = 'Swap Up',             silent = true }},
-        { '<c-h>', cmd 'Treewalker SwapLeft',  { desc = 'Swap Left',           silent = true }},
-        { '<c-l>', cmd 'Treewalker SwapRight', { desc = 'Swap Right',          silent = true }},
+        { '<m-j>', cmd 'Treewalker SwapDown',  { desc = 'Swap Down',           silent = true }},
+        { '<m-k>', cmd 'Treewalker SwapUp',    { desc = 'Swap Up',             silent = true }},
+        { '<m-h>', cmd 'Treewalker SwapLeft',  { desc = 'Swap Left',           silent = true }},
+        { '<m-l>', cmd 'Treewalker SwapRight', { desc = 'Swap Right',          silent = true }},
         { '<esc>', function() pcall(TW_MODE.deactivate, TW_MODE) end,
           { desc = 'Exit Treewalker Mode', silent = true } },
         { toggle_key, function() pcall(TW_MODE.deactivate, TW_MODE) end,
