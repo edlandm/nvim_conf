@@ -1,40 +1,19 @@
-local flash_jump = function(_forward)
-  require("flash").jump({
-    search = { forward = _forward, multi_window = true, wrap = false, },
-  })
-end
-
-local select_any_word = function()
-  require("flash").jump({
-    pattern = ".", -- initialize pattern with any char
-    search = {
-      mode = function(pattern)
-        -- remove leading dot
-        if pattern:sub(1, 1) == "." then
-          pattern = pattern:sub(2)
-        end
-        -- return word pattern and proper skip pattern
-        return ([[\<%s\w*\>]]):format(pattern), ([[\<%s]]):format(pattern)
-      end,
-    },
-    -- select the range
-    jump = { pos = "range" },
-  })
-end
-
-local flash_cword = function()
-  require("flash").jump({
-    pattern = vim.fn.expand("<cword>"),
-    search = {
-      mode = function(pattern)
-        return ([[\<%s\>]]):format(pattern)
-      end,
-    },
-  })
+---function to that returns function that applies `opts` to the given flash method
+---@param method string
+---@param opts? table
+---@return function
+local function flash(method, opts)
+  assert(method, 'method required')
+  return function()
+    local f = require('flash')
+    assert(f, 'unable to load flash')
+    f[method](opts)
+  end
 end
 
 return {
   "folke/flash.nvim",
+  event = "VeryLazy",
   opts = {
     labels = "cieahtsnbyouldwvgxjkrmf",
     label = {
@@ -47,25 +26,53 @@ return {
     modes = {
       char = {
         jump_labels = true,
-      }
-    }
+      },
+      char_actions = function(motion)
+        return {
+          -- jump2d style: same case goes next, opposite case goes prev
+          [motion] = "next",
+          [motion:match("%l") and motion:upper() or motion:lower()] = "prev",
+        }
+      end,
+      jump = { autojump = true }
+    },
   },
-  event = "VeryLazy",
-  config = true,
   keys = {
-    { "_j",  "<cmd>lua require('flash').jump({ search = { forward = true, multi_window = true, wrap = false } })<cr>",
-      mode = {"n", "x", "o" }, desc = "flash: jump forward (down)" },
-    { "_k",  "<cmd>lua require('flash').jump({ search = { forward = false, multi_window = true, wrap = false } })<cr>",
-      mode = {"n", "x", "o" }, desc = "flash: jump backward (up)" },
-    { "_*", flash_cword, mode = {"n", "x", "o" },
-        desc = "flash: cword" },
-    { "<cr>", "<cmd>lua require('flash').treesitter()<cr>", mode = {"n", "x", "o"},
-        desc = "flash: Treesitter mode" },
-    { "__", "<cmd>lua require('flash').treesitter_search()<cr>", mode = {"n", "x", "o"},
-        desc = "flash: Treesitter nodes" },
-    { "r", "<cmd>lua require('flash').remote()<cr>", mode = "o",
-        desc = "flash: remote" },
-    { "__", "<cmd>lua require('flash').treesitter_search()<cr>", mode = "o",
-        desc = "flash: Treesitter Search" },
+    { "_j", flash('jump', {
+      search = { forward = true, multi_window = true, wrap = false, }
+    }), mode = {"n", "x", "o" }, desc = "flash: jump forward (down)" },
+    { "_k", flash('jump', {
+      search = { forward = false, multi_window = true, wrap = false, }
+    }), mode = {"n", "x", "o" }, desc = "flash: jump backward (up)" },
+    { "_*", flash('jump', {
+      pattern = vim.fn.expand("<cword>"),
+      search = {
+        mode = function(pattern)
+          return ([[\<%s\>]]):format(pattern)
+        end,
+      },
+    }), mode = {"n", "x", "o" }, desc = "flash: cword" },
+    { "_d", flash('jump', {
+      matcher = function(win)
+        return vim.tbl_map(function(diag)
+          return {
+            pos = { diag.lnum + 1, diag.col },
+            end_pos = { diag.end_lnum + 1, diag.end_col - 1 },
+          }
+        end, vim.diagnostic.get(vim.api.nvim_win_get_buf(win)))
+      end,
+      action = function(match, state)
+        vim.api.nvim_win_call(match.win, function()
+          vim.api.nvim_win_set_cursor(match.win, match.pos)
+          vim.diagnostic.open_float()
+        end)
+        state:restore()
+      end,
+    }), mode = "n", desc = 'flash: show diagnostics at target' },
+    { "__",    flash('jump', { continue = true }), mode = { "n", "x", "o" }, desc = "flash: continue searc" },
+    { "_",     flash 'remote',            mode = "o",               desc = "flash: remote" },
+    { "<cr>",  flash 'treesitter',        mode = { "n", "x", "o" }, desc = "flash: Treesitter mode" },
+    { "<c-s>", flash 'treesitter_search', mode = { "n", "x", "o" }, desc = "flash: Treesitter search" },
+    { "<c-s>", flash("toggle"),           mode = "c",               desc = "Toggle Flash Search" },
   }
 }
