@@ -414,6 +414,27 @@ local function repeat_edit_on_next_line()
   api.nvim_win_set_cursor(0, { row + 1, col })
 end
 
+local function toggle_quickfix()
+  local qf_exists = false
+  for _, win in pairs(vim.fn.getwininfo()) do
+    if win.quickfix == 1 then
+      qf_exists = true
+      break
+    end
+  end
+
+  if qf_exists then
+    vim.cmd 'cclose'
+  else
+    -- Only open if there are items in the quickfix list
+    if vim.fn.getqflist({size = 0}).size > 0 then
+      vim.cmd 'copen'
+    else
+      vim.notify('Quickfix list is empty', vim.log.levels.INFO)
+    end
+  end
+end
+
 function M.setup()
   local cmd = M.cmd
   local leader = M.leader
@@ -470,16 +491,12 @@ function M.setup()
     { 'Buffer Delete',  leader 'bd', cmd 'b#|bwipeout #' },
     { 'Buffer Delete!', leader 'bD', cmd 'b#|bwipeout! #' },
     { 'Buffer Only',    leader 'bo', cmd "execute \"silent! tabonly|silent! %bd|e#|bd#\" | echo 'Closed all buffers (and tabs) except current'" },
+    { 'Quickfix Toggle',    '<c-c>',   toggle_quickfix },
     { 'Quickfix Next',      '<M-j>',   cmd 'cnext' },
     { 'Quickfix Next File', '<M-S-J>', cmd 'cnfile' },
     { 'Quickfix Prev',      '<M-k>',   cmd 'cprevious' },
     { 'Quickfix Prev File', '<M-S-K>', cmd 'cpfile' },
-    -- fallbacks in the event that the terminal doesn't support <M-S-*> mappings
-    { 'Quickfix Next',      leader 'cn', cmd 'cnext' },
-    { 'Quickfix Next File', leader 'cN', cmd 'cnfile' },
-    { 'Quickfix Prev',      leader 'cp', cmd 'cprevious' },
-    { 'Quickfix Prev File', leader 'cP', cmd 'cpfile' },
-    { 'Append Session Marker', leader 'as', '0C<C-R>=repeat(\"=\",<Space>78)<CR><Esc>0R<C-R>\"<Space><Esc>' },
+    { 'Append Section Marker', leader 'as', '0C<C-R>=repeat(\"=\",<Space>78)<CR><Esc>0R<C-R>\"<Space><Esc>' },
     { 'Append <prompt> to <motion>',  leader 'a', operator_append_prompt },
     { 'Prepend <prompt> to <motion>', leader 'i', operator_prepend_prompt },
     { 'Delete lines with <cword> in <motion>', leader 'd', cword_operator_delete_lines },
