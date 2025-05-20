@@ -548,6 +548,7 @@ function M.setup()
     { 'Insert Current File Name',           '<c-r><c-n>', "<c-r>=expand('%:t:r')<cr>" },
     { 'Insert Current File',                '<c-r><c-f>', "<c-r>=expand('%:t')<cr>" },
     { 'Insert Current File Path',           '<c-r><c-p>', "<c-r>=expand('%:p')<cr>" },
+    { 'Insert CWD',                         '<c-r><c-d>', "<c-r>=getcwd()<cr>" },
     { '<- Current Line',                    '<c-d>',      '<c-o><<' },
     { '-> Current Line',                    '<c-t>',      '<c-o>>>' },
   })
@@ -582,6 +583,7 @@ function M.setup()
     { 'Insert Current File Name',         '<c-r><c-n>', "<c-r>=expand('%:t:r')<cr>", { silent = false, } },
     { 'Insert Current File',              '<c-r><c-f>', "<c-r>=expand('%:t')<cr>",   { silent = false, } },
     { 'Insert Current File Path',         '<c-r><c-p>', "<c-r>=expand('%:p')<cr>",   { silent = false, } },
+    { 'Insert CWD',                       '<c-r><c-d>', "<c-r>=getcwd()<cr>",        { silent = false, } },
   })
   ---- Operator-Pending Mode ===================================================
   M.omap({
