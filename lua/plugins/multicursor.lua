@@ -2,47 +2,74 @@ return {
   'jake-stewart/multicursor.nvim',
   event = 'VeryLazy',
   dependencies = {
-    'debugloop/layers.nvim'
+    'debugloop/layers.nvim',
+    {
+      "zaucy/mcos.nvim",
+      dependencies = {
+        "jake-stewart/multicursor.nvim",
+      },
+      opts = {},
+    },
   },
   config = function ()
-    local mc = require('multicursor-nvim')
+    local mc = require 'multicursor-nvim'
     mc.setup()
 
     local layers = require('layers')
     local MULTI_MODE = layers.mode.new()
     MULTI_MODE:auto_show_help()
 
-    -- MULTI_MODE:add_hook(function ()
-    --   vim.cmd('redrawstatus')
-    -- end)
+    local mc_activate = function ()
+      if not MULTI_MODE:active() then
+        MULTI_MODE:activate()
+      end
+    end
 
     local mappings = require('mappings')
     mappings.nmap({
-      { 'Enable Multi-Cursor Mode', mappings.leader('n'),
-        function ()
-          if not MULTI_MODE:active() then
-            MULTI_MODE:activate()
-          end
-        end },
+      { 'Enable Multi-Cursor Mode', mappings.leader('n'), mc_activate },
       { 'Restore Multi-Cursor Mode', mappings.leader('gn'), function ()
         mc.restoreCursors()
-        if not MULTI_MODE:active() then
-          MULTI_MODE:activate()
-        end
+        mc_activate()
       end },
     })
 
     mappings.xmap({
       { 'Enable Multi-Cursor Mode', mappings.leader('n'), function ()
-        MULTI_MODE:activate()
+        mc_activate()
         mc.matchAddCursor(1)
       end },
     })
 
+    local mcos = require 'mcos'
+    mcos.setup {}
+
+    vim.keymap.set({ 'n', 'v' }, 'gm', function()
+      mappings.operator(
+        function (positions)
+          mc_activate()
+          vim.api.nvim_buf_set_mark(0, '<', positions.top, 0, {})
+          vim.api.nvim_buf_set_mark(0, '>', positions.bottom, 0, {})
+          vim.fn.feedkeys(':')
+          local cmdline = ("'<,'>MCOS "):format(positions.top, positions.bottom)
+          require('mcos.util').setcmdline_delayed(cmdline, #cmdline + 1)
+        end)
+    end)
+    vim.keymap.set({ 'n' }, 'gmm', function()
+      mc_activate()
+      mcos.bufkeymapfunc()
+    end)
+
+    -- shorthand because I like specifying the description at the beginning
+    local map = function(mapping)
+      local lhs, desc, fn = unpack(mapping)
+      return { lhs, fn, { desc = desc } }
+    end
+
     MULTI_MODE:keymaps({
       n = {
-        {
-          '<esc>',
+        map {
+          '<esc>', 'Exit Multi-Cursor Mode',
           function ()
             if mc.hasCursors() then
               mc.clearCursors()
@@ -54,70 +81,61 @@ return {
               pcall(MULTI_MODE.deactivate, MULTI_MODE)
             end
           end,
-          { desc = 'Exit Multi-Cursor Mode' }
         },
-        {
-          'n',
+        map {
+          'gn', 'Restore cursors',
+          mc.restoreCursors,
+        },
+        map {
+          'n', 'Add cursor and jump to next <cword>',
           function () mc.matchAddCursor(1) end,
-          { desc = 'Add cursor and jump to next <cword>' }
         },
-        {
-          'N',
+        map {
+          'N', 'Add cursor and jump to prev <cword>',
           function () mc.matchAddCursor(-1) end,
-          { desc = 'Add cursor and jump to prev <cword>' }
         },
-        {
-          's',
+        map {
+          's', 'Skip to next <cword>',
           function () mc.matchSkipCursor(1) end,
-          { desc = 'Skip to next <cword>' }
         },
-        {
-          'S',
+        map {
+          'S', 'Skip to prev <cword>',
           function () mc.matchSkipCursor(-1) end,
-          { desc = 'Skip to prev <cword>' }
         },
-        {
-          '<c-k>',
+        map {
+          '<c-k>', 'Add cursor above the main cursor',
           function () mc.addCursor('k') end,
-          { desc = 'Add cursor above the main cursor' }
         },
-        {
-          '<c-j>',
+        map {
+          '<c-j>', 'Add cursor below the main cursor',
           function () mc.addCursor('j') end,
-          { desc = 'Add cursor below the main cursor' }
         },
-        {
-          '<c-n>',
+        map {
+          ')', 'Next cursor',
           function () mc.nextCursor() end,
-          { desc = 'Next cursor' }
         },
-        {
-          '<c-p>',
+        map {
+          '(', 'Prev cursor',
           function () mc.prevCursor() end,
-          { desc = 'Prev cursor' }
         },
-        {
-          '<c-t>',
+        map {
+          '<c-t>', 'Toggle main cursor',
           function () mc.toggleCursor() end,
-          { desc = 'Toggle main cursor' }
         },
-        {
-          '<c-x>',
+        map {
+          '<c-x>', 'Delete main cursor',
           function () mc.deleteCursor() end,
-          { desc = 'Delete main cursor' }
         },
-        {
-          '<c-s>',
+        map {
+          'gs', 'Split cursors by regex',
           function () mc.splitCursors() end,
-          { desc = 'Split cursors by regex' }
         },
-        {
-          '<c-l>',
+        map {
+          '<c-l>', 'Align cursor columns',
           function () mc.alignCursors() end,
-          { desc = 'Align cursor columns' }
         },
-        {
-          '<c-q>',
+        map {
+          '<c-q>', 'Disable/Enable cursor movement',
           function ()
             if mc.cursorsEnabled() then
               mc.disableCursors()
@@ -125,19 +143,36 @@ return {
               mc.enableCursors()
             end
           end,
-          { desc = 'Disable/Enable cursor movement' },
-        }
+        },
+        map {
+          '<c-n>', 'Add cursor for all matches of <cword> in buffer',
+          mc.matchAllAddCursors,
+        },
+        map {
+          '<m-n>', 'Add cursor at next search result',
+          function() mc.searchAddCursor(1) end,
+        },
+        map {
+          '<m-s-n>', 'Add cursor at prev search result',
+          function() mc.searchAddCursor(-1) end,
+        },
+        map {
+          '<m-s>', 'Skip to next search result',
+          function() mc.searchSkipCursor(1) end,
+        },
+        map {
+          '<m-s-s>', 'Add cursor at prev search result',
+          function() mc.searchSkipCursor(-1) end,
+        },
       },
       x = {
-        {
-          'n',
+        map {
+          'n', 'Add cursor and jump to next word under cursor',
           function () mc.matchAddCursor(1) end,
-          { desc = 'Add cursor and jump to next word under cursor' }
         },
-        {
-          'N',
+        map {
+          'N', 'Add cursor and jump to previous word under cursor',
           function () mc.matchAddCursor(-1) end,
-          { desc = 'Add cursor and jump to previous word under cursor' }
         },
       },
     })
