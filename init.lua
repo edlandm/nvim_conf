@@ -5,6 +5,7 @@ require("settings").setup()
 require("autocmd").setup()
 require("commands")
 require("mappings").setup()
+require("quickfix")
 
 local fs_stat = (vim.uv or vim.loop).fs_stat ---@diagnostic disable-line
 
