@@ -525,13 +525,12 @@ return {
   {
     'nvim-orgmode/orgmode',
     dependencies = {
-      'nvim-orgmode/org-bullets.nvim',
-      'hamidi-dev/org-list.nvim',
       'folke/snacks.nvim',
     },
     specs = {
       {
         'nvim-orgmode/org-bullets.nvim',
+        ft = { 'org' },
         opts = {
           concealcursor = true,
         },
@@ -539,6 +538,7 @@ return {
       },
       {
         'hamidi-dev/org-list.nvim',
+        ft = { 'org' },
         dependencies = {
           'tpope/vim-repeat',
         },
