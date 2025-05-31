@@ -88,6 +88,18 @@ end
 
 M.cmd = M.wrap('<cmd>', '<cr>')
 M.lua = M.wrap('<cmd>lua ', '<cr>')
+
+---convenience function that takes a list of mapping tuples in the format that
+---I prefer (description-first for readability) and returns a LazyKeySpec[]
+function M.to_lazy(m)
+  assert(type(m) == 'table', 'this function expects either a tuple or list of tuples')
+  if type(m[1]) == 'table' then
+    return vim.tbl_map(M.to_lazy, m)
+  end
+  local desc, lhs, rhs, modes = unpack(m)
+  assert(type(desc) == 'string', 'first param of mapping tuple must be string description')
+  assert(type(lhs) == 'string', 'second param of mapping tuple must be string lhs')
+  return { lhs, rhs, mode = (modes or { 'n' }), desc = desc }
 end
 
 ---if cursor is on a word, call `fn` with <cWORD> as the first argument
