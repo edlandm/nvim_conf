@@ -72,18 +72,22 @@ function M.lleader(s)
   return ('<localleader>%s'):format(s)
 end
 
----wrap string in <cmd><cr>
----@param s any
----@return string
-function M.cmd(s)
-  return ('<cmd>%s<cr>'):format(s)
+function M.prefix(p)
+  assert(p, 'argument required')
+  return function(s) return p .. (s or '') end
 end
 
----wrap string in <cmd>lua <cr>
----@param s any
----@return string
-function M.lua(s)
-  return ('<cmd>lua %s<cr>'):format(s)
+---return a function that takes a string and wraps it with `s` [and `e`]
+---@param s string
+---@param e string
+---@return fun(x:string):string
+function M.wrap(s, e)
+  assert(s, 'argument required')
+  return function(x) return ('%s%s%s'):format(s, x, e or s) end
+end
+
+M.cmd = M.wrap('<cmd>', '<cr>')
+M.lua = M.wrap('<cmd>lua ', '<cr>')
 end
 
 ---if cursor is on a word, call `fn` with <cWORD> as the first argument
