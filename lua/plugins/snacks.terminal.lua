@@ -37,7 +37,8 @@ local home = vim.fn.getenv('HOME')
 
 return {
   'folke/snacks.nvim',
-  terminal = { enabled = true },
+  terminal = { enabled = false },
+  --[[
   keys = make_mappings({
     -- terminal mappings
     -- want to have ones for opening in current window, float, horizontal, and vertical
@@ -54,4 +55,5 @@ return {
     { 'Term: broot $HOME split', pref 'Bs', function() br(home, horizontal) end },
     { 'Term: broot $HOME vert',  pref 'Bv', function() br(home, vertical)   end },
   }),
+  --]]
 }
