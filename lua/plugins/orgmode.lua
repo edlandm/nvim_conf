@@ -398,11 +398,13 @@ local function get_headlines(buf)
             offset = offset + #hl[1]
           end
 
-          for i = 1, #code_highlights do
-            local hl = code_highlights[i]
-            hl.col     = offset + hl.col
-            hl.end_col = offset + hl.end_col
-            table.insert(highlights, hl)
+          if code_highlights then
+            for i = 1, #code_highlights do
+              local hl = code_highlights[i]
+              hl.col     = offset + hl.col
+              hl.end_col = offset + hl.end_col
+              table.insert(highlights, hl)
+            end
           end
           table.insert(highlights, { code_content })
         end
