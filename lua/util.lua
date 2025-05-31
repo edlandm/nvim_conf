@@ -263,4 +263,20 @@ function M.load_lua_table(path)
   return obj
 end
 
+
+---use unix `file` command to determine whether a file is likely binary
+---@param path path
+---@return boolean whether file is likely to be a binary file
+function M.is_binary_file(path)
+  if not path then return false end
+  local command = 'file -b --mime-encoding ' .. path
+  local handle = io.popen(command, 'r')
+  if not handle then return false end
+
+  local encoding = handle:read '*l'
+  handle:close()
+
+  return encoding == 'binary'
+end
+
 return M
