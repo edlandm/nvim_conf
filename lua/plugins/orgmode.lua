@@ -378,7 +378,9 @@ local function get_headlines(buf)
           local sep = '::'
           local desc_str = desc and ('['..desc..']') or ''
 
+          ---@type vim.api.keyset.set_extmark|{ col: number, end_col: number, row: number, field: string }[]?
           local code_highlights = Snacks.picker.highlight.get_highlights({ code = code_content, lang = lang })[1]
+
           highlights = {
             { '├╴',         'SnacksPickerTree' },
             { ' ',          'SnacksPickerIconHeadline' },
