@@ -10,4 +10,6 @@ require('settings').setopts('g', {
   { 'neovide_cursor_animate_in_insert_mode', false },
   { 'neovide_cursor_vfx_mode',               'railgun' },
   { 'neovide_cursor_vfx_particle_density',   10.0 },
+  { 'neovide_scroll_animation_far_lines',    0 },
+  { 'neovide_scroll_animation_length',       0.2 },
 })
