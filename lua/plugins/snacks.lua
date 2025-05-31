@@ -62,6 +62,17 @@ local function toggle_init()
         csvview[(state and 'enable' or 'disable')]()
       end
     },
+    codeium = Snacks.toggle.new {
+      name = 'Codeium Suggestions',
+      get  = function()
+        return vim.b.codeium_enabled or false
+      end,
+      set  = function(state)
+        local ok, _ = pcall(require, 'codeium')
+        assert(ok, 'windsurf.nvim required for this functionality')
+        vim.b.codeium_enabled = state
+      end
+    },
     git_signcolumn = Snacks.toggle.new {
       name = 'Git SignColumn',
       get  = function()
@@ -108,6 +119,7 @@ local function toggle_init()
     [pref 'cL'] = conf.conceallevel,
     [pref 'cl'] = conf.cursorline,
     [pref 'cv'] = conf.third_party.csvview,
+    [pref 'cs'] = conf.third_party.codeium,
     [pref 'd']  = conf.diagnostics,
     [pref 'gb'] = conf.third_party.git_current_line_blame,
     [pref 'gs'] = conf.third_party.git_signcolumn,
