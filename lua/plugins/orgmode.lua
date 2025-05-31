@@ -605,8 +605,11 @@ return {
         org = {
           org_cycle = 'za',
           org_todo = '<localleader>t',
-          org_todo_prev = false,
+          org_todo_prev = '<localleader>t[',
           org_edit_special = '<localleader>e',
+          org_priority = '<localleader>#',
+          org_priority_up = '<localleader>[',
+          org_priority_down = '<localleader>]',
         },
       },
       hyperlinks = {
