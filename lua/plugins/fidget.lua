@@ -1,6 +1,12 @@
+local mappings = require('mappings')
+local leader, cmd, prefix, map = mappings.leader, mappings.cmd, mappings.prefix, mappings.to_lazy
+local pref = prefix(leader 'NF')
 return {
   'j-hui/fidget.nvim',
   lazy = false,
+  init = function()
+    require 'which-key'.add { pref(), group = 'Fidget Notifications' }
+  end,
   opts = {
     -- Options related to notification subsystem
     notification = {
@@ -16,4 +22,8 @@ return {
         -- end,
     },
   },
+  keys = map {
+    { 'Fidget: Show History',  pref 'h', cmd 'Fidget history' },
+    { 'Fidget: Clear History', pref 'c', cmd 'Fidget clear_history' },
+  }
 }
