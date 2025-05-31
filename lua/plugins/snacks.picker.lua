@@ -138,6 +138,20 @@ local function jump_no_reset_cursor(picker, _, action)
   end
 end
 
+local function term_picker()
+  Snacks.picker.buffers({
+    hidden = true,
+    filter = {
+      filter = function(item)
+        return item.file
+          :lower()
+          -- TODO:lots of potential to refine this
+          :match('term')
+      end
+    },
+  })
+end
+
 return {
   "folke/snacks.nvim",
   opts = {
@@ -237,6 +251,7 @@ return {
     { 'Pick Directories',       tab '.',     run(pick 'directories') },
     { 'Pick Resume',            tab '<tab>', run(pick 'resume') },
     { 'Pick Buffers',           tab 'b',     run(pick 'buffers') },
+    { 'Pick Terminals',         tab 't',     term_picker },
     { 'SmartPicker',            tab ' ',     run(pick 'smart') },
     { 'Pick Holster',           tab 'e',     run(pick 'holster_commands') },
     { 'Pick Diagnostics <buf>', tab 'd',     function() Snacks.picker.diagnostics_buffer(with_ivy) end },
