@@ -1,4 +1,6 @@
 return {
-    "vhyrro/luarocks.nvim",
-    config = true,
+  "vhyrro/luarocks.nvim",
+  opts = {
+    rocks = { 'lua-protobuf' },
+  },
 }
