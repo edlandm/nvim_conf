@@ -527,7 +527,6 @@ return {
     dependencies = {
       'nvim-orgmode/org-bullets.nvim',
       'hamidi-dev/org-list.nvim',
-      'michhernand/RLDX.nvim',
       'folke/snacks.nvim',
     },
     specs = {
@@ -557,6 +556,17 @@ return {
           { '<tab>o', function() org.pickers.all_headlines(0) end, desc = 'ORG: Picker' }
         },
       },
+      {
+        'michhernand/RLDX.nvim',
+        pin = true,
+        ft = { 'org' },
+        opts = {
+          ---@diagnostic disable
+          db_filename = vim.fs.joinpath(vim.fn.stdpath('data'), 'rolodex.db.json'),
+          encryption = 'plaintext',
+          schema_ver = '0.0.2',
+        },
+      }
     },
     event = 'VeryLazy',
     ft = { 'org' },
