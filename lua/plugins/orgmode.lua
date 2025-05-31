@@ -652,6 +652,17 @@ return {
         end
       end },
       { 'New List Item', ';n', run 'require("orgmode").action("org_mappings.meta_return")', 'i' },
+      { 'Flash: Open Org Link', '_o',
+        function()
+          require("flash").jump({
+            pattern = '[[',
+            action = function(match, state)
+              vim.api.nvim_win_set_cursor(match.win, match.pos)
+              require('orgmode').action('org_mappings.open_at_point')
+            end,
+          })
+        end,
+      }
     }
   },
   {
