@@ -575,19 +575,11 @@ function M.setup()
     { 'Replace Selection With <Prompt>',            leader('r'), visual_replace_prompt, { silent = false } },
     { 'Prepend <prompt> to Selected Lines',         'I',         visual_prepend_prompt, { silent = false } },
     { 'Append <prompt> to Selected Lines',          'A',         visual_append_prompt,  { silent = false } },
+    { 'Format Text',                                'gq',        'gqgV' },
     { 'Search Forward For Selection',               '*',         ":<c-u>let @/=@\"<cr>gvy:let [@/,@\"]=[@\",@/]<cr>/\\V<c-r>=substitute(escape(@/,'/\\'),'\\n','\\\\n','g')<cr><cr>" },
     { 'Search Backward For Selection',              '#',         ":<c-u>let @/=@\"<cr>gvy:let [@/,@\"]=[@\",@/]<cr>/\\V<c-r>=substitute(escape(@/,'/\\'),'\\n','\\\\n','g')<cr><cr>NN" },
     { 'Search For Selection Without Moving Cursor', leader('*'), 'y:let @/ = \"<c-r>0\\\\>\"<cr>' },
     { 'Execute Last :Command',                      leader(':'), '@:' },
-  })
-  ---- Terminal Mode ===========================================================
-  M.tmap({
-    { 'Normal Mode',         '<esc><esc>', '<c-\\><c-n>' },
-    { 'Switch Window Up',    '<c-k>',      '<c-\\><c-n><c-w>k' },
-    { 'Switch Window Down',  '<c-j>',      '<c-\\><c-n><c-w>j' },
-    { 'Switch Window Left',  '<c-h>',      '<c-\\><c-n><c-w>h' },
-    { 'Switch Window Right', '<c-l>',      '<c-\\><c-n><c-w>l' },
-    { 'Kill terminal process', '<a-d><a-d><a-d>', '<cmd>lua vim.fn.jobstop(vim.bo[vim.api.nvim_get_current_buf()].channel)<cr>' },
   })
   ---- Command-line Mode =======================================================
   M.cmap({
