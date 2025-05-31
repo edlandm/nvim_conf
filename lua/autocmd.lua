@@ -44,11 +44,6 @@ local function setup()
     { {'InsertLeave'}, { pattern = '*', command = 'set list' } },
   })
 
-  augroup('TERMINAL_ENTER', {
-    { {'TermOpen'}, { pattern = '*', command = 'setlocal nonumber norelativenumber' } },
-    { {'TermOpen'}, { pattern = '*', command = 'startinsert' } },
-  })
-
   augroup('GITREBASE_FileType', {
     { {'FileType'}, { pattern = 'gitrebase', command = 'g/\\<fixup!/s/^pick\\ze\\>/fixup/' } },
   })
