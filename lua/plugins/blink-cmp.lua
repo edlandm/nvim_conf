@@ -8,7 +8,7 @@ return {
   'saghen/blink.cmp',
   lazy = false,
   build = 'cargo build --release',
-  -- tag = 'v0.1.0',
+  -- tag = 'v1.3.1',
   dependencies = {
     { 'saghen/blink.compat', opts = { version = '*', opts = {}, } },
     'xzbdmw/colorful-menu.nvim', -- this makes it prettier
@@ -16,7 +16,7 @@ return {
     'L3MON4D3/LuaSnip',
     'saadparwaiz1/cmp_luasnip',
     'niuiic/blink-cmp-rg.nvim',
-    'michhernand/RLDX.nvim',
+    'Exafunction/windsurf.nvim'
   },
   opts = {
     enabled = function ()
@@ -31,20 +31,19 @@ return {
       preset = 'default',
       ['<C-y>'] = { 'select_and_accept', 'fallback' },
 
-      ['<C-n>'] = { 'select_next', 'fallback' },
+      ['<C-n>']  = { 'select_next', 'fallback' },
       ['<Down>'] = { 'select_next', 'fallback' },
 
       ['<C-p>'] = { 'select_prev', 'fallback' },
-      ['<Up>'] = { 'select_prev', 'fallback' },
+      ['<Up>']  = { 'select_prev', 'fallback' },
 
-      ['<C-Right>'] = { 'snippet_forward', 'fallback' },
-      ['<C-Left>'] = { 'snippet_backward', 'fallback' },
-
-      ['<Tab>'] = {},
-      ['<S-Tab>'] = {},
+      ['<C-Right>'] = { 'snippet_forward',  'fallback' },
+      ['<C-Left>']  = { 'snippet_backward', 'fallback' },
+      ['<Tab>']     = {},
+      ['<S-Tab>']   = {},
 
       ['<C-s>']     = { function(cmp) cmp.show({ providers = { 'snippets' } }) end },
-      ['<C-space>'] = { function(cmp) cmp.show({ providers = { 'codeium' } }) end },
+      ['<C-space>'] = {},
     },
 
     completion = {
@@ -52,6 +51,7 @@ return {
       documentation = { auto_show = true, },
       ghost_text    = { enabled   = true, },
       trigger = {
+        prefetch_on_insert = true,
         show_on_blocked_trigger_characters = function()
           if vim.api.nvim_get_mode().mode == 'c' then return {} end
           -- you can also block per filetype, for example:
@@ -80,7 +80,17 @@ return {
     },
 
     sources = {
-      default = { 'path', 'lsp', 'buffer', 'ripgrep' },
+      default = function()
+        if vim.b.codeium_enabled then
+          return { 'codeium' }
+        end
+
+        local providers = { 'path', 'lsp', 'buffer', 'ripgrep' }
+        if vim.bo.filetype then
+          table.insert(providers, 'lazydev')
+        end
+        return providers
+      end,
       per_filetype = {
         codecompanion = { 'codecompanion' },
         oil           = { 'path' },
@@ -91,14 +101,21 @@ return {
           score_offset = 2,
         },
         codeium = {
-          name = 'codeium',
-          module = 'blink.compat.source',
-          score_offset = 1,
-          enabled = vim.schedule_wrap(function()
-            return not (
-              vim.api.nvim_buf_get_name(0):match('^neorg://code%-block')
-            )
-          end)
+          name = 'Codeium',
+          module = 'codeium.blink',
+          async = true,
+          -- score_offset = 1,
+          -- enabled = vim.schedule_wrap(function()
+          --   return not (
+          --     vim.api.nvim_buf_get_name(0):match('^neorg://code%-block')
+          --   )
+          -- end)
+        },
+        lazydev = {
+          name = "LazyDev",
+          module = "lazydev.integrations.blink",
+          -- make lazydev completions top priority (see `:h blink.cmp`)
+          score_offset = 100,
         },
         ripgrep = {
           module = "blink-cmp-rg",
@@ -158,9 +175,13 @@ return {
         -- Commands
         if type == '@' then return { 'cmdline' } end
         if type == ':' then
-          if not vim.fn.getcmdline():match("^[%%0-9,'<>%-]*!") then
-            return { 'cmdline' }
+          local cmdline = vim.fn.getcmdline()
+          if cmdline:match("^[%%0-9,'<>%-]*!") then
+            return {}
+          elseif cmdline:match("^term") then
+            return {}
           end
+          return { 'cmdline' }
         end
         return {}
       end,
@@ -170,7 +191,7 @@ return {
           show_on_x_blocked_trigger_characters = nil, -- Inherits from top level `completion.trigger.show_on_blocked_trigger_characters` config when not set
         },
         menu = {
-          auto_show = nil, -- Inherits from top level `completion.menu.auto_show` config when not set
+          auto_show = true, -- Inherits from top level `completion.menu.auto_show` config when not set
           draw = {
             columns = { { 'label', 'label_description', gap = 1 } },
           },
