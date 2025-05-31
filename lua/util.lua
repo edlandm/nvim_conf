@@ -263,6 +263,10 @@ function M.load_lua_table(path)
   return obj
 end
 
+function _G.tap(...)
+  require('snacks').debug.inspect(...)
+  return ...
+end
 
 ---use unix `file` command to determine whether a file is likely binary
 ---@param path path
