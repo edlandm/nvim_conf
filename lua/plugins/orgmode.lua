@@ -635,22 +635,20 @@ return {
       },
     },
     keys = org.map {
-      { 'Open Link', '<cr>', function()
-        for _, hook in ipairs(org.open.hooks.pre) do
-          if hook() == false then
-            return
+      { 'Open Link at <cursor>', '<cr>',
+        function()
+          for _, hook in ipairs(org.open.hooks.pre) do
+            if hook() == false then return end
+          end
+
+          -- They can begin with `$`
+          require('orgmode').action('org_mappings.open_at_point')
+
+          for _, hook in ipairs(org.open.hooks.post) do
+            if hook() == false then return end
           end
         end
-
-        -- They can begin with `$`
-        require('orgmode').action('org_mappings.open_at_point')
-
-        for _, hook in ipairs(org.open.hooks.post) do
-          if hook() == false then
-            return
-          end
-        end
-      end },
+      },
       { 'New List Item', ';n', run 'require("orgmode").action("org_mappings.meta_return")', 'i' },
       { 'Flash: Open Org Link', '_o',
         function()
