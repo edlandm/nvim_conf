@@ -689,6 +689,14 @@ return {
               target = "%<%Y-%m-%d>.org",
             },
           },
+          bindings = {
+            goto_today        = '<prefix>t',
+            goto_tomorrow     = '<prefix>T',
+            goto_yesterday    = '<prefix>y',
+            capture_today     = '<prefix>dt',
+            capture_tomorrow  = '<prefix>dT',
+            capture_yesterday = '<prefix>dy',
+          },
         },
       },
       bindings = {
