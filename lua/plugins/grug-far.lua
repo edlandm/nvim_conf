@@ -3,7 +3,9 @@ local map, cmd = mappings.to_lazy, mappings.cmd
 local pref     = mappings.prefix('g/')
 return {
   'MagicDuck/grug-far.nvim',
-  opts = {},
+  opts = {
+    showCompactInputs = true,
+  },
   init = function()
     require 'which-key'.add { pref(), group = 'GrugFar (search)', mode = { 'n', 'x' } }
   end,
