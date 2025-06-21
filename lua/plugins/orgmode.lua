@@ -240,7 +240,7 @@ function org.pickers.all_headlines(level)
   local max_level = level or 3
   local items = {}
   for _, file in pairs(require('orgmode').files.all_files) do
-    local filename = file.filename:match('/([^/]+)%.org$')
+    local filename = file.filename:match('/([^/]+)%.%S-$')
     local title = org.fn.file_get_property(file.filename, 'title') or file:get_directive('title') or ''
     table.insert(items, {
       file = file.filename,
