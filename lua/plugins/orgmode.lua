@@ -603,13 +603,16 @@ return {
       mappings = {
         prefix = '<localleader>o',
         org = {
-          org_cycle = 'za',
-          org_todo = '<localleader>t',
-          org_todo_prev = '<localleader>t[',
-          org_edit_special = '<localleader>e',
-          org_priority = '<localleader>#',
-          org_priority_up = '<localleader>[',
-          org_priority_down = '<localleader>]',
+          org_cycle           = 'za',
+          org_todo            = '<localleader>t',
+          org_todo_prev       = false,
+          org_edit_special    = '<localleader>e',
+          org_priority        = '<localleader>p',
+          org_priority_up     = false,
+          org_priority_down   = false,
+          org_timestamp_up    = false,
+          org_timestamp_down  = false,
+          org_toggle_checkbox = false,
         },
       },
       hyperlinks = {
