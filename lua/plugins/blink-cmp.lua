@@ -176,7 +176,7 @@ return {
         if type == '@' then return { 'cmdline' } end
         if type == ':' then
           local cmdline = vim.fn.getcmdline()
-          if cmdline:match("^[%%0-9,'<>%-]*!") then
+          if cmdline:match("^[%%0-9,'<>%.%-]*!") then
             return {}
           elseif cmdline:match("^term") then
             return {}
