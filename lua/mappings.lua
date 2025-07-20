@@ -127,6 +127,7 @@ function M.operator(callback, _opts)
   local starting_window = vim.api.nvim_get_current_win()
   local cursor = fun.getcurpos()
   _G.op_fn = function ()
+    local origin = vim.fn.getcurpos(0)
     local positions = {
       top     = fun.line("'["),
       bottom  = fun.line("']"),
@@ -159,11 +160,8 @@ function M.operator(callback, _opts)
         -- jump to the end of the line at the bottom of the range
         cursor[2] = positions[jump]
         cursor[3] = vim.v.maxcol
-      --[[
       elseif jump == 'origin' then
-        jump to position where cursor was before the operation
-        only necessary if the operatorfunc moved the cursor
-      --]]
+        vim.fn.setpos('.', origin)
       end
       api.nvim_win_set_cursor(starting_window, {cursor[2], cursor[3]})
     end
