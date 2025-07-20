@@ -53,6 +53,8 @@ local function safe_source(path)
 end
 
 local config = vim.fn.stdpath('config')
-safe_source(vim.fs.joinpath(config, 'lua', 'neovide_settings.lua'))
+if vim.g.neovide then
+  safe_source(vim.fs.joinpath(config, 'lua', 'neovide_settings.lua'))
+end
 safe_source(vim.fs.joinpath(config, 'lua', 'local.lua'))
 safe_source(vim.fn.expand('~/.nvim.local.lua'))
