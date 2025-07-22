@@ -1,5 +1,5 @@
 local function setmaps()
-  local mappings = require('mappings')
+  local mappings = require 'config.mappings'
   mappings.nmap({
     -- execute code
     { "Hurl: execute buffer", "<F5>", "<cmd>%HurlRunner<cr>" },

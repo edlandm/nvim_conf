@@ -283,4 +283,9 @@ function M.is_binary_file(path)
   return encoding == 'binary'
 end
 
+function M.nilif(a, b)
+  if a == nil or a == b then return nil end
+  return a
+end
+
 return M

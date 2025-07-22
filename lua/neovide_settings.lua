@@ -1,4 +1,4 @@
-require('settings').setopts('g', {
+require 'config.settings'.setopts('g', {
   { 'neovide_opacity',                       1 },
   { 'neovide_floating_blur_amount_x',        2.0 },
   { 'neovide_floating_blur_amount_y',        2.0 },

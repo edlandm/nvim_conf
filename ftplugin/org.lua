@@ -3,7 +3,7 @@ vim.wo.wrap = false
 vim.wo.concealcursor = 'nc'
 
 ---- MAPPINGS ================================================================
-local mappings = require 'mappings'
+local mappings = require 'config.mappings'
 mappings.nmap({
   { 'ORG: CD to :PWD:', '<localleader>.', org.fn.cd_to_pwd },
   { 'Turn selection into a link to <clipboard>', '<localleader>l', org.fn.selection_to_link },
@@ -30,6 +30,8 @@ mappings.nmap({
 mappings.imap({
   { 'Add New Heading after current section', '<m-l>', org.fn.insert_new_section },
   { 'New Subheading after current section',  '<m-d>', function() org.fn.insert_new_section({ is_subsection = true }) end },
+  { 'Insert Code Block',  '```', '#+BEGIN_SRC o#+END_SRC<Up>$' },
+  { 'Insert Block Quote', '>> ', '#+BEGIN_QUOTE o#+END_QUOTE<Up>$' },
   -- { 'DESC', 'LHS',  },
 }, true)
 

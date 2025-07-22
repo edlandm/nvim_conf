@@ -1,8 +1,28 @@
 local api = vim.api
 local fun = vim.fn
 local util = require('util')
-local prompt = util.prompt
+local prompt, nilif = util.prompt, util.nilif
 
+local function prefix(p)
+  assert(p, 'argument required')
+  return function(s) return p .. (s or '') end
+end
+
+---return a function that takes a string and wraps it with `s` [and `e`]
+---@param b string begin
+---@param e string end
+---@return fun(s:string):string
+local function wrap(b, e)
+  assert(b, 'argument required')
+  return function(s) return ('%s%s%s'):format(b, s, e or b) end
+end
+
+local leader = prefix '<leader>'
+local lleader = prefix '<localleader>'
+local cmd = wrap('<cmd>', '<cr>')
+local lua = wrap('<cmd>lua ', '<cr>')
+
+-- MODULE STUFF ==============================================================
 local M = {}
 
 --- @alias abbrev_mode 'ia' | 'ca' | '!a'
@@ -23,6 +43,7 @@ local M = {}
 
 ---- Utility Functions
 ---function for making shortcut functions for making mappings
+---@deprecated use map() instead
 ---@param mode mode
 ---@return mapfn
 local function map_fn(mode)
@@ -51,43 +72,54 @@ local function map_fn(mode)
   end
 end
 
+---@deprecated use map() instead
 M.nmap = map_fn('n') -- normal
+---@deprecated use map() instead
 M.imap = map_fn('i') -- insert
+---@deprecated use map() instead
 M.xmap = map_fn('x') -- visual
+---@deprecated use map() instead
 M.tmap = map_fn('t') -- terminal
+---@deprecated use map() instead
 M.cmap = map_fn('c') -- command-line
+---@deprecated use map() instead
 M.omap = map_fn('o') -- operator-pending mode
 
----prepend `s` with `<leader>`
----@param s string
----@return string
-function M.leader(s)
-  return ('<leader>%s'):format(s)
-end
+---shortcut fn to make mappings in my prefered format (description first)
+---@alias keymap [ string, string, string|function, table? ]
+---@param keymap_groups { mode?:string, buf?:boolean, buffer?:boolean, noremap?:boolean, noremap?:boolean, silent?:boolean, expr?:boolean, [integer]:keymap[] }[]
+function M.map(keymap_groups)
+  for _, group in ipairs(keymap_groups) do
+    local mode = group.mode or 'n'
+    local buf = group.buf or group.buffer or false
+    local noremap = group.noremap == false and false or true
+    local silent = group.silent == false and false or true
+    local expr = group.expr and true or false
+    local defaults = { noremap = noremap, silent = silent, expr = expr }
 
----prepend `s` with `<localleader>`
----@param s string
----@return string
-function M.lleader(s)
-  return ('<localleader>%s'):format(s)
-end
+    -- print(vim.inspect { mode=mode, buf=buf, noremap=noremap })
+    for _, keymap in ipairs(group) do
+      local desc, lhs, rhs, _opts = unpack(keymap)
+      local opts = vim.tbl_deep_extend('keep',
+        _opts or {},
+        { desc = desc, callback = type(rhs) == 'function' and rhs or nil },
+        defaults)
 
-function M.prefix(p)
-  assert(p, 'argument required')
-  return function(s) return p .. (s or '') end
-end
+      if type(rhs) == 'function' then
+        rhs = ''
+      end
 
----return a function that takes a string and wraps it with `s` [and `e`]
----@param s string
----@param e string
----@return fun(x:string):string
-function M.wrap(s, e)
-  assert(s, 'argument required')
-  return function(x) return ('%s%s%s'):format(s, x, e or s) end
+      -- print(vim.inspect {lhs=lhs, rhs=rhs, opts=opts})
+      if nilif(desc, '') and nilif(lhs, '') then
+        if buf then
+          vim.api.nvim_buf_set_keymap(0, mode, lhs, rhs, opts)
+        else
+          vim.api.nvim_set_keymap(mode, lhs, rhs, opts)
+        end
+      end
+    end
+  end
 end
-
-M.cmd = M.wrap('<cmd>', '<cr>')
-M.lua = M.wrap('<cmd>lua ', '<cr>')
 
 ---convenience function that takes a list of mapping tuples in the format that
 ---I prefer (description-first for readability) and returns a LazyKeySpec[]
@@ -273,8 +305,6 @@ function M.replace(s, e, pat, rep, global)
   vim.cmd('keeppatterns '..s..','.._e..' s/'..pat..'/'..rep..'/e'..g)
 end
 
----- Normal Mode =============================================================
--- Functions =================================================================
 ---replace all occurrences of `<cword>` with `<prompt>` in current buffer
 local function cword_prompt_replace()
   M.cword(function(word)
@@ -428,173 +458,179 @@ local function repeat_edit_on_next_line()
   api.nvim_win_set_cursor(0, { row + 1, col })
 end
 
-local function toggle_quickfix()
-  local qf_exists = false
-  for _, win in pairs(vim.fn.getwininfo()) do
-    if win.quickfix == 1 then
-      qf_exists = true
-      break
-    end
-  end
-
-  if qf_exists then
-    vim.cmd 'cclose'
-  else
-    -- Only open if there are items in the quickfix list
-    if vim.fn.getqflist({size = 0}).size > 0 then
-      vim.cmd 'copen'
-    else
-      vim.notify('Quickfix list is empty', vim.log.levels.INFO)
-    end
-  end
-end
-
 function M.setup()
-  local cmd = M.cmd
-  local leader = M.leader
-  M.nmap({
-    { 'Move Cursor Down (visual line)', 'j', 'gj' },
-    { 'Move Cursor Up (visual line)', 'k', 'gk' },
-    { 'Scroll Up', '<c-e>', '3<c-e>' },
-    { 'Scroll Down', '<c-y>', '3<c-y>' },
-    { 'Jump or Scroll Up', '<c-u>',
-      function()
-        local cursor = vim.api.nvim_win_get_cursor(0)
-        local first_visible = vim.fn.line('w0')
-        local travel = math.floor(vim.api.nvim_win_get_height(0) / 2)
-        local is_jump_within_view = (cursor[1]-1 - travel) < first_visible
-        vim.cmd(('execute "normal! %d%s"') -- scroll with <c-y> or jump with k
-          :format(travel, is_jump_within_view and '' or 'k'))
-      end
-    },
-    { 'Jump or Scroll Up', '<c-d>',
-      function()
-        local cursor = vim.api.nvim_win_get_cursor(0)
-        local last_visible = vim.fn.line('w$')
-        local travel = math.floor(vim.api.nvim_win_get_height(0) / 2)
-        local is_jump_within_view = (cursor[1]-1 + travel) > last_visible
-        vim.cmd(('execute "normal! %d%s"') -- scroll with <c-e> or jump with j
-          :format(travel, is_jump_within_view and '' or 'j'))
-      end
-    },
-    { 'Open <cfile> (vsplit)', '<c-w><c-v>', cmd 'vertical wincmd f' },
-    { 'Next Tab (Buf if only one tab)', ')',
-      function()
-        if #vim.api.nvim_list_tabpages() == 1 then
-          vim.cmd('bnext')
-        else
-          vim.cmd('tabnext')
+  M.map {
+    { mode = 'n', -- NORMAL MODE ===============================================
+      { 'Move Cursor Down (visual line)', 'j', 'gj' },
+      { 'Move Cursor Up (visual line)', 'k', 'gk' },
+      { 'Scroll Up', '<c-e>', '3<c-e>' },
+      { 'Scroll Down', '<c-y>', '3<c-y>' },
+      { 'Jump or Scroll Up', '<c-u>',
+        function()
+          local cursor = vim.api.nvim_win_get_cursor(0)
+          local first_visible = vim.fn.line('w0')
+          local travel = math.floor(vim.api.nvim_win_get_height(0) / 2)
+          local is_jump_within_view = (cursor[1]-1 - travel) < first_visible
+          vim.cmd(('execute "normal! %d%s"') -- scroll with <c-y> or jump with k
+            :format(travel, is_jump_within_view and '' or 'k'))
         end
-      end
-    },
-    { 'Prev Tab (Buf if only one tab)', '(',
-      function()
-        if #vim.api.nvim_list_tabpages() == 1 then
-          vim.cmd('bNext')
-        else
-          vim.cmd('tabNext')
+      },
+      { 'Jump or Scroll Up', '<c-d>',
+        function()
+          local cursor = vim.api.nvim_win_get_cursor(0)
+          local last_visible = vim.fn.line('w$')
+          local travel = math.floor(vim.api.nvim_win_get_height(0) / 2)
+          local is_jump_within_view = (cursor[1]-1 + travel) > last_visible
+          vim.cmd(('execute "normal! %d%s"') -- scroll with <c-e> or jump with j
+            :format(travel, is_jump_within_view and '' or 'j'))
         end
-      end
+      },
+      { 'Open <cfile> (vsplit)', '<c-w><c-v>', cmd 'vertical wincmd f' },
+      { 'Next Tab (Buf if only one tab)', ')',
+        function()
+          if #vim.api.nvim_list_tabpages() == 1 then
+            vim.cmd('bnext')
+          else
+            vim.cmd('tabnext')
+          end
+        end
+      },
+      { 'Prev Tab (Buf if only one tab)', '(',
+        function()
+          if #vim.api.nvim_list_tabpages() == 1 then
+            vim.cmd('bNext')
+          else
+            vim.cmd('tabNext')
+          end
+        end
+      },
+      { 'Run previous :command', leader ':', '@:' },
+      { 'CD to <cfile> dir', leader '.', cmd "cd %:p:h | echo 'cd -> '.getcwd()" },
+      { 'CD up one dir', leader ',', cmd "cd .. | echo 'cd -> '.getcwd()" },
+      { 'Search <cword> without moving', leader '*', cmd 'let @/ = expand(\"<cword>\") .. \"\\\\>\" | set hlsearch' },
+      { '<- Pasted Text', leader '<', 'V`]<' },
+      { '-> Pasted Text', leader '>', 'V`]>' },
+      { 'Buffer Delete',  leader 'bd', cmd 'b#|bwipeout #' },
+      { 'Buffer Delete!', leader 'bD', cmd 'b#|bwipeout! #' },
+      { 'Buffer Only',    leader 'bo', cmd "execute \"silent! tabonly|silent! %bd|e#|bd#\" | echo 'Closed all buffers (and tabs) except current'" },
+      { 'Quickfix Toggle', '<c-c>',
+        function()
+          for _, win in pairs(vim.fn.getwininfo()) do
+            if win.quickfix == 1 then
+              vim.cmd 'cclose'
+              return
+            end
+          end
+
+          -- Only open if there are items in the quickfix list
+          if vim.fn.getqflist({size = 0}).size > 0 then
+            vim.cmd 'copen'
+          else
+            vim.notify('Quickfix list is empty', vim.log.levels.INFO)
+          end
+        end
+      },
+      { 'Quickfix Next',      '<M-j>',   cmd 'cnext' },
+      { 'Quickfix Next File', '<M-S-J>', cmd 'cnfile' },
+      { 'Quickfix Prev',      '<M-k>',   cmd 'cprevious' },
+      { 'Quickfix Prev File', '<M-S-K>', cmd 'cpfile' },
+      { 'Append Section Marker', leader 'as', '0C<C-R>=repeat(\"=\",<Space>78)<CR><Esc>0R<C-R>\"<Space><Esc>' },
+      { 'Append <prompt> to <motion>',  leader 'a', operator_append_prompt },
+      { 'Prepend <prompt> to <motion>', leader 'i', operator_prepend_prompt },
+      { 'Delete lines with <cword> in <motion>', leader 'd', cword_operator_delete_lines },
+      -- TODO: I'd like to change this swap mapping to `<leader>[` and `<leader>]`
+      -- I'd like it so that it can take a count before the [] key, or without
+      -- a count it swaps with the line immediately above/below.
+      { 'Swap <cline> with end of <motion>', leader 's', operator_swap_lines },
+      { 'Move <cline> to the line before end of <motion>', leader 'm', operator_move_line },
+      { 'Replace <cword> with <prompt> within <motion>', leader 'r', cword_operator_prompt_replace },
+      { 'Replace <cword> with <prompt> (whole buffer)',  leader 'rr', cword_prompt_replace },
+      { 'Quit (close window)', leader 'q', cmd 'q' },
+      { 'Quit! (close window)', leader 'Q', cmd 'q!' },
+      { 'Save file', leader 'w', cmd 'w' },
+      { 'Toggle ConcealCursor', leader 'ot', toggle_concealcursor },
+      { 'Yank File Contents', leader 'yy',
+        echo('Yanked File Contents',
+          yank(function () return api.nvim_buf_get_lines(0, 0, -1, true) end)) },
+      { 'Yank File Name', leader 'yf',
+        echo('Yanked File Name',
+          yank(function () return fun.expand('%:t:r') end)) },
+      { 'Yank File NAME', leader 'yF',
+        echo('Yanked File NAME',
+          yank(function () return fun.expand('%:t') end)) },
+      { 'Yank File Path (absolute)', leader 'yp',
+        echo('Yanked File Path (absolute)',
+          yank(function () return fun.expand('%:p') end)) },
+      { 'Yank Quote Register to System Clipboard', leader 'y<cr>', cmd 'let @+=@" | echo "Transfered To Clipboard"' },
+      { 'Search Forward', 'n',
+        function () local keys = { 'N', 'n' } return keys[(vim.v.searchforward+1)] end,
+        { expr = true } },
+      { 'Search Backward', 'N',
+        function () local keys = { 'n', 'N' } return keys[(vim.v.searchforward+1)] end,
+        { expr = true } },
+      { 'Execute Q Macro', 'Q', '@q' },
+      { 'Repeat Last Command On Next Line', 'S', 'j@:' },
+      { 'Repeat Last Edit On Next Line', 's', repeat_edit_on_next_line },
+      { 'Yank To The End Of The Line', 'Y', 'y$' },
+      { 'Format To End Of Pasted Text', '=p', '=`]' },
+      { 'Yank to system clipboard', 'gy', '"+y' },
+      { 'Paste from system clipboard', 'gp', '"+p' },
+      { '', '', '' },
     },
-    { 'Run previous :command', leader ':', '@:' },
-    { 'CD to <cfile> dir', leader '.', cmd "cd %:p:h | echo 'cd -> '.getcwd()" },
-    { 'CD up one dir', leader ',', cmd "cd .. | echo 'cd -> '.getcwd()" },
-    { 'Search <cword> without moving', leader '*', cmd 'let @/ = expand(\"<cword>\") .. \"\\\\>\" | set hlsearch' },
-    { '<- Pasted Text', leader '<', 'V`]<' },
-    { '-> Pasted Text', leader '>', 'V`]>' },
-    { 'Buffer Delete',  leader 'bd', cmd 'b#|bwipeout #' },
-    { 'Buffer Delete!', leader 'bD', cmd 'b#|bwipeout! #' },
-    { 'Buffer Only',    leader 'bo', cmd "execute \"silent! tabonly|silent! %bd|e#|bd#\" | echo 'Closed all buffers (and tabs) except current'" },
-    { 'Quickfix Toggle',    '<c-c>',   toggle_quickfix },
-    { 'Quickfix Next',      '<M-j>',   cmd 'cnext' },
-    { 'Quickfix Next File', '<M-S-J>', cmd 'cnfile' },
-    { 'Quickfix Prev',      '<M-k>',   cmd 'cprevious' },
-    { 'Quickfix Prev File', '<M-S-K>', cmd 'cpfile' },
-    { 'Append Section Marker', leader 'as', '0C<C-R>=repeat(\"=\",<Space>78)<CR><Esc>0R<C-R>\"<Space><Esc>' },
-    { 'Append <prompt> to <motion>',  leader 'a', operator_append_prompt },
-    { 'Prepend <prompt> to <motion>', leader 'i', operator_prepend_prompt },
-    { 'Delete lines with <cword> in <motion>', leader 'd', cword_operator_delete_lines },
-    -- TODO: I'd like to change this swap mapping to `<leader>[` and `<leader>]`
-    -- I'd like it so that it can take a count before the [] key, or without
-    -- a count it swaps with the line immediately above/below.
-    { 'Swap <cline> with end of <motion>', leader 's', operator_swap_lines },
-    { 'Move <cline> to the line before end of <motion>', leader 'm', operator_move_line },
-    { 'Replace <cword> with <prompt> within <motion>', leader 'r', cword_operator_prompt_replace },
-    { 'Replace <cword> with <prompt> (whole buffer)',  leader 'rr', cword_prompt_replace },
-    { 'Quit (close window)', leader 'q', cmd 'q' },
-    { 'Quit! (close window)', leader 'Q', cmd 'q!' },
-    { 'Save file', leader 'w', cmd 'w' },
-    { 'Toggle ConcealCursor', leader 'ot', toggle_concealcursor },
-    { 'Yank File Contents', leader 'yy',
-      echo('Yanked File Contents',
-        yank(function () return api.nvim_buf_get_lines(0, 0, -1, true) end)) },
-    { 'Yank File Name', leader 'yf',
-      echo('Yanked File Name',
-        yank(function () return fun.expand('%:t:r') end)) },
-    { 'Yank File NAME', leader 'yF',
-      echo('Yanked File NAME',
-        yank(function () return fun.expand('%:t') end)) },
-    { 'Yank File Path (absolute)', leader 'yp',
-      echo('Yanked File Path (absolute)',
-        yank(function () return fun.expand('%:p') end)) },
-    { 'Yank Quote Register to System Clipboard', leader 'y<cr>', cmd 'let @+=@" | echo "Transfered To Clipboard"' },
-    { 'Search Forward', 'n',
-      function () local keys = { 'N', 'n' } return keys[(vim.v.searchforward+1)] end,
-      { expr = true } },
-    { 'Search Backward', 'N',
-      function () local keys = { 'n', 'N' } return keys[(vim.v.searchforward+1)] end,
-      { expr = true } },
-    { 'Execute Q Macro', 'Q', '@q' },
-    { 'Repeat Last Command On Next Line', 'S', 'j@:' },
-    { 'Repeat Last Edit On Next Line', 's', repeat_edit_on_next_line },
-    { 'Yank To The End Of The Line', 'Y', 'y$' },
-    { 'Format To End Of Pasted Text', '=p', '=`]' },
-    { 'Yank to system clipboard', 'gy', '"+y' },
-    { 'Paste from system clipboard', 'gp', '"+p' },
-  })
-  ---- Insert Mode =============================================================
-  M.imap({
-    { 'Move Cursor To The Start Of Line',   '<c-a>',      '<c-o>^' },
-    { 'Move Cursor To The End Of Line',     '<c-e>',      '<c-o>$' },
-    { 'Paste From System Clipboard',        '<c-r><c-r>', '<c-r>+', { silent = false } },
-    { 'Insert a new line above the cursor', '<c-o><c-o>', '<c-o>O' },
-    { 'Insert Current Line',                '<c-r><c-e>', "<c-r>=getline('.')<cr>" },
-    { 'Insert Current File Name',           '<c-r><c-n>', "<c-r>=expand('%:t:r')<cr>" },
-    { 'Insert Current File',                '<c-r><c-f>', "<c-r>=expand('%:t')<cr>" },
-    { 'Insert Current File Path',           '<c-r><c-p>', "<c-r>=expand('%:p')<cr>" },
-    { 'Insert CWD',                         '<c-r><c-d>', "<c-r>=getcwd()<cr>" },
-    { '<- Current Line',                    '<c-d>',      '<c-o><<' },
-    { '-> Current Line',                    '<c-t>',      '<c-o>>>' },
-  })
-  ---- Visual Mode =============================================================
-  M.xmap({
-    { 'Run Normal-Mode Commands On Selection',      'N',         ':norm' },
-    { 'Replace In Selected Range',                  'r',         ":<c-u>keeppatterns '<,'>s/", { silent = false } },
-    { 'Replace Selection With <Prompt>',            leader('r'), visual_replace_prompt, { silent = false } },
-    { 'Prepend <prompt> to Selected Lines',         'I',         visual_prepend_prompt, { silent = false } },
-    { 'Append <prompt> to Selected Lines',          'A',         visual_append_prompt,  { silent = false } },
-    { 'Format Text',                                'gq',        'gqgV' },
-    { 'Search Forward For Selection',               '*',         ":<c-u>let @/=@\"<cr>gvy:let [@/,@\"]=[@\",@/]<cr>/\\V<c-r>=substitute(escape(@/,'/\\'),'\\n','\\\\n','g')<cr><cr>" },
-    { 'Search Backward For Selection',              '#',         ":<c-u>let @/=@\"<cr>gvy:let [@/,@\"]=[@\",@/]<cr>/\\V<c-r>=substitute(escape(@/,'/\\'),'\\n','\\\\n','g')<cr><cr>NN" },
-    { 'Search For Selection Without Moving Cursor', leader('*'), 'y:let @/ = \"<c-r>0\\\\>\"<cr>' },
-    { 'Execute Last :Command',                      leader(':'), '@:' },
-  })
-  ---- Command-line Mode =======================================================
-  M.cmap({
-    -- these mappings need to not be silent otherwise the command line does not
-    -- visually update
-    { 'Move Cursor To The Start Of Line', '<c-a>',      '<HOME>',                    { silent = false, } },
-    { 'Move Cursor To The End Of Line',   '<c-e>',      '<END>',                     { silent = false, } },
-    { 'Paste From System Clipboard',      '<c-r><c-r>', '<c-r>+',                    { silent = false, } },
-    { 'Insert Current Line',              '<c-r><c-e>', "<c-r>=getline('.')<cr>",    { silent = false, } },
-    { 'Insert Current File Name',         '<c-r><c-n>', "<c-r>=expand('%:t:r')<cr>", { silent = false, } },
-    { 'Insert Current File',              '<c-r><c-f>', "<c-r>=expand('%:t')<cr>",   { silent = false, } },
-    { 'Insert Current File Path',         '<c-r><c-p>', "<c-r>=expand('%:p')<cr>",   { silent = false, } },
-    { 'Insert CWD',                       '<c-r><c-d>', "<c-r>=getcwd()<cr>",        { silent = false, } },
-  })
-  ---- Operator-Pending Mode ===================================================
-  M.omap({
-  })
+    { mode = 'i', -- INSERT MODE ===============================================
+      { 'Move Cursor To The Start Of Line',   '<c-a>',      '<c-o>^' },
+      { 'Move Cursor To The End Of Line',     '<c-e>',      '<c-o>$' },
+      { 'Paste From System Clipboard',        '<c-r><c-r>', '<c-r>+', { silent = false } },
+      { 'Insert a new line above the cursor', '<c-o><c-o>', '<c-o>O' },
+      { 'Insert Current Line',                '<c-r><c-e>', "<c-r>=getline('.')<cr>" },
+      { 'Insert Current File Name',           '<c-r><c-n>', "<c-r>=expand('%:t:r')<cr>" },
+      { 'Insert Current File',                '<c-r><c-f>', "<c-r>=expand('%:t')<cr>" },
+      { 'Insert Current File Path',           '<c-r><c-p>', "<c-r>=expand('%:p')<cr>" },
+      { 'Insert CWD',                         '<c-r><c-d>', "<c-r>=getcwd()<cr>" },
+      { '<- Current Line',                    '<c-d>',      '<c-o><<' },
+      { '-> Current Line',                    '<c-t>',      '<c-o>>>' },
+      { '', '', '' },
+    },
+    { mode = 'x', -- VISUAL MODE ===============================================
+      { 'Run Normal-Mode Commands On Selection',      'N',         ':norm' },
+      { 'Replace In Selected Range',                  'r',         ":<c-u>keeppatterns '<,'>s/", { silent = false } },
+      { 'Replace Selection With <Prompt>',            leader('r'), visual_replace_prompt, { silent = false } },
+      { 'Prepend <prompt> to Selected Lines',         'I',         visual_prepend_prompt, { silent = false } },
+      { 'Append <prompt> to Selected Lines',          'A',         visual_append_prompt,  { silent = false } },
+      { 'Format Text',                                'gq',        'gqgV' },
+      { 'Search Forward For Selection',               '*',         ":<c-u>let @/=@\"<cr>gvy:let [@/,@\"]=[@\",@/]<cr>/\\V<c-r>=substitute(escape(@/,'/\\'),'\\n','\\\\n','g')<cr><cr>" },
+      { 'Search Backward For Selection',              '#',         ":<c-u>let @/=@\"<cr>gvy:let [@/,@\"]=[@\",@/]<cr>/\\V<c-r>=substitute(escape(@/,'/\\'),'\\n','\\\\n','g')<cr><cr>NN" },
+      { 'Search For Selection Without Moving Cursor', leader('*'), 'y:let @/ = \"<c-r>0\\\\>\"<cr>' },
+      { 'Execute Last :Command',                      leader(':'), '@:' },
+      { '', '', '' },
+    },
+    { mode = 'c', -- COMMANDLINE MODE ==========================================
+      -- these mappings need to not be silent otherwise the command line does not
+      -- visually update
+      { 'Move Cursor To The Start Of Line', '<c-a>',      '<HOME>',                    { silent = false, } },
+      { 'Move Cursor To The End Of Line',   '<c-e>',      '<END>',                     { silent = false, } },
+      { 'Paste From System Clipboard',      '<c-r><c-r>', '<c-r>+',                    { silent = false, } },
+      { 'Insert Current Line',              '<c-r><c-e>', "<c-r>=getline('.')<cr>",    { silent = false, } },
+      { 'Insert Current File Name',         '<c-r><c-n>', "<c-r>=expand('%:t:r')<cr>", { silent = false, } },
+      { 'Insert Current File',              '<c-r><c-f>', "<c-r>=expand('%:t')<cr>",   { silent = false, } },
+      { 'Insert Current File Path',         '<c-r><c-p>', "<c-r>=expand('%:p')<cr>",   { silent = false, } },
+      { 'Insert CWD',                       '<c-r><c-d>', "<c-r>=getcwd()<cr>",        { silent = false, } },
+      { '', '', '' },
+    },
+    { mode = 't', -- TERMINAL MODE =============================================
+      { '', '', '' },
+    },
+    { mode = 't', -- OPERATOR-PENDING MODE =====================================
+      { '', '', '' },
+    },
+  }
 end
+
+M.prefix  = prefix
+M.wrap    = wrap
+M.leader  = leader
+M.lleader = lleader
+M.cmd     = cmd
+M.lua     = lua
 
 return M

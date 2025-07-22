@@ -1,5 +1,7 @@
 local api = vim.api
-local not_empty = require('util').not_empty
+local util = require 'util'
+local not_empty = util.not_empty
+local mappings = require 'config.mappings'
 
 ---create a new augroup for the given autocmds
 ---@param name string
@@ -57,6 +59,14 @@ local function setup()
           if buf ~= args.buf then return end
         end
         client:stop()
+      end
+    } }
+  })
+
+  augroup('DIAGNOSTICS_HOLD', {
+    { {'CursorHold'}, { desc = 'Show diagnostics if multiple',
+      callback = function()
+        vim.diagnostic.open_float(nil, { focusable = false, source = 'if_many' })
       end
     } }
   })

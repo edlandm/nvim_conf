@@ -53,7 +53,7 @@ local function setup()
     { 'shiftwidth',     4 },
     { 'shortmess',     'ltToOCF' },
     { 'splitkeep',     'cursor' },
-   { 'suffixes',       '.bak,~,.o,.h,.info,.swp,.obj,.pyc' },
+    { 'suffixes',       '.bak,~,.o,.h,.info,.swp,.obj,.pyc' },
     { 'suffixesadd',    'txt,html,md,sh' },
     { 'swapfile',       false },
     { 'switchbuf',      'useopen' },
@@ -66,6 +66,7 @@ local function setup()
     { 'timeoutlen',     250 },
     { 'title',          false },
     { 'titleold',       '' },
+    { 'updatetime',     2000 },
     { 'viewoptions',    'cursor' },
     { 'wildignore',     '.hg,.git,.svn,*.aux,*.out,*.toc,*.jpg,*.bmp,*.gif,*.png,*.jpeg,*.o,*.obj,*.exe,*.dll,*.manifest,#.spl,#.sw?,#.DS_Store,#.pyc' },
     { 'wildmode',       'list:longest' },
@@ -79,10 +80,7 @@ local function setup()
     { 'netrw_browsex_viewer', 'xdg-open' },
   })
 
-  vim.diagnostic.config {
-    virtual_lines = { current_line = true },
-    virtual_text = true,
-  }
+  vim.diagnostic.config { virtual_text = true }
 end
 
 return {

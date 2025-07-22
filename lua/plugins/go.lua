@@ -14,7 +14,7 @@ return {
   build = ':lua require("go.install").update_all_sync()', -- if you need to install/update all binaries
   ft = {"go", 'gomod'},
   init = function ()
-    require('autocmd').augroup('GOLANG', {
+    require 'config.autocmd'.augroup('GOLANG', {
       { { 'BufEnter', 'BufNewFile' }, { pattern = '*.go', callback = set_maps } },
       { { 'FileType' }, { pattern = 'go', callback = set_maps } },
       { { 'BufWritePre' }, { pattern = '*.go', command = 'GoFmt' } },

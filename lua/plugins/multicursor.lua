@@ -25,7 +25,7 @@ return {
       end
     end
 
-    local mappings = require('mappings')
+    local mappings = require 'config.mappings'
     mappings.nmap({
       { 'Enable Multi-Cursor Mode', mappings.leader('n'), mc_activate },
       { 'Restore Multi-Cursor Mode', mappings.leader('gn'), function ()

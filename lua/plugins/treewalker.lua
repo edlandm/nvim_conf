@@ -1,4 +1,4 @@
-local cmd = require('mappings').cmd
+local cmd = require 'config.mappings'.cmd
 return {
   "aaronik/treewalker.nvim",
   dependencies = {

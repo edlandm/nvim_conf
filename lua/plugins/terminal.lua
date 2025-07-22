@@ -1,4 +1,4 @@
-local mappings = require('mappings')
+local mappings = require 'config.mappings'
 local lua, map = mappings.lua, mappings.to_lazy
 local pref     = mappings.prefix('<leader>t')
 
@@ -17,7 +17,7 @@ return {
       startInserted = false,
     },
     init = function()
-      require('mappings').tmap({
+      require 'config.mappings'.tmap({
         { 'Normal Mode', '<esc><esc>', '<c-\\><c-n>' },
         { 'Normal Mode', 'hs',         '<c-\\><c-n>' },
         -- { 'Switch Window Up',    '<c-k>',      '<c-\\><c-n><c-w>k' },

@@ -4,6 +4,6 @@ vim.wo.foldmethod = "indent"
 
 vim.bo.makeprg = 'lua'
 
-require('mappings').nmap({
+require 'config.mappings'.nmap({
   { 'execute current file with :make', '<F5>', '<cmd>make %<cr>'  },
 }, true)

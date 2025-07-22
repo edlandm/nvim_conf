@@ -1,4 +1,4 @@
-local mappings = require 'mappings'
+local mappings = require 'config.mappings'
 local to_lazy, lua = mappings.to_lazy, mappings.lua
 return {
   'monaqa/dial.nvim',

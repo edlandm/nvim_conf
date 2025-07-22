@@ -1,4 +1,4 @@
-local setopts = require('settings').setopts
+local setopts = require 'config.settings'.setopts
 
 setopts('wo', {
   { 'conceallevel',  2 },
@@ -236,7 +236,7 @@ local function run_codeblock()
   end
 end
 
-local mappings = require('mappings')
+local mappings = require 'config.mappings'
 local ll = mappings.lleader
 
 mappings.nmap({

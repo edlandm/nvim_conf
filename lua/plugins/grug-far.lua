@@ -1,4 +1,4 @@
-local mappings = require 'mappings'
+local mappings = require 'config.mappings'
 local map, cmd = mappings.to_lazy, mappings.cmd
 local pref     = mappings.prefix('g/')
 return {

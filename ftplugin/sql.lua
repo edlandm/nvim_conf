@@ -1,6 +1,6 @@
 -- vim:fdm=marker
 -- {{{ Settings ==============================================================
-local setopts = require('settings').setopts
+local setopts = require 'config.settings'.setopts
 
 setopts('o', {
   { 'shiftround', false },
@@ -289,7 +289,7 @@ user_cmd("SqlRenameVariable",
 -- }}}
 -- {{{ mappings
 -- {{{ INSERT ================================================================
-require('mappings').imap({
+require 'config.mappings'.imap({
   { 'expand: AND',                    'A<tab>',  'AND<space>' },
   { 'expand: CASE WHEN...END',        'C<tab>',  'CASE<space>WHEN<esc>o<tab>END<esc>kA<space>' },
   { 'expand: CONVERT',                'CR<tab>', 'CONVERT()<left>' },
@@ -313,8 +313,8 @@ require('mappings').imap({
 }, true)
 -- }}}
 -- {{{ NORMAL ================================================================
-local lleader = require('mappings').lleader
-require('mappings').nmap({
+local lleader = require 'config.mappings'.lleader
+require 'config.mappings'.nmap({
   { 'Swap WHERE operands', lleader('so'), '<cmd>!sql mappredicate sio<cr>'},
   -- table definitions can take the form of
   -- @table_var_name(field1, field2)
@@ -329,7 +329,7 @@ require('mappings').nmap({
 }, true)
 -- }}}
 -- {{{ VISUAL ================================================================
-require('mappings').xmap({
+require 'config.mappings'.xmap({
   -- TODO: find a way to do this with Treesitter
   { 'Uppercase SQL keywords', lleader('U'), '!sql uppercase<cr>' },
   { 'Generate colums aliases (in a SELECT statement)', lleader('sa'), ':SqlSelectAliases<cr>' },

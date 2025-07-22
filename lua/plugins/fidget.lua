@@ -1,4 +1,4 @@
-local mappings = require('mappings')
+local mappings = require 'config.mappings'
 local leader, cmd, prefix, map = mappings.leader, mappings.cmd, mappings.prefix, mappings.to_lazy
 local pref = prefix(leader 'NF')
 return {
