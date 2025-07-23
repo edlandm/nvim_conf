@@ -10,15 +10,20 @@ require 'quickfix'
 
 local fs_stat = (vim.uv or vim.loop).fs_stat ---@diagnostic disable-line
 local function safe_source(path)
-  ---@diagnostic disable-next-line
-  if fs_stat(path) then
-    vim.cmd.source(path)
+  if not path then return end
+  if type(path) == 'table' then
+    for _, p in ipairs(path) do
+      safe_source(p)
+    end
+    return
   end
+  if not fs_stat(path) then return end
+  vim.cmd.source(path)
 end
 
 local config = vim.fn.stdpath('config')
-if vim.g.neovide then
-  safe_source(vim.fs.joinpath(config, 'lua', 'neovide_settings.lua'))
-end
-safe_source(vim.fs.joinpath(config, 'lua', 'local.lua'))
-safe_source(vim.fn.expand('~/.nvim.local.lua'))
+safe_source {
+  vim.g.neovide and vim.fs.joinpath(config, 'lua', 'neovide_settings.lua') or false,
+  vim.fs.joinpath(config, 'lua', 'local.lua'),
+  vim.fn.expand('~/.nvim.local.lua'),
+}
