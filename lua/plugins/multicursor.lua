@@ -26,26 +26,28 @@ return {
     end
 
     local mappings = require 'config.mappings'
-    mappings.nmap({
-      { 'Enable Multi-Cursor Mode', mappings.leader('n'), mc_activate },
-      { 'Restore Multi-Cursor Mode', mappings.leader('gn'), function ()
-        mc.restoreCursors()
-        mc_activate()
-      end },
-    })
-
-    mappings.xmap({
-      { 'Enable Multi-Cursor Mode', mappings.leader('n'), function ()
-        mc_activate()
-        mc.matchAddCursor(1)
-      end },
-    })
+    local leader, operator = mappings.leader, mappings.operator
+    mappings.map {
+      { mode = 'n',
+        { 'Enable Multi-Cursor Mode', leader 'n', mc_activate },
+        { 'Restore Multi-Cursor Mode', leader 'gn', function ()
+          mc.restoreCursors()
+          mc_activate()
+        end },
+      },
+      { mode = 'x',
+        { 'Enable Multi-Cursor Mode', leader 'n', function ()
+          mc_activate()
+          mc.matchAddCursor(1)
+        end },
+      },
+    }
 
     local mcos = require 'mcos'
     mcos.setup {}
 
     vim.keymap.set({ 'n', 'v' }, 'gm', function()
-      mappings.operator(
+      operator(
         function (positions)
           mc_activate()
           vim.api.nvim_buf_set_mark(0, '<', positions.top, 0, {})

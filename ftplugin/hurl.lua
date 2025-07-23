@@ -9,6 +9,6 @@ local function uri_encode_param_value(_lnum)
 end
 
 local mappings = require 'config.mappings'
-mappings.nmap({
-  {'Url-encode FormData value on <line>', mappings.lleader('u'), uri_encode_param_value },
-})
+mappings.map { mode = 'n',
+  {'Url-encode FormData value on <line>', mappings.lleader 'u', uri_encode_param_value },
+}

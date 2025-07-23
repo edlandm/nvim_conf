@@ -17,7 +17,7 @@ return {
       startInserted = false,
     },
     init = function()
-      require 'config.mappings'.tmap({
+      require 'config.mappings'.map { mode = 't',
         { 'Normal Mode', '<esc><esc>', '<c-\\><c-n>' },
         { 'Normal Mode', 'hs',         '<c-\\><c-n>' },
         -- { 'Switch Window Up',    '<c-k>',      '<c-\\><c-n><c-w>k' },
@@ -25,7 +25,7 @@ return {
         -- { 'Switch Window Left',  '<c-h>',      '<c-\\><c-n><c-w>h' },
         -- { 'Switch Window Right', '<c-l>',      '<c-\\><c-n><c-w>l' },
         { 'Kill terminal process', '<a-d><a-d><a-d>', '<cmd>lua vim.fn.jobstop(vim.bo[vim.api.nvim_get_current_buf()].channel)<cr>' },
-      })
+      }
     end,
     keys = map {
       { 'Open Terminal',   pref 't', term 'open', { 'n', 't' } },

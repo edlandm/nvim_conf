@@ -288,56 +288,52 @@ user_cmd("SqlRenameVariable",
   { nargs = "*", })
 -- }}}
 -- {{{ mappings
--- {{{ INSERT ================================================================
-require 'config.mappings'.imap({
-  { 'expand: AND',                    'A<tab>',  'AND<space>' },
-  { 'expand: CASE WHEN...END',        'C<tab>',  'CASE<space>WHEN<esc>o<tab>END<esc>kA<space>' },
-  { 'expand: CONVERT',                'CR<tab>', 'CONVERT()<left>' },
-  { 'expand: DECLARE',                'D<tab>',  'DECLARE<cr><tab>' },
-  { 'expand: FROM t_',                'F<tab>',  'FROM t_' },
-  { 'expand: GROUP BY',               'G<tab>',  'GROUP BY<cr><tab> ' },
-  { 'expand: HAVING',                 'H<tab>',  'HAVING<tab>' },
-  { 'expand: INSERT INTO',            'I<tab>',  'INSERT<space>INTO' },
-  { 'expand: LEFT OUTER JOIN t_ ON',  'L<tab>',  'LEFT<space>OUTER<space>JOIN<space>t_<cr>ON<tab><esc>>>kA' },
-  { 'expand: INNER JOIN t_ ON',       'N<tab>',  'INNER<space>JOIN<space>t_<cr>ON<tab><esc>>>kA' },
-  { 'expand: ORDER BY',               'O<tab>',  'ORDER<space>BY<cr><tab>' },
-  { 'expand: PARTITION BY',           'P<tab>',  'PARTITION<space>BY<space>' },
-  { 'expand: SELECT 1',               'SS<tab>', 'SELECT 1' },
-  { 'expand: SELECT TOP 1',           'ST<tab>', 'SELECT TOP 1<cr><tab>' },
-  { 'expand: SELECT',                 'S<tab>',  'SELECT<cr><tab> ' },
-  { 'expand: UPDATE',                 'U<tab>',  'UPDATE<space><cr>SET<tab><esc>kA' },
-  { 'expand: OVER ()',                'V<tab>',  'OVER<space>()<left>' },
-  { 'expand: WHERE',                  'W<tab>',  'WHERE<space>' },
-  { 'expand: WITH (NOLOCK)',          'WN',      'WITH<space>(NOLOCK)' },
-  { 'expand SELECT column shorthand', '<c-s>',   expand_cols_cur_line },
-}, true)
--- }}}
--- {{{ NORMAL ================================================================
-local lleader = require 'config.mappings'.lleader
-require 'config.mappings'.nmap({
-  { 'Swap WHERE operands', lleader('so'), '<cmd>!sql mappredicate sio<cr>'},
-  -- table definitions can take the form of
-  -- @table_var_name(field1, field2)
-  -- #temp_table_name(field1, field2)
-  -- or
-  -- @table_var_name:field1, field2
-  -- #temp_table_name:field1, field2
-  { 'Expand Table Definition (#temp or @variable)', lleader('et'), '<cmd>.!prodb expand table<cr>' },
-  { 'Rename Variable (<cword>)', lleader('rv'), '<cmd>SqlRenameVariable<cr>' },
-  { 'Convert <cword> to snake_case', lleader('cs'), _G.sql_snake_case_cword },
-  -- { '', lleader(''), '' },
-}, true)
--- }}}
--- {{{ VISUAL ================================================================
-require 'config.mappings'.xmap({
-  -- TODO: find a way to do this with Treesitter
-  { 'Uppercase SQL keywords', lleader('U'), '!sql uppercase<cr>' },
-  { 'Generate colums aliases (in a SELECT statement)', lleader('sa'), ':SqlSelectAliases<cr>' },
-  { 'Format commas in SQL list', lleader('fc'), ':SqlFixCommas<cr>' },
-  { 'Assign columns (in a SELECT statement) to variables', lleader('sv'), ':SqlAssignColumnsToVariables<cr>' },
-  { 'Match columns (in a WHERE clause) to variables', lleader('wv'), ':SqlWhereMatchColumnsToVariables<cr>' },
-  { 'Convert variables to @in_ parameters', lleader('vi'), ':SqlVarsToInParams<cr>' },
-  { 'Convert variables to @out_ parameters', lleader('vi'), ':SqlVarsToOutParams<cr>' },
-}, true)
--- }}}
+local mappings = require 'config.mappings'
+local lleader = mappings.lleader
+mappings.map {
+  { mode = 'n', buffer = true,
+    { 'Swap WHERE operands', lleader 'so', '<cmd>!sql mappredicate sio<cr>'},
+    -- table definitions can take the form of
+      -- @table_var_name(field1, field2)
+      -- #temp_table_name(field1, field2)
+      -- or
+      -- @table_var_name:field1, field2
+      -- #temp_table_name:field1, field2
+      { 'Expand Table Definition (#temp or @variable)', lleader 'et', '<cmd>.!prodb expand table<cr>' },
+      { 'Rename Variable (<cword>)',                    lleader 'rv', '<cmd>SqlRenameVariable<cr>' },
+      { 'Convert <cword> to snake_case',                lleader 'cs', _G.sql_snake_case_cword },
+  },
+  { mode = 'i', buffer = true,
+    { 'expand: AND',                    'A<tab>',  'AND<space>' },
+    { 'expand: CASE WHEN...END',        'C<tab>',  'CASE<space>WHEN<esc>o<tab>END<esc>kA<space>' },
+    { 'expand: CONVERT',                'CR<tab>', 'CONVERT()<left>' },
+    { 'expand: DECLARE',                'D<tab>',  'DECLARE<cr><tab>' },
+    { 'expand: FROM t_',                'F<tab>',  'FROM t_' },
+    { 'expand: GROUP BY',               'G<tab>',  'GROUP BY<cr><tab> ' },
+    { 'expand: HAVING',                 'H<tab>',  'HAVING<tab>' },
+    { 'expand: INSERT INTO',            'I<tab>',  'INSERT<space>INTO' },
+    { 'expand: LEFT OUTER JOIN t_ ON',  'L<tab>',  'LEFT<space>OUTER<space>JOIN<space>t_<cr>ON<tab><esc>>>kA' },
+    { 'expand: INNER JOIN t_ ON',       'N<tab>',  'INNER<space>JOIN<space>t_<cr>ON<tab><esc>>>kA' },
+    { 'expand: ORDER BY',               'O<tab>',  'ORDER<space>BY<cr><tab>' },
+    { 'expand: PARTITION BY',           'P<tab>',  'PARTITION<space>BY<space>' },
+    { 'expand: SELECT 1',               'SS<tab>', 'SELECT 1' },
+    { 'expand: SELECT TOP 1',           'ST<tab>', 'SELECT TOP 1<cr><tab>' },
+    { 'expand: SELECT',                 'S<tab>',  'SELECT<cr><tab> ' },
+    { 'expand: UPDATE',                 'U<tab>',  'UPDATE<space><cr>SET<tab><esc>kA' },
+    { 'expand: OVER ()',                'V<tab>',  'OVER<space>()<left>' },
+    { 'expand: WHERE',                  'W<tab>',  'WHERE<space>' },
+    { 'expand: WITH (NOLOCK)',          'WN',      'WITH<space>(NOLOCK)' },
+    { 'expand SELECT column shorthand', '<c-s>',   expand_cols_cur_line },
+  },
+  { mode = 'x', buffer = true,
+    -- TODO: find a way to do this with Treesitter
+    { 'Uppercase SQL keywords',                              lleader 'U', '!sql uppercase<cr>' },
+    { 'Generate colums aliases (in a SELECT statement)',     lleader 'sa', ':SqlSelectAliases<cr>' },
+    { 'Format commas in SQL list',                           lleader 'fc', ':SqlFixCommas<cr>' },
+    { 'Assign columns (in a SELECT statement) to variables', lleader 'sv', ':SqlAssignColumnsToVariables<cr>' },
+    { 'Match columns (in a WHERE clause) to variables',      lleader 'wv', ':SqlWhereMatchColumnsToVariables<cr>' },
+    { 'Convert variables to @in_ parameters',                lleader 'vi', ':SqlVarsToInParams<cr>' },
+    { 'Convert variables to @out_ parameters',               lleader 'vi', ':SqlVarsToOutParams<cr>' },
+  },
+}
 -- }}}

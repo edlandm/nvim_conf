@@ -26,12 +26,12 @@ local lua = wrap('<cmd>lua ', '<cr>')
 local M = {}
 
 --- @alias abbrev_mode 'ia' | 'ca' | '!a'
---- @alias mode 'n' | 'i' | 'x' | 't' | 'c' | 'l' | 'v' | 's' | 'o' | abbrev_mode
+--- @alias vim_mode 'n' | 'i' | 'x' | 't' | 'c' | 'l' | 'v' | 's' | 'o' | abbrev_mode
 --- @alias desc string
 --- @alias lhs string
 --- @alias rhs string | function
---- @alias mapping [ desc, lhs, rhs, vim.keymap.set.Opts? ]
---- @alias mapfn fun(mappings: mapping[], _buffer?: boolean):nil
+---@alias keymap [ desc, lhs, rhs, table? ]
+---@alias keymap_group { mode?:string, buf?:boolean, buffer?:boolean, noremap?:boolean, noremap?:boolean, silent?:boolean, expr?:boolean, [integer]:keymap }
 
 --- @alias jumpDest 'start' | 'end' | 'top' | 'bottom' | 'origin'
 --- @alias operatorOpts { jump:jumpDest? }
@@ -41,64 +41,11 @@ local M = {}
 --- @alias selectionType 'char' | 'line' | 'block
 --- @alias visualRange { top:position, bottom:position, selection_type:selectionType }
 
----- Utility Functions
----function for making shortcut functions for making mappings
----@deprecated use map() instead
----@param mode mode
----@return mapfn
-local function map_fn(mode)
-  return function (mappings, _buffer)
-    local buffer = _buffer or false
-    for _, m in ipairs(mappings) do
-      local desc, lhs, rhs, opts = unpack(m)
-      local defaults = { desc = desc, noremap = true, silent = true, expr = false }
-      opts = vim.tbl_deep_extend('keep', opts or {}, defaults)
-
-      assert(fun.empty(desc) == 0, 'mapping description required')
-      assert(fun.empty(lhs)  == 0, 'mapping lhs required')
-      assert(fun.empty(rhs)  == 0, 'mapping rhs required')
-
-      if type(rhs) == 'function' then
-        opts.callback = rhs
-        rhs = ''
-      end
-
-      if buffer then
-        api.nvim_buf_set_keymap(0, mode, lhs, rhs, opts)
-      else
-        api.nvim_set_keymap(mode, lhs, rhs, opts)
-      end
-    end
-  end
-end
-
----@deprecated use map() instead
-M.nmap = map_fn('n') -- normal
----@deprecated use map() instead
-M.imap = map_fn('i') -- insert
----@deprecated use map() instead
-M.xmap = map_fn('x') -- visual
----@deprecated use map() instead
-M.tmap = map_fn('t') -- terminal
----@deprecated use map() instead
-M.cmap = map_fn('c') -- command-line
----@deprecated use map() instead
-M.omap = map_fn('o') -- operator-pending mode
-
 ---shortcut fn to make mappings in my prefered format (description first)
----@alias keymap [ string, string, string|function, table? ]
----@param keymap_groups { mode?:string, buf?:boolean, buffer?:boolean, noremap?:boolean, noremap?:boolean, silent?:boolean, expr?:boolean, [integer]:keymap[] }[]
+---@param keymap_groups keymap_group | keymap_group[]
 function M.map(keymap_groups)
-  for _, group in ipairs(keymap_groups) do
-    local mode = group.mode or 'n'
-    local buf = group.buf or group.buffer or false
-    local noremap = group.noremap == false and false or true
-    local silent = group.silent == false and false or true
-    local expr = group.expr and true or false
-    local defaults = { noremap = noremap, silent = silent, expr = expr }
-
-    -- print(vim.inspect { mode=mode, buf=buf, noremap=noremap })
-    for _, keymap in ipairs(group) do
+  local function setmap(mode, buf, defaults, keymap)
+      -- vim.print({ mode=mode, buf=buf, defaults=defaults, keymap=keymap })
       local desc, lhs, rhs, _opts = unpack(keymap)
       local opts = vim.tbl_deep_extend('keep',
         _opts or {},
@@ -109,7 +56,6 @@ function M.map(keymap_groups)
         rhs = ''
       end
 
-      -- print(vim.inspect {lhs=lhs, rhs=rhs, opts=opts})
       if nilif(desc, '') and nilif(lhs, '') then
         if buf then
           vim.api.nvim_buf_set_keymap(0, mode, lhs, rhs, opts)
@@ -117,7 +63,39 @@ function M.map(keymap_groups)
           vim.api.nvim_set_keymap(mode, lhs, rhs, opts)
         end
       end
+  end
+
+  local function set_group_maps(group)
+    local mode     = group.mode or 'n'
+    local buf      = group.buf or group.buffer or false
+    local defaults = {
+      noremap = group.noremap == false and false or true,
+      silent  = group.silent  == false and false or true,
+      expr    = group.expr and true or false,
+    }
+
+    -- vim.print { mode=mode, buf=buf, defaults=defaults }
+    for _, keymap in ipairs(group) do
+      setmap(mode, buf, defaults, keymap)
     end
+  end
+
+  local is_list_of_list_of_mappings = (type(keymap_groups) == 'table'
+    and type(keymap_groups[1]) == 'table'
+    and type(keymap_groups[1][1]) == 'table')
+
+  local is_list_of_of_mappings = (type(keymap_groups) == 'table'
+    and type(keymap_groups[1]) == 'table'
+    and type(keymap_groups[1][1]) == 'string')
+
+  if is_list_of_list_of_mappings then
+    for _, group in ipairs(keymap_groups) do
+      set_group_maps(group)
+    end
+  elseif is_list_of_of_mappings then
+      set_group_maps(keymap_groups)
+  else
+    vim.notify('map :: unexpected keymap_group format', vim.log.levels.ERROR, {})
   end
 end
 

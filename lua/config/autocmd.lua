@@ -1,7 +1,6 @@
 local api = vim.api
 local util = require 'util'
 local not_empty = util.not_empty
-local mappings = require 'config.mappings'
 
 ---create a new augroup for the given autocmds
 ---@param name string

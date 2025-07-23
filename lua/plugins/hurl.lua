@@ -1,38 +1,38 @@
 local function setmaps()
-  local mappings = require 'config.mappings'
-  mappings.nmap({
-    -- execute code
-    { "Hurl: execute buffer", "<F5>", "<cmd>%HurlRunner<cr>" },
-    { "Hurl: execute buffer", "<localleader>eb", "<cmd>%HurlRunner<cr>" },
-    { "Hurl: [e]xecute [f]ile", "<localleader>ef", "<cmd>HurlRunner<cr>" },
-    { "Hurl: [e]xecute [r]equest", "<localleader>er", "vip:HurlRunner<cr>" },
-    { "Hurl: [e]xecute up [t]o request", "<localleader>et",
-      function ()
-        vim.cmd.normal('vip')
-        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<esc>", true, false, true), 'itx', false)
+  require 'config.mappings'.map {
+    { mode = 'n', buffer = true,
+      -- execute code
+      { "Hurl: execute buffer", "<F5>", "<cmd>%HurlRunner<cr>" },
+      { "Hurl: execute buffer", "<localleader>eb", "<cmd>%HurlRunner<cr>" },
+      { "Hurl: [e]xecute [f]ile", "<localleader>ef", "<cmd>HurlRunner<cr>" },
+      { "Hurl: [e]xecute [r]equest", "<localleader>er", "vip:HurlRunner<cr>" },
+      { "Hurl: [e]xecute up [t]o request", "<localleader>et",
+        function ()
+          vim.cmd.normal('vip')
+          vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<esc>", true, false, true), 'itx', false)
 
-        vim.api.nvim_buf_set_mark(0, '<', 1, 0, {})
-        local endline = vim.api.nvim_buf_get_mark(0, '>')[1]
+          vim.api.nvim_buf_set_mark(0, '<', 1, 0, {})
+          local endline = vim.api.nvim_buf_get_mark(0, '>')[1]
 
-        vim.api.nvim_cmd({ cmd = 'HurlRunner', range = {1, endline} }, {})
-      end
+          vim.api.nvim_cmd({ cmd = 'HurlRunner', range = {1, endline} }, {})
+        end
+      },
+      { "Hurl: show last response", "<localleader>e<cr>", "<cmd>HurlShowLastResponse<cr>" },
+      -- environment variables
+      { "Hurl: Set [e]nvironment variable", "<localleader>he", ":HurlSetVariable " , { silent = false  }},
+      -- NOTE: for now this buffer is only for viewing variables, but modifying is on the roadmap
+      { "Hurl: View environment [V]ariables", "<localleader>hV", "<cmd>HurlManageVariable<cr>" },
+      -- NOTE: can be comma-separated list
+      { "Hurl: Set environment [f]ile", "<localleader>hf", ":HurlSetEnvFile ", { silent = false  }},
+      -- modes
+      { "Hurl: Toggle popup/[s]plit mode", "<localleader>hs", "<cmd>HurlToggleMode<cr>" },
+      { "Hurl: Toggle [v]erbose mode", "<localleader>hv", "<cmd>HurlToggleMode<cr>" },
     },
-    { "Hurl: show last response", "<localleader>e<cr>", "<cmd>HurlShowLastResponse<cr>" },
-    -- environment variables
-    { "Hurl: Set [e]nvironment variable", "<localleader>he", ":HurlSetVariable " , { silent = false  }},
-    -- NOTE: for now this buffer is only for viewing variables, but modifying is on the roadmap
-    { "Hurl: View environment [V]ariables", "<localleader>hV", "<cmd>HurlManageVariable<cr>" },
-    -- NOTE: can be comma-separated list
-    { "Hurl: Set environment [f]ile", "<localleader>hf", ":HurlSetEnvFile ", { silent = false  }},
-    -- modes
-    { "Hurl: Toggle popup/[s]plit mode", "<localleader>hs", "<cmd>HurlToggleMode<cr>" },
-    { "Hurl: Toggle [v]erbose mode", "<localleader>hv", "<cmd>HurlToggleMode<cr>" },
-  }, true)
-
-  mappings.xmap({
-    { "Hurl: Run selection", "<F5>", ":HurlRunner<cr>" },
-    { "Hurl: Run selection", "<localleader>e", ":HurlRunner<cr>" },
-  }, true)
+    { mode = 'x', buffer = true,
+      { "Hurl: Run selection", "<F5>", ":HurlRunner<cr>" },
+      { "Hurl: Run selection", "<localleader>e", ":HurlRunner<cr>" },
+    },
+  }
 end
 
 return {

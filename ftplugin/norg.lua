@@ -102,7 +102,7 @@ local function run_codeblock()
     { 'ranged_verbatim_tag' },
     assert(vim.treesitter.get_node(), 'Unable to get cursor node.'))
 
-  local notify = vim.schedule_wrap(vim.api.nvim_notify)
+  local notify = vim.schedule_wrap(vim.api.nvim_echo)
   if not code_block then
     notify('Not in Code-block', vim.log.levels.INFO, {})
     return
@@ -239,34 +239,34 @@ end
 local mappings = require 'config.mappings'
 local ll = mappings.lleader
 
-mappings.nmap({
-  { "neorg: follow link",                     "<CR>",       "<Plug>(neorg.esupports.hop.hop-link)",             },
-  { "neorg: open link in vsplit",             "<c-w><c-v>", "<Plug>(neorg.esupports.hop.hop-link.vsplit)",      },
-  { "neorg: edit code-block in new buffer",   ll("e"),      "<Plug>(neorg.looking-glass.magnify-code-block)",   },
-  { "neorg: run code-block",                  ll("r"),      run_codeblock,                                      },
-  { "neorg: demote item (nested)",            "<<",         "<Plug>(neorg.promo.demote.nested)",                },
-  { "neorg: demote item",                     "< ",         "<Plug>(neorg.promo.demote)",                       },
-  { "neorg: promote item (nested)",           ">>",         "<Plug>(neorg.promo.promote.nested)",               },
-  { "neorg: promote item",                    "> ",         "<Plug>(neorg.promo.promote)",                      },
-  { "neorg: invert all items in list",        ll("li"),     "<Plug>(neorg.pivot.list.invert)",                  },
-  { "neorg: toggle list ordered<->unordered", ll("lt"),     "<Plug>(neorg.pivot.list.toggle)",                  },
-  { "neorg: set task to ambiguous",           ll("ta"),     "<Plug>(neorg.qol.todo-items.todo.task-ambiguous)", },
-  { "neorg: set task to cancelled",           ll("tc"),     "<Plug>(neorg.qol.todo-items.todo.task-cancelled)", },
-  { "neorg: set task to done",                ll("td"),     "<Plug>(neorg.qol.todo-items.todo.task-done)",      },
-  { "neorg: set task to hold",                ll("th"),     "<Plug>(neorg.qol.todo-items.todo.task-on-hold)",   },
-  { "neorg: set task to important",           ll("ti"),     "<Plug>(neorg.qol.todo-items.todo.task-important)", },
-  { "neorg: set task to pending",             ll("tp"),     "<Plug>(neorg.qol.todo-items.todo.task-pending)",   },
-  { "neorg: set task to recurring",           ll("tr"),     "<Plug>(neorg.qol.todo-items.todo.task-recurring)", },
-  { "neorg: set task to undone",              ll("tu"),     "<Plug>(neorg.qol.todo-items.todo.task-undone)",    },
-}, true)
-
-mappings.xmap({
-  { "neorg: demote range",  "<", "<Plug>(neorg.promo.demote.range)",  },
-  { "neorg: promote range", ">", "<Plug>(neorg.promo.promote.range)", },
-}, true)
-
-mappings.imap({
-  { "neorg: demote item (nested)",      "<c-d>", "<Plug>(neorg.promo.demote.nested)",  },
-  { "neorg: promote item (nested)",     "<c-t>", "<Plug>(neorg.promo.promote.nested)", },
-  { "neorg: create a noew list/header", ";n",    "<Plug>(neorg.itero.next-iteration)", },
-}, true)
+mappings.map{
+  { mode = 'n', buffer = true,
+    { "neorg: follow link",                     "<CR>",       "<Plug>(neorg.esupports.hop.hop-link)",             },
+    { "neorg: open link in vsplit",             "<c-w><c-v>", "<Plug>(neorg.esupports.hop.hop-link.vsplit)",      },
+    { "neorg: edit code-block in new buffer",   ll("e"),      "<Plug>(neorg.looking-glass.magnify-code-block)",   },
+    { "neorg: run code-block",                  ll("r"),      run_codeblock,                                      },
+    { "neorg: demote item (nested)",            "<<",         "<Plug>(neorg.promo.demote.nested)",                },
+    { "neorg: demote item",                     "< ",         "<Plug>(neorg.promo.demote)",                       },
+    { "neorg: promote item (nested)",           ">>",         "<Plug>(neorg.promo.promote.nested)",               },
+    { "neorg: promote item",                    "> ",         "<Plug>(neorg.promo.promote)",                      },
+    { "neorg: invert all items in list",        ll("li"),     "<Plug>(neorg.pivot.list.invert)",                  },
+    { "neorg: toggle list ordered<->unordered", ll("lt"),     "<Plug>(neorg.pivot.list.toggle)",                  },
+    { "neorg: set task to ambiguous",           ll("ta"),     "<Plug>(neorg.qol.todo-items.todo.task-ambiguous)", },
+    { "neorg: set task to cancelled",           ll("tc"),     "<Plug>(neorg.qol.todo-items.todo.task-cancelled)", },
+    { "neorg: set task to done",                ll("td"),     "<Plug>(neorg.qol.todo-items.todo.task-done)",      },
+    { "neorg: set task to hold",                ll("th"),     "<Plug>(neorg.qol.todo-items.todo.task-on-hold)",   },
+    { "neorg: set task to important",           ll("ti"),     "<Plug>(neorg.qol.todo-items.todo.task-important)", },
+    { "neorg: set task to pending",             ll("tp"),     "<Plug>(neorg.qol.todo-items.todo.task-pending)",   },
+    { "neorg: set task to recurring",           ll("tr"),     "<Plug>(neorg.qol.todo-items.todo.task-recurring)", },
+    { "neorg: set task to undone",              ll("tu"),     "<Plug>(neorg.qol.todo-items.todo.task-undone)",    },
+  },
+  { mode = 'x', buffer = true,
+    { "neorg: demote range",  "<", "<Plug>(neorg.promo.demote.range)",  },
+    { "neorg: promote range", ">", "<Plug>(neorg.promo.promote.range)", },
+  },
+  { mode = 'i', buffer = true,
+    { "neorg: demote item (nested)",      "<c-d>", "<Plug>(neorg.promo.demote.nested)",  },
+    { "neorg: promote item (nested)",     "<c-t>", "<Plug>(neorg.promo.promote.nested)", },
+    { "neorg: create a noew list/header", ";n",    "<Plug>(neorg.itero.next-iteration)", },
+  },
+}

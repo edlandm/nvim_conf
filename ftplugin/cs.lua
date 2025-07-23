@@ -8,6 +8,6 @@ require 'config.settings'.setopts('bo', {
   { 'makeprg', 'dotnet build' },
 })
 
-require 'config.mappings'.nmap({
+require 'config.mappings'.map { mode = 'n', buffer = true,
   { 'Start Debugger', '<F5>', '<cmd>lua require("dap").continue()<cr>' }
-}, true)
+}
