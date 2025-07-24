@@ -436,6 +436,29 @@ local function repeat_edit_on_next_line()
   api.nvim_win_set_cursor(0, { row + 1, col })
 end
 
+---delete the current buffer without closing the current window
+---uses bwipeout to completely unlist and clear buffer from memory
+---@param bang boolean true = force delete even if unsaved changes
+local function buf_delete(bang)
+  local sbang = bang and '!' or ''
+  local ok, err = pcall(vim.cmd, ('b#|bwipeout%s #'):format(sbang)) ---@diagnostic disable-line
+  if ok then return end
+  local expected_errors = { 86, 23 }
+  local is_err_expected = false
+  for _, num in ipairs(expected_errors) do
+    local s, _ = err:find(('E%d: '):format(num))
+    if s then
+      is_err_expected = true
+      break
+    end
+  end
+  if not is_err_expected then
+    vim.notify('Unexpected error deleting buffer: ' .. err, vim.log.levels.ERROR, {})
+    return
+  end
+  vim.cmd(('bp|bwipeout%s #'):format(sbang))
+end
+
 function M.setup()
   M.map {
     { mode = 'n', -- NORMAL MODE ===============================================
@@ -488,8 +511,8 @@ function M.setup()
       { 'Search <cword> without moving', leader '*', cmd 'let @/ = expand(\"<cword>\") .. \"\\\\>\" | set hlsearch' },
       { '<- Pasted Text', leader '<', 'V`]<' },
       { '-> Pasted Text', leader '>', 'V`]>' },
-      { 'Buffer Delete',  leader 'bd', cmd 'b#|bwipeout #' },
-      { 'Buffer Delete!', leader 'bD', cmd 'b#|bwipeout! #' },
+      { 'Buffer Delete',  leader 'bd', function() buf_delete(false) end },
+      { 'Buffer Delete!', leader 'bD', function() buf_delete(true) end },
       { 'Buffer Only',    leader 'bo', cmd "execute \"silent! tabonly|silent! %bd|e#|bd#\" | echo 'Closed all buffers (and tabs) except current'" },
       { 'Quickfix Toggle', '<c-c>',
         function()
