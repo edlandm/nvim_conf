@@ -99,17 +99,46 @@ function M.map(keymap_groups)
   end
 end
 
+---@alias to_lazy_keymap { [1]:string, [2]:string, [3]:string|function, [string]:string }
+---@alias LazyKeySpec table
+
 ---convenience function that takes a list of mapping tuples in the format that
 ---I prefer (description-first for readability) and returns a LazyKeySpec[]
-function M.to_lazy(m)
-  assert(type(m) == 'table', 'this function expects either a tuple or list of tuples')
-  if type(m[1]) == 'table' then
-    return vim.tbl_map(M.to_lazy, m)
+---@param keymap to_lazy_keymap|{ [integer]: to_lazy_keymap, [string]:any }
+---@return LazyKeySpec|LazyKeySpec[]
+function M.to_lazy(keymap)
+  do -- type assertions
+    local _type = type(keymap)
+    assert(_type == 'table',
+      ('expected either a tuple or list of tuples. Got: <%s>')
+        :format(_type))
   end
-  local desc, lhs, rhs, modes = unpack(m)
-  assert(type(desc) == 'string', 'first param of mapping tuple must be string description')
-  assert(type(lhs) == 'string', 'second param of mapping tuple must be string lhs')
-  return { lhs, rhs, mode = (modes or { 'n' }), desc = desc }
+  if type(keymap[1]) == 'table' then -- list of keymaps
+    local properties = {}
+    local keymaps = {}
+    for key, value in pairs(keymap) do
+      if type(key) == 'string' then
+        properties[key] = value
+      else
+        table.insert(keymaps, value)
+      end
+    end
+    return vim.tbl_map(function (km)
+      return M.to_lazy(vim.tbl_deep_extend('keep', km, properties))
+    end, keymaps)
+  end
+  -- single keymap
+  local desc, lhs, rhs = unpack(keymap, 1, 3)
+  do -- type assertions
+    local types = vim.tbl_map(type, { desc, lhs, rhs })
+    assert(
+      (types[1] == 'string' and
+      types[2] == 'string' and
+      (types[3] == 'string' or types[3] == 'function')),
+      ('expected tuple (string, string, string|function). Got: (%s, %s, %s)')
+        :format(types[1], types[2], types[3]))
+  end
+  return vim.tbl_deep_extend('keep', { lhs, rhs, desc = desc }, keymap)
 end
 
 ---if cursor is on a word, call `fn` with <cWORD> as the first argument
