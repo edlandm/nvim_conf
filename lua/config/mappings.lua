@@ -139,6 +139,8 @@ function M.operator(callback, _opts)
   _G.op_fn = function ()
     local origin = vim.fn.getcurpos(0)
     local positions = {
+      fun.line("'["), -- allow table to be used and unpacked as a tuple
+      fun.line("']"),
       top     = fun.line("'["),
       bottom  = fun.line("']"),
       start   = fun.line("'["),
