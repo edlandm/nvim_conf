@@ -11,6 +11,5 @@ return {
       ui_contrast = 'high',
       dim_inactive_windows = true,
     },
-    config = true,
   },
 }
