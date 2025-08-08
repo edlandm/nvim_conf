@@ -16,6 +16,7 @@ local function setup()
   setopts(nil, {
     'cursorline',
     'expandtab',
+    'exrc',
     'ignorecase',
     'list',
     'number',
