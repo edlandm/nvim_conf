@@ -13,7 +13,7 @@ local function safe_source(path)
   if not path then return end
   if type(path) == 'table' then
     for _, p in ipairs(path) do
-      safe_source(p)
+      safe_source(type(p) == 'table' and vim.fs.joinpath(unpack(p)) or p)
     end
     return
   end
@@ -22,8 +22,10 @@ local function safe_source(path)
 end
 
 local config = vim.fn.stdpath('config')
+local home = vim.fn.getenv('HOME')
 safe_source {
-  vim.g.neovide and vim.fs.joinpath(config, 'lua', 'neovide_settings.lua') or false,
-  vim.fs.joinpath(config, 'lua', 'local.lua'),
-  vim.fn.expand('~/.nvim.local.lua'),
+  { config, 'lua', 'local.lua' },
+  { config, 'lua', 'config', 'local.lua' },
+  { home, '.nvim.local.lua' },
+  vim.g.neovide and { config, 'lua', 'neovide_settings.lua' } or false,
 }
