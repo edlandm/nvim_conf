@@ -2,6 +2,7 @@ local mappings = require 'config.mappings'
 local to_lazy, lua = mappings.to_lazy, mappings.lua
 return {
   'monaqa/dial.nvim',
+  events = 'VeryLazy',
   config = function()
     local augend = require 'dial.augend'
     local config = require 'dial.config'
@@ -117,9 +118,9 @@ return {
     { 'increment <cword>', 'g<c-a>', lua 'require("dial.map").manipulate("increment", "gnormal")' },
     { 'decrement <cword>', 'g<c-x>', lua 'require("dial.map").manipulate("decrement", "gnormal")' },
     -- visual
-    { 'increment <cword>', '<c-a>',  lua 'require("dial.map").manipulate("increment", "visual")',    { 'x' } },
-    { 'decrement <cword>', '<c-x>',  lua 'require("dial.map").manipulate("decrement", "visual")',    { 'x' } },
-    { 'increment <cword>', 'g<c-a>', lua 'require("dial.map").manipulate("increment", "gvisual")',   { 'x' } },
-    { 'decrement <cword>', 'g<c-x>', lua 'require("dial.map").manipulate("decrement", "gvisual")',   { 'x' } },
+    { 'increment <cword>', '<c-a>',  lua 'require("dial.map").manipulate("increment", "visual")',  mode = 'x'  },
+    { 'decrement <cword>', '<c-x>',  lua 'require("dial.map").manipulate("decrement", "visual")',  mode = 'x'  },
+    { 'increment <cword>', 'g<c-a>', lua 'require("dial.map").manipulate("increment", "gvisual")', mode = 'x'  },
+    { 'decrement <cword>', 'g<c-x>', lua 'require("dial.map").manipulate("decrement", "gvisual")', mode = 'x'  },
   },
 }
