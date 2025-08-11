@@ -69,6 +69,34 @@ local function setup()
       end
     } }
   })
+
+  augroup('EXRC', {
+    { {'VimEnter', 'DirChanged'}, { desc = 'Check for and load .nvim.lua files',
+      callback = function()
+        vim.notify('searching for .nvim.lua file', vim.log.levels.TRACE)
+        local exrc_file = vim.fn.findfile('.nvim.lua', vim.fn.getcwd(0) .. ';')
+        if vim.fn.filereadable(exrc_file) == 1 then
+          local chunk, load_err = loadfile(exrc_file) -- load_err will contain message if loadfile fails
+          if not chunk then
+            vim.notify(
+              "Error loading (syntax/compilation) " .. exrc_file .. ": " .. tostring(load_err),
+              vim.log.levels.ERROR)
+            return
+          end
+
+          local success, run_err = pcall(chunk) -- run_err will contain message if chunk() fails
+          if not success then
+            -- Handle runtime errors during execution of the chunk
+            vim.notify(
+              "Error running " .. exrc_file .. ": " .. tostring(run_err),
+              vim.log.levels.ERROR)
+            return
+          end
+          vim.notify("Sourced " .. exrc_file, vim.log.levels.TRACE)
+        end
+      end
+    } }
+  })
 end
 
 return {
