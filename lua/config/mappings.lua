@@ -253,6 +253,8 @@ function M.visual(f, _opts)
   assert(bottom[1] > 0, '> mark not set')
 
   local range = {
+    top, -- allow table to be used and unpacked as a tuple
+    bottom,
     top = top,
     bottom = bottom,
     selection_type = selection_type,
