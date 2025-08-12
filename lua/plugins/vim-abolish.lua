@@ -125,6 +125,7 @@ return {
     )
   end,
   keys = {
-    { '<leader>S', ':Supplant<cr>', mode = { 'x' }, desc = 'Supplant with Template' }
+    { 'R', ":<c-u>keeppatterns '<,'>S/", mode = { 'x' }, desc = 'Subvert In Selected Range', silent = false },
+    { '<leader>S', ':Supplant<cr>', mode = { 'x' }, desc = 'Supplant with Template' },
   },
 }
