@@ -33,22 +33,24 @@ function M.try(result, resolve, reject)
 end
 
 ---prompt for input then call `callback` on the response
----@param _prompt string | { prompt: string|table, cancelreturn: string? }
----@param callback fun(response: string)
-function M.prompt(_prompt, callback)
-  assert(_prompt, "prompt required")
-  assert(callback, "callback required")
+---@param opts { [1]:string|string[]|table, [2]:fun(response: string), use_snacks:boolean  }
+function M.prompt(opts)
+  assert(opts, 'prompt() :: opts required')
+  assert(type(opts) == 'table', 'prompt() :: opts must be a table')
+  opts = vim.tbl_deep_extend('keep', opts, { use_snacks = false })
+  local _prompt, callback = unpack(opts)
+  assert(_prompt,  "prompt() :: prompt required")
+  assert(callback, "prompt() :: callback required")
 
-  if package.loaded['snacks.input'] then
-    local p = _prompt.prompt or _prompt
-    if type(p) == 'table' then
-      p = table.concat(p, '\n')
+  if opts.use_snacks then
+    local ok, input = pcall(require, 'snacks.input')
+    if ok then
+      input({ prompt = type(_prompt) == 'table' and table.concat(_prompt, '\n') or _prompt }, callback)
+      return
     end
-    require('snacks.input')({ prompt=p }, callback)
-    return
+    vim.notify('Snacks.input is not enabled; falling back', vim.log.levels.WARN)
   end
 
-  local opts
   if type(_prompt) == 'string' then
     opts = { prompt = _prompt, cancelreturn = '<CANCELRETURN>' }
   else
@@ -286,6 +288,67 @@ end
 function M.nilif(a, b)
   if a == nil or a == b then return nil end
   return a
+end
+
+---return a partially applied function
+---@param fn function
+---@return function
+function M.partial(fn)
+  return function(...)
+    local args = ...
+    return function(...)
+      fn(args, ...)
+    end
+  end
+end
+
+---wrapper to use fidget to notify or fallback to vim.notify
+---@param msg string
+---@param level? integer|string vim log level
+---@param opts? table
+function M.notify(msg, level, opts)
+  local ok, notification = pcall(require, 'fidget.notification')
+  local notify = ok and notification.notify or vim.notify
+  notify(msg, level, opts)
+end
+
+---yank the result of `cb` (or its expansion if string) into unnamed register
+---and notify if successful
+---@param cb fun():(string|string[])|string|string[] function to call or string to expand and yank
+---@param msg string? message to display on success
+function M.yank(cb, msg)
+  return function()
+    local text
+    local _type = type(cb)
+    if _type == 'function' then
+      text = cb()
+    elseif _type == 'string' then
+      text = vim.fn.expand(cb)
+    else
+      error('yank: invalid type: expected string|function, got: ' .. _type)
+    end
+    fun.setreg('"', text)
+    if msg then
+      M.notify(msg, vim.log.levels.INFO, { key = 'YANK' })
+    end
+  end
+end
+
+---change working directory to `dir` and notify user if successful
+---@param path path directory to change to
+function M.cd(path)
+  local dir = vim.fn.expand(path)
+  local stat, err = vim.uv.fs_stat(dir)
+  if not stat then
+    vim.notify(err or ('unable to find: ' .. dir), vim.log.levels.ERROR)
+    return
+  elseif stat.type ~= 'directory' then
+    vim.notify(('"%s" is not a directory'):format(dir), vim.log.levels.ERROR)
+    return
+  end
+  vim.cmd.cd(dir)
+
+  M.notify('cd -> ' .. vim.fn.getcwd(), vim.log.levels.INFO, { key = 'CD' })
 end
 
 return M

@@ -1,7 +1,7 @@
 local api = vim.api
 local fun = vim.fn
 local util = require('util')
-local prompt, nilif = util.prompt, util.nilif
+local prompt, nilif, partial, notify, yank = util.prompt, util.nilif, util.partial, util.notify, util.yank
 
 local function prefix(p)
   assert(p, 'argument required')
@@ -319,10 +319,10 @@ end
 ---replace all occurrences of `<cword>` with `<prompt>` in current buffer
 local function cword_prompt_replace()
   M.cword(function(word)
-    prompt('Replace: ', function(response)
+    prompt {'Replace: ', function(response)
       if not response then return end
       M.replace(1, '$', '\\<' .. word .. '\\>', response)
-    end)
+    end }
   end)
 end
 
@@ -330,10 +330,10 @@ end
 local function cword_operator_prompt_replace()
   M.cword(function(word)
     M.operator(function(positions)
-      prompt('Replace: ', function(response)
+      prompt { 'Replace: ', function(response)
         if not response then return end
         M.replace(positions.top, positions.bottom, '\\<' .. word .. '\\>', response)
-      end)
+      end }
     end, {jump = 'origin'})
   end)
 end
@@ -376,45 +376,45 @@ local function visual_replace_prompt()
       search_pattern = escaped
     end
 
-    prompt('Replace: ', function(response)
+    prompt { 'Replace: ', function(response)
       M.replace(1, '$', search_pattern, response)
-    end)
+    end }
   end, {jump = 'origin'})
 end
 
 ---append the lines in `<motion>` with `<prompt>`
 local function operator_append_prompt()
   M.operator(function(positions)
-    prompt('Append: ', function(response)
+    prompt { 'Append: ', function(response)
       M.replace(positions.top, positions.bottom, '$', response)
-    end)
+    end }
   end, {jump = 'origin'})
 end
 
 ---append the selected lines with `<prompt>`
 local function visual_append_prompt()
   M.visual(function(range)
-    prompt('Append: ', function(response)
+    prompt { 'Append: ', function(response)
       M.replace(range.top[1], range.bottom[1], '$', response)
-    end)
+    end }
   end, {resume_visual = true})
 end
 
 ---prepend  the selected lines with `<prompt>`
 local function visual_prepend_prompt()
   M.visual(function(range)
-    prompt('Prepend: ', function(response)
+    prompt { 'Prepend: ', function(response)
       M.replace(range.top[1], range.bottom[1], '^\\s*\\zs', response)
-    end)
+    end }
   end, {resume_visual = true})
 end
 
 ---prepend the lines in `<motion>` with `<prompt>`
 local function operator_prepend_prompt()
   M.operator(function(positions)
-    prompt('Prepend: ', function(response)
+    prompt { 'Prepend: ', function(response)
       M.replace(positions.top, positions.bottom, '^\\s*\\zs', response)
-    end)
+    end }
   end, {jump = 'origin'})
 end
 
@@ -455,12 +455,6 @@ local function echo(msg, fn)
   end
 end
 
-local function yank(fn)
-  return function()
-    fun.setreg('"', fn())
-  end
-end
-
 local function repeat_edit_on_next_line()
   local cursor = api.nvim_win_get_cursor(0)
   local row, col = unpack(cursor)
@@ -491,6 +485,8 @@ local function buf_delete(bang)
   end
   vim.cmd(('bp|bwipeout%s #'):format(sbang))
 end
+
+local cd = partial(util.cd)
 
 function M.setup()
   M.map {
@@ -539,8 +535,8 @@ function M.setup()
         end
       },
       { 'Run previous :command', leader ':', '@:' },
-      { 'CD to <cfile> dir', leader '.', cmd "cd %:p:h | echo 'cd -> '.getcwd()" },
-      { 'CD up one dir', leader ',', cmd "cd .. | echo 'cd -> '.getcwd()" },
+      { 'CD to <cfile> dir', leader '.', cd '%:p:h' },
+      { 'CD up one dir',     leader ',', cd '..' },
       { 'Search <cword> without moving', leader '*', cmd 'let @/ = expand(\"<cword>\") .. \"\\\\>\" | set hlsearch' },
       { '<- Pasted Text', leader '<', 'V`]<' },
       { '-> Pasted Text', leader '>', 'V`]>' },
@@ -583,18 +579,12 @@ function M.setup()
       { 'Quit! (close window)', leader 'Q', cmd 'q!' },
       { 'Save file', leader 'w', cmd 'w' },
       { 'Toggle ConcealCursor', leader 'ot', toggle_concealcursor },
-      { 'Yank File Contents', leader 'yy',
-        echo('Yanked File Contents',
-          yank(function () return api.nvim_buf_get_lines(0, 0, -1, true) end)) },
-      { 'Yank File Name', leader 'yf',
-        echo('Yanked File Name',
-          yank(function () return fun.expand('%:t:r') end)) },
-      { 'Yank File NAME', leader 'yF',
-        echo('Yanked File NAME',
-          yank(function () return fun.expand('%:t') end)) },
-      { 'Yank File Path (absolute)', leader 'yp',
-        echo('Yanked File Path (absolute)',
-          yank(function () return fun.expand('%:p') end)) },
+      { 'Yank File Contents', leader 'yy', yank(
+        function () return api.nvim_buf_get_lines(0, 0, -1, true) end,
+        'Yanked File Contents') },
+      { 'Yank File Name',            leader 'yf', yank('%:t:r', 'Yanked File Name') },
+      { 'Yank File NAME',            leader 'yF', yank('%:t',   'Yanked File NAME') },
+      { 'Yank File Path (absolute)', leader 'yp', yank('%:p',   'Yanked File Path (absolute)') },
       { 'Yank Quote Register to System Clipboard', leader 'y<cr>', cmd 'let @+=@" | echo "Transfered To Clipboard"' },
       { 'Search Forward', 'n',
         function () local keys = { 'N', 'n' } return keys[(vim.v.searchforward+1)] end,
