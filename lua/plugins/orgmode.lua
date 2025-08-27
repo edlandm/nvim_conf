@@ -1,3 +1,5 @@
+local util = require('util')
+
 ---@class org.conf
 ---@field open org.open.conf
 
@@ -120,8 +122,7 @@ function org.fn.cd_to_pwd()
     return
   end
 
-  vim.cmd({ cmd = 'cd', args = { vim.fn.expand(pwd) } })
-  print('cd -> ' .. pwd)
+  util.cd(pwd)
 end
 
 ---create hard link from current file to :PWD:/index.org
