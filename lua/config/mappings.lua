@@ -613,6 +613,7 @@ function M.setup()
       { 'Insert CWD',                         '<c-r><c-d>', "<c-r>=getcwd()<cr>" },
       { '<- Current Line',                    '<c-d>',      '<c-o><<' },
       { '-> Current Line',                    '<c-t>',      '<c-o>>>' },
+      { 'Insert Unnamed Register',            '<c-space>',  '<c-r>"' },
       { '', '', '' },
     },
     { mode = 'x', -- VISUAL MODE ===============================================
