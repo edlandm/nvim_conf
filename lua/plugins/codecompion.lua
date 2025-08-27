@@ -15,13 +15,15 @@ return {
       },
     },
     adapters = {
-      anthropic = function()
-        return require('codecompanion.adapters').extend('anthropic', {
-          env = {
-            api_key = 'cmd:cat ' .. vim.fn.expand('~/.local/claud.api.key')
-          },
-        })
-      end,
+      http = {
+        anthropic = function()
+          return require('codecompanion.adapters').extend('anthropic', {
+            env = {
+              api_key = 'cmd:cat ' .. vim.fn.expand('~/.local/claud.api.key')
+            },
+          })
+        end,
+      },
     },
   },
   specs = {
