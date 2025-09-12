@@ -4,12 +4,6 @@ local M = package.loaded[name]
 
 local step_sizes = { 1, 5, 10 }
 
-local default_opts = {
-  vertical_step_size = 5,
-  horizontal_step_size = 5,
-  resize_mode = {},
-}
-
 -- expand_up expands the window upwards by M.vertical_step_size.
 function M.expand_up()
 	local above_win_number = vim.fn.winnr("k")
@@ -132,32 +126,17 @@ function M.decrease_horizontal_step_size()
   update_step_size('horizontal', 'negative')
 end
 
----use layers.nvim to create a window-resize mode
----@param opts { enable_mapping?:string, keymaps?:table }?
-function M.create_resize_mode(opts)
-  local ok, layers = pcall(require, 'layers')
-  if not ok then
-    vim.notify('resize.nvim :: missing dependency: debugloop/layers.nvim', vim.log.levels.ERROR, {})
-    return
-  end
-  local RESIZE_MODE = layers.mode.new()
-  RESIZE_MODE:auto_show_help()
+function M.exit_resize_mode()
+  pcall(M.RESIZE_MODE.deactivate, M.RESIZE_MODE)
+end
 
-  local function enter_resize_mode()
-    if not RESIZE_MODE:active() then
-      RESIZE_MODE:activate()
-    end
-  end
-
-  local function exit_resize_mode()
-    pcall(RESIZE_MODE.deactivate, RESIZE_MODE)
-  end
-
-  opts = vim.tbl_deep_extend('keep', opts or {}, {
-    enable_mapping = '<c-w><c-r>',
+local default_opts = {
+  vertical_step_size = 5,
+  horizontal_step_size = 5,
+  resize_mode = {
     keymaps = {
       n = {
-        { '<esc>', exit_resize_mode, { desc = 'Exit Resize-Mode' } },
+        { '<esc>', M.exit_resize_mode, { desc = 'Exit Resize-Mode' } },
         { 'h', M.expand_left,  { desc = 'Expand Left'  } },
         { 'l', M.expand_right, { desc = 'Expand Right' } },
         { 'j', M.expand_down,  { desc = 'Expand Down'  } },
@@ -172,20 +151,25 @@ function M.create_resize_mode(opts)
         { ')', M.increase_vertical_step_size, { desc = 'Increase Vert Step Size' } },
       },
     }
-  })
-
-  vim.api.nvim_set_keymap('n', opts.enable_mapping, '', {
-    desc = 'Enable Resize-Mode', callback = enter_resize_mode
-  })
-  RESIZE_MODE:keymaps(opts.keymaps)
-end
+  },
+}
 
 function M.setup(opts)
+  print 'resize.setup'
   M.opts = vim.tbl_deep_extend('keep', opts or {}, default_opts)
 
-  if opts.resize_mode ~= false then
-    M.create_resize_mode(opts.resize_mode)
+  if not M.opts.resize_mode then return end
+
+  -- create resize mode ======================================================
+  local ok, layers = pcall(require, 'layers')
+  if not ok then
+    vim.notify('resize.nvim :: missing dependency: debugloop/layers.nvim', vim.log.levels.ERROR, {})
+    return
   end
+
+  M.RESIZE_MODE = layers.mode.new()
+  M.RESIZE_MODE:auto_show_help()
+  M.RESIZE_MODE:keymaps(M.opts.resize_mode.keymaps)
 end
 
 return M

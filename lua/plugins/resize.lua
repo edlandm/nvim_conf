@@ -6,4 +6,7 @@ return {
     'debugloop/layers.nvim',
   },
   opts = {},
+  keys = {
+    { '<c-w><c-r>', '<Plug>(ResizeMode)', { desc = 'Resize Mode' }},
+  },
 }
