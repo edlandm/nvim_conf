@@ -155,7 +155,6 @@ local default_opts = {
 }
 
 function M.setup(opts)
-  print 'resize.setup'
   M.opts = vim.tbl_deep_extend('keep', opts or {}, default_opts)
 
   if not M.opts.resize_mode then return end
