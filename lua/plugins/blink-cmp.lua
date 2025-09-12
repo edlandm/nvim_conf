@@ -14,7 +14,6 @@ return {
     'xzbdmw/colorful-menu.nvim', -- this makes it prettier
     -- sources
     'L3MON4D3/LuaSnip',
-    'saadparwaiz1/cmp_luasnip',
     'niuiic/blink-cmp-rg.nvim',
     'Exafunction/windsurf.nvim'
   },
@@ -28,7 +27,7 @@ return {
     -- for keymap, all values may be string | string[]
     -- use an empty table to disable a keymap
     keymap = {
-      preset = 'default',
+      preset = 'none',
       ['<C-y>'] = { 'select_and_accept', 'fallback' },
 
       ['<C-n>']  = { 'select_next', 'fallback' },
@@ -39,11 +38,31 @@ return {
 
       ['<C-Right>'] = { 'snippet_forward',  'fallback' },
       ['<C-Left>']  = { 'snippet_backward', 'fallback' },
-      ['<Tab>']     = {},
-      ['<S-Tab>']   = {},
+      ['<Tab>'] = {
+        function(cmp)
+          if not cmp.snippet_active() then return end
+          local ok, ls = pcall(require, 'luasnip')
+          if ok and ls and ls.choice_active() then
+            ls.change_choice(1)
+            return true
+          end
+        end,
+        'fallback',
+      },
+      ['<S-Tab>'] = {
+        function(cmp)
+          if not cmp.snippet_active() then return end
+          local ok, ls = pcall(require, 'luasnip')
+          if ok and ls and ls.choice_active() then
+            ls.change_choice(-1)
+            return true
+          end
+        end,
+        'fallback',
+      },
 
-      ['<C-s>']     = { function(cmp) cmp.show({ providers = { 'snippets' } }) end },
-      ['<C-space>'] = {},
+      -- ['<C-s>']     = { function(cmp) cmp.show({ providers = { 'snippets' } }) end },
+      ['<C-space>'] = false,
     },
 
     completion = {
@@ -88,6 +107,7 @@ return {
         local providers = { 'path', 'lsp', 'buffer', 'ripgrep' }
         if vim.bo.filetype then
           table.insert(providers, 'lazydev')
+          table.insert(providers, 'snippets')
         end
         return providers
       end,
@@ -201,7 +221,7 @@ return {
 
     fuzzy = {
       -- frencency tracks the most recently/frequently used items and boosts the score of the item
-      use_frecency = true,
+      frecency = { enabled = true },
       -- proximity bonus boosts the score of items with a value in the buffer
       use_proximity = true,
 
