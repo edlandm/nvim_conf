@@ -247,7 +247,7 @@ return {
   },
   keys = make_mappings {
     -- picker ---------------------------------------------------------------
-    -- favor <c-p> to use fff picker, however <tab>f is a backup if fff breaks
+    { 'Pick Files',             '<c-p>',     run(pick 'files') },
     { 'Pick Files',             tab 'f',     run(pick 'files') },
     { 'Pick Directories',       tab '.',     run(pick 'directories') },
     { 'Pick Resume',            tab '<tab>', run(pick 'resume') },
