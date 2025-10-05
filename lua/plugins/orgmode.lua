@@ -595,8 +595,8 @@ return {
       org_todo_keyword_faces = {
         TODO      = ':foreground red :weight bold',
         DOING     = ':foreground lightgreen :underline on',
-        WAITING   = ':foreground orange',
-        DELEGATED = ':foreground orange :slant italic',
+        WAITING   = ':foreground yellow',
+        DELEGATED = ':foreground yellow :slant italic',
         DONE      = ':foreground green',
         CANCELLED = ':foreground grey :slant italic',
       },
