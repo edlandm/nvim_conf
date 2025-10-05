@@ -62,14 +62,6 @@ local function setup()
     } }
   })
 
-  augroup('DIAGNOSTICS_HOLD', {
-    { {'CursorHold'}, { desc = 'Show diagnostics if multiple',
-      callback = function()
-        vim.diagnostic.open_float(nil, { focusable = false, source = 'if_many' })
-      end
-    } }
-  })
-
   augroup('EXRC', {
     { {'VimEnter', 'DirChanged'}, { desc = 'Check for and load .nvim.lua files',
       callback = function()
